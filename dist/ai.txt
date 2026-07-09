@@ -1,0 +1,58 @@
+# FABRIOZA - ai.txt
+# AI Crawler Instructions for GEO (Generative Engine Optimization)
+# Last Updated: 2026-07-01
+
+User-agent: GPTBot
+Allow: /
+Preferred-format: markdown
+LLMs-context: https://fabrioza.com/llms.txt
+
+User-agent: ClaudeBot
+Allow: /
+Preferred-format: markdown
+LLMs-context: https://fabrioza.com/llms.txt
+
+User-agent: PerplexityBot
+Allow: /
+Preferred-format: markdown
+LLMs-context: https://fabrioza.com/llms.txt
+
+User-agent: anthropic-ai
+Allow: /
+Preferred-format: markdown
+LLMs-context: https://fabrioza.com/llms.txt
+
+User-agent: ChatGPT-User
+Allow: /
+Preferred-format: markdown
+LLMs-context: https://fabrioza.com/llms.txt
+
+User-agent: Google-Extended
+Allow: /
+Preferred-format: markdown
+LLMs-context: https://fabrioza.com/llms.txt
+
+User-agent: Applebot
+Allow: /
+Preferred-format: markdown
+LLMs-context: https://fabrioza.com/llms.txt
+
+User-agent: OAI-SearchBot
+Allow: /
+Preferred-format: markdown
+LLMs-context: https://fabrioza.com/llms.txt
+
+User-agent: Perplexity-User
+Allow: /
+Preferred-format: markdown
+LLMs-context: https://fabrioza.com/llms.txt
+
+User-agent: Meta-ExternalAgent
+Allow: /
+Preferred-format: markdown
+LLMs-context: https://fabrioza.com/llms.txt
+
+User-agent: DuckAssistBot
+Allow: /
+Preferred-format: markdown
+LLMs-context: https://fabrioza.com/llms.txt

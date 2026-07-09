@@ -1,0 +1,22 @@
+services:
+  web:
+    build: .
+    container_name: fabrioza-web
+    restart: unless-stopped
+    # Contact-form SMTP (sends through the cPanel mail server).
+    # Set SMTP_PASS in a .env file next to this compose file on the server:
+    #   echo 'SMTP_PASS=the-mailbox-password' > .env
+    environment:
+      SMTP_HOST: ${SMTP_HOST:-smtp.hostinger.com}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:-sales@fabrioza.com}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_TO: ${MAIL_TO:-sales@fabrioza.com}
+    ports:
+      # Put your SSL-terminating reverse proxy (Caddy / nginx / Traefik) in
+      # front of this port. The proxy MUST forward X-Forwarded-Proto: https
+      # (all three do by default) - dist/.htaccess uses it to avoid a
+      # redirect loop on the HTTPS 301.
+      # Override the host port per machine via .env (WEB_PORT=8085 on the
+      # VPS, where 8080 is taken) so git pull never conflicts.
+      - "${WEB_PORT:-8080}:80"

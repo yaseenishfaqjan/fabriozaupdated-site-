@@ -1,0 +1,66 @@
+# ============================================
+# FABRIOZA - robots.txt
+# SEO + AI Crawler Optimized
+# Updated: 2026-07-01
+# ============================================
+
+# --- Main Crawlers ---
+User-agent: *
+Allow: /
+Allow: /images/
+Allow: /videos/
+Allow: /blog/
+Allow: /custom-*/
+Disallow: /api/
+Disallow: /cgi-bin/
+Disallow: /private/
+Disallow: /admin/
+Disallow: /tmp/
+Disallow: /*.pdf$
+
+# --- AI Crawlers (GEO Optimization) ---
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: BingBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+# --- LLMs.txt Pointer (AI Content Preference) ---
+LLMs: https://fabrioza.com/llms.txt
+AI-Content-Preference: https://fabrioza.com/llms.txt
+
+# --- Sitemap ---
+Sitemap: https://fabrioza.com/sitemap.xml

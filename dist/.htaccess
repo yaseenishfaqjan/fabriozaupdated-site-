@@ -1,0 +1,132 @@
+# ============================================
+# FABRIOZA - Apache Configuration
+# SEO-Critical: redirects, routing, compression, caching
+#
+# IMPORTANT: All redirects below use mod_rewrite (RewriteRule), never
+# mod_alias (Redirect / RedirectMatch). In .htaccess context Apache runs
+# ALL mod_rewrite rules before mod_alias, regardless of file order, so
+# mixing the two silently disables RedirectMatch whenever any RewriteRule
+# also matches the request (previous bug: the SPA fallback and the
+# directory-serve rule swallowed /home, /process, /about, /products, etc.
+# before their RedirectMatch 301s ever ran). Rule order inside the single
+# chain below IS the precedence order - keep redirects above routing.
+# ============================================
+
+Options -Indexes
+DirectoryIndex index.html
+
+# Serve folder pages without mod_dir's automatic /page -> /page/ 301
+# (canonical URLs on this site have NO trailing slash)
+<IfModule mod_dir.c>
+  DirectorySlash Off
+</IfModule>
+
+# Real 404 page (used by the R=404 rule below and for genuinely missing files)
+ErrorDocument 404 /404.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # --- 1. Force HTTPS + strip www ---
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+
+  # X-Forwarded-Proto check keeps this from looping when running behind a
+  # reverse proxy / load balancer that terminates SSL (VPS-Docker setups).
+  # localhost is exempt so the container can be tested/previewed locally.
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:[0-9]+)?$ [NC]
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+  # --- 2. /home was indexed as a duplicate of the homepage ---
+  RewriteRule ^home/?$ https://fabrioza.com/ [R=301,L]
+
+  # --- 3. Homepage anchor sections wrongly exposed as top-level paths ---
+  # The live nav already links to /#how-it-works, /#factory, /#faq; these
+  # catch previously indexed URLs and old bookmarks. NE keeps the "#" literal.
+  RewriteRule ^process/?$ https://fabrioza.com/#how-it-works [R=301,NE,L]
+  RewriteRule ^factory/?$ https://fabrioza.com/#factory      [R=301,NE,L]
+  RewriteRule ^faq/?$     https://fabrioza.com/#faq          [R=301,NE,L]
+
+  # --- 4. Old thin "meta refresh" stub pages -> single-hop server 301s ---
+  # /about, /contact, /products, /moq exist on disk only as client-side
+  # redirect stubs; crawlers flagged them as "Page with redirect".
+  RewriteRule ^about/?$    https://fabrioza.com/#factory    [R=301,NE,L]
+  RewriteRule ^contact/?$  https://fabrioza.com/#contact    [R=301,NE,L]
+  RewriteRule ^products/?$ https://fabrioza.com/#catalog    [R=301,NE,L]
+  RewriteRule ^moq/?$      https://fabrioza.com/#calculator [R=301,NE,L]
+
+  # --- 4b. /fashion-wear and /premium-fashion removed (client design conflict) ---
+  RewriteRule ^fashion-wear/?$ /femme-collection [R=301,L]
+  RewriteRule ^premium-fashion/?$ /femme-collection [R=301,L]
+
+  # --- 5. Legacy blog slugs superseded by consolidated articles ---
+  RewriteRule ^blog/how-to-find-clothing-manufacturer/?$      /blog/how-to-find-reliable-clothing-manufacturer [R=301,L]
+  RewriteRule ^blog/oem-vs-odm-vs-private-label/?$            /blog/oem-odm-clothing-manufacturer [R=301,L]
+  RewriteRule ^blog/sports-team-uniform-manufacturing-guide/?$ /blog/team-uniform-manufacturer [R=301,L]
+  RewriteRule ^blog/clothing-manufacturing-costs-breakdown/?$ /blog/clothing-manufacturing-costs-guide [R=301,L]
+  RewriteRule ^blog/how-to-start-clothing-brand-2025/?$       /blog/how-to-start-clothing-brand [R=301,L]
+  RewriteRule ^blog/sustainable-fashion-manufacturing-guide/?$ /blog/sustainable-clothing-manufacturer-pakistan [R=301,L]
+
+  # --- 7. Strip ".../index.html" from direct requests ---
+  # Old internal links pointed at /page/index.html; canonicalize them.
+  # THE_REQUEST (the raw client request line) guard prevents a loop with
+  # the internal directory-serve rewrite in step 9.
+  RewriteCond %{THE_REQUEST} \s/([^?\s]*)index\.html[?\s]
+  RewriteRule ^(.*?)/?index\.html$ /$1 [R=301,L]
+
+  # --- 8. Strip trailing slashes (canonical URLs have none; root exempt) ---
+  # Must run BEFORE the directory-serve and SPA-fallback rules, otherwise
+  # /page/ and /page both answer 200 as duplicate URLs. No !-d condition:
+  # real pages ARE directories here (folder/index.html structure).
+  RewriteCond %{REQUEST_URI} !^/$
+  RewriteCond %{REQUEST_URI} !^/api/
+  RewriteCond %{REQUEST_URI} ^/(.+)/$
+  RewriteRule ^ /%1 [R=301,L]
+
+  # --- 9. Serve folder/index.html for extensionless page URLs (200, no hop) ---
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteCond %{REQUEST_FILENAME}/index.html -f
+  RewriteRule ^(.*[^/])$ $1/index.html [L]
+
+  # --- 10. React BrowserRouter SPA fallback ---
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteCond %{REQUEST_URI} !^/api/
+  RewriteCond %{REQUEST_URI} !\.php$
+  # Missing static assets must 404, not silently serve the homepage
+  RewriteCond %{REQUEST_URI} !\.(jpg|jpeg|png|gif|webp|svg|ico|css|js|mjs|map|txt|xml|json|woff|woff2|ttf|eot|mp4|webm|pdf)$ [NC]
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# --- Compression (Gzip) ---
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE application/rss+xml application/xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# --- Browser Caching for Static Assets ---
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType application/json "access plus 1 day"
+  ExpiresByType text/html "access plus 1 day"
+</IfModule>
+
+# --- Security Headers ---
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-XSS-Protection "1; mode=block"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
