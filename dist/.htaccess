@@ -54,6 +54,7 @@ ErrorDocument 404 /404.html
   # /about, /contact, /products, /moq exist on disk only as client-side
   # redirect stubs; crawlers flagged them as "Page with redirect".
   RewriteRule ^about/?$    https://fabrioza.com/#factory    [R=301,NE,L]
+  RewriteRule ^services/?$ /what-we-make                    [R=301,L]
   RewriteRule ^contact/?$  https://fabrioza.com/#contact    [R=301,NE,L]
   RewriteRule ^products/?$ https://fabrioza.com/#catalog    [R=301,NE,L]
   RewriteRule ^moq/?$      https://fabrioza.com/#calculator [R=301,NE,L]
@@ -91,15 +92,12 @@ ErrorDocument 404 /404.html
   RewriteCond %{REQUEST_FILENAME}/index.html -f
   RewriteRule ^(.*[^/])$ $1/index.html [L]
 
-  # --- 10. React BrowserRouter SPA fallback ---
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_FILENAME} !-l
-  RewriteCond %{REQUEST_URI} !^/api/
-  RewriteCond %{REQUEST_URI} !\.php$
-  # Missing static assets must 404, not silently serve the homepage
-  RewriteCond %{REQUEST_URI} !\.(jpg|jpeg|png|gif|webp|svg|ico|css|js|mjs|map|txt|xml|json|woff|woff2|ttf|eot|mp4|webm|pdf)$ [NC]
-  RewriteRule . /index.html [L]
+  # --- 10. No SPA fallback (removed 2026-07-09) ---
+  # Every legitimate page is a real static file (folder/index.html); the
+  # React app's only routes (/ and /privacy) are served statically. The old
+  # catch-all served the homepage shell with a 200 for ANY unknown URL,
+  # which Bing flagged as thin/insufficient content (soft-404s, e.g.
+  # /services). Unknown paths now fall through to the branded 404 page.
 </IfModule>
 
 # --- Compression (Gzip) ---
