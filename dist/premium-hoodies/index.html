@@ -1203,6 +1203,14 @@
  ]
 }
 </script>
+<style>
+/* Mobile header: hide text nav (template CTA stays), keep logo + Get Quote on one clean row */
+@media(max-width:900px){
+  .header-inner nav, header nav{display:none !important}
+  .header-inner{padding:14px 0 !important}
+  .header-inner .logo{font-size:20px !important;white-space:nowrap}
+}
+</style>
 </head>
 <body>
 
@@ -1215,7 +1223,6 @@
       <a href="/sportswear-catalog">Sportswear</a>
       <a href="/streetwear-collection">Streetwear</a>
       <a href="/pricing">Pricing</a>
-      <a href="/#contact" class="header-cta">Get Quote</a>
     </nav>
     <a href="/#contact" class="header-cta">Get Quote</a>
   </div>
