@@ -59,9 +59,12 @@ ErrorDocument 404 /404.html
   RewriteRule ^products/?$ https://fabrioza.com/#catalog    [R=301,NE,L]
   RewriteRule ^moq/?$      https://fabrioza.com/#calculator [R=301,NE,L]
 
-  # --- 4b. /fashion-wear and /premium-fashion removed (client design conflict) ---
-  RewriteRule ^fashion-wear/?$ /femme-collection [R=301,L]
-  RewriteRule ^premium-fashion/?$ /femme-collection [R=301,L]
+  # --- 4b. Removed womenswear pages (client design conflict / catalog reset).
+  # All 301 to the collections hub; retarget if replacements are built. ---
+  RewriteRule ^fashion-wear/?$ /what-we-make [R=301,L]
+  RewriteRule ^premium-fashion/?$ /what-we-make [R=301,L]
+  RewriteRule ^femme-collection/?$ /what-we-make [R=301,L]
+  RewriteRule ^luxury-blazers/?$ /what-we-make [R=301,L]
 
   # --- 5. Legacy blog slugs superseded by consolidated articles ---
   RewriteRule ^blog/how-to-find-clothing-manufacturer/?$      /blog/how-to-find-reliable-clothing-manufacturer [R=301,L]
