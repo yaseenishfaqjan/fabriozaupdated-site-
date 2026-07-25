@@ -10,13 +10,15 @@ Allow: /
 Allow: /images/
 Allow: /videos/
 Allow: /blog/
-Allow: /custom-*/
+Allow: /custom-*
 Disallow: /api/
 Disallow: /cgi-bin/
 Disallow: /private/
 Disallow: /admin/
 Disallow: /tmp/
 Disallow: /*.pdf$
+Disallow: /?s=
+Disallow: /*?s=
 
 # --- AI Crawlers (GEO Optimization) ---
 User-agent: GPTBot
