@@ -16,6 +16,39 @@
 <meta property="og:image" content="https://fabrioza.com/images/fabrioza-logo.jpg">
 <meta property="og:site_name" content="FABRIOZA">
 
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "Can I order just 20 pieces to test quality first?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Yes. Our 20-piece trial tier exists exactly for this - 20 finished garments of your design from the same production line, before you commit to the standard 50-piece MOQ. See fabrioza.com/sample-order."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Do small trial orders get the same quality control?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Yes - 20-piece trial orders get the same 4-stage QC as a 5,000-piece run: fabric inspection, in-line checks, measurement audit, and pre-shipment inspection with photos."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Does my trial order cost count toward a bulk order?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Yes. When you scale the same design to bulk, the trial cost is credited toward your bulk invoice - details come with your quote."
+   }
+  }
+ ]
+}
+</script>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#F7F7F5;color:#1A1A1A;line-height:1.6}
@@ -130,7 +163,7 @@ td{padding:14px 16px;vertical-align:middle}
         <li><a href="/">Home</a></li>
         <li><a href="/#catalog">Products</a></li>
         <li><a href="/#comparison">Compare</a></li>
-        <li><a href="/pricing/">Pricing</a></li>
+        <li><a href="/pricing">Pricing</a></li>
         <li><a href="/#contact">Contact</a></li>
       </ul>
     </nav>
@@ -152,6 +185,7 @@ td{padding:14px 16px;vertical-align:middle}
       <span>Hoodies from $12.00</span>
       <span>Uniforms from $9.00</span>
       <span>Caps from $4.50</span>
+      <span>Trial orders from 20 pcs</span>
     </div>
   </div>
 </section>
@@ -178,6 +212,15 @@ td{padding:14px 16px;vertical-align:middle}
           </tr>
         </thead>
         <tbody>
+          <tr style="background:rgba(74,124,89,0.12);border-left:3px solid #4A7C59">
+            <td><span class="product-name">Trial Order (Any Product)</span><br><small style="color:#6B6B6B">20 pcs to test quality before bulk &mdash; <a href="/sample-order" style="color:#4A7C59;font-weight:600">how it works</a></small></td>
+            <td class="moq">20 pcs</td>
+            <!-- TODO(fabrioza): trial-tier per-unit prices - quoted per design until finalized -->
+            <td class="price" style="font-size:13px">Quoted in 24h</td>
+            <td class="moq">Credited at bulk</td>
+            <td class="moq">2-3 weeks</td>
+            <td class="check">Same 4-stage QC</td>
+          </tr>
           <tr class="highlight">
             <td><span class="product-name">Heavyweight T-Shirt</span><br><small style="color:#6B6B6B">180-220gsm cotton, oversized/boxy fit</small></td>
             <td class="moq">50 pcs</td>
@@ -409,6 +452,30 @@ td{padding:14px 16px;vertical-align:middle}
       <div style="display:flex;align-items:center;gap:12px;background:#fff;padding:14px 20px;border-radius:8px">
         <span style="color:#4A7C59;font-weight:700;font-size:18px">✓</span>
         <span style="font-size:14px">NDA & IP protection — your designs are safe</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Trial / MOQ FAQ -->
+<section class="section" style="background:#fff">
+  <div class="container">
+    <div class="section-title">
+      <span>FAQ</span>
+      <h2>Trial &amp; MOQ Questions</h2>
+    </div>
+    <div style="max-width:760px;margin:0 auto">
+      <div style="background:#F7F7F5;border-radius:10px;padding:20px 24px;margin-bottom:12px">
+        <h3 style="font-size:15px;margin-bottom:8px">Can I order just 20 pieces to test quality first?</h3>
+        <p style="font-size:13.5px;color:#555">Yes. Our <a href="/sample-order" style="color:#4A7C59">20-piece trial tier</a> exists exactly for this &mdash; 20 finished garments of your design from the same production line, before you commit to the standard 50-piece MOQ.</p>
+      </div>
+      <div style="background:#F7F7F5;border-radius:10px;padding:20px 24px;margin-bottom:12px">
+        <h3 style="font-size:15px;margin-bottom:8px">Do small trial orders get the same quality control?</h3>
+        <p style="font-size:13.5px;color:#555">Yes &mdash; 20-piece trial orders get the same 4-stage QC as a 5,000-piece run: fabric inspection, in-line checks, measurement audit, and pre-shipment inspection with photos.</p>
+      </div>
+      <div style="background:#F7F7F5;border-radius:10px;padding:20px 24px;margin-bottom:12px">
+        <h3 style="font-size:15px;margin-bottom:8px">Does my trial order cost count toward a bulk order?</h3>
+        <p style="font-size:13.5px;color:#555">Yes. When you scale the same design to bulk, the trial cost is credited toward your bulk invoice &mdash; details come with your quote.</p>
       </div>
     </div>
   </div>

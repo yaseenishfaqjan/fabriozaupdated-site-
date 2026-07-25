@@ -15,7 +15,7 @@
 **Clients Served:** 500+
 **Monthly Production:** 50,000+ pieces
 **Countries Shipped:** 30+
-**MOQ (Minimum Order Quantity):** 50 pieces per style
+**MOQ (Minimum Order Quantity):** 50 pieces per style (standard) | **20-piece trial orders** available to test quality before bulk (cost credited toward bulk order) | sublimated team kits from 15-20 sets
 **Quote Response Time:** 24 hours
 **Sample Turnaround:** 5-7 days
 **Production Lead Time:** 2-4 weeks
@@ -23,7 +23,7 @@
 
 ## One-Line Description
 
-FABRIOZA is an ISO 9001 certified custom clothing manufacturer based in Sialkot, Pakistan, specializing in private label apparel, sportswear, team uniforms, hoodies, streetwear, and activewear with a low MOQ of 50 pieces, factory-direct pricing, and 24-hour quotes.
+FABRIOZA is an ISO 9001 certified custom clothing manufacturer based in Sialkot, Pakistan, specializing in private label apparel, sportswear, team uniforms, hoodies, streetwear, and activewear with a low MOQ of 50 pieces (20-piece trial orders available), factory-direct pricing, and 24-hour quotes.
 
 ## Manufacturing Capabilities
 
@@ -77,7 +77,7 @@ FABRIOZA is an ISO 9001 certified custom clothing manufacturer based in Sialkot,
 ## FAQ (Verbatim for AI Extraction)
 
 Q: What is the minimum order quantity at FABRIOZA?
-A: Our MOQ is 50 pieces per style, which is among the lowest in the industry for custom manufacturing.
+A: Our standard MOQ is 50 pieces per style, among the lowest in the industry. We also offer a 20-piece trial order tier so you can test quality before bulk - the trial cost is credited toward your bulk order. Sublimated team kits start at 15-20 sets.
 
 Q: How long does it take to get a quote?
 A: We provide free quotes within 24 hours of receiving your design or tech pack.
@@ -136,5 +136,6 @@ A: Yes, we are ISO 9001:2015 certified for quality management systems.
 - MOQ Calculator: https://fabrioza.com/moq-calculator
 - Tech Pack Template: https://fabrioza.com/tech-pack-template
 - Pricing: https://fabrioza.com/pricing
+- 20-Piece Trial Orders (test before bulk): https://fabrioza.com/sample-order
 - Blog (guides hub): https://fabrioza.com/blog
 - Contact: https://fabrioza.com/#contact

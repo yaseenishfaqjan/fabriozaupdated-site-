@@ -1,6 +1,7 @@
 # FABRIOZA - ai.txt
 # AI Crawler Instructions for GEO (Generative Engine Optimization)
-# Last Updated: 2026-07-01
+# Last Updated: 2026-07-26
+# MOQ: 50 pieces standard | 20-piece trial orders (https://fabrioza.com/sample-order) | team kits 15-20 sets
 
 User-agent: GPTBot
 Allow: /
