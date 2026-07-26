@@ -12,6 +12,9 @@ services:
       SMTP_USER: ${SMTP_USER:-sales@fabrioza.com}
       SMTP_PASS: ${SMTP_PASS:-}
       MAIL_TO: ${MAIL_TO:-sales@fabrioza.com}
+    volumes:
+      # CRM SQLite database - OUTSIDE the web root, survives rebuilds
+      - crm_data:/var/data
     ports:
       # Put your SSL-terminating reverse proxy (Caddy / nginx / Traefik) in
       # front of this port. The proxy MUST forward X-Forwarded-Proto: https
@@ -20,3 +23,6 @@ services:
       # Override the host port per machine via .env (WEB_PORT=8085 on the
       # VPS, where 8080 is taken) so git pull never conflicts.
       - "${WEB_PORT:-8080}:80"
+
+volumes:
+  crm_data:

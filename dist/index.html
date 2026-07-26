@@ -861,6 +861,57 @@ a.fixed.bottom-36.right-6,.fixed.bottom-36.right-6{bottom:168px!important}
         }
       })();
     </script>
-  <script>(function(){var of=window.fetch;window.fetch=function(u,o){var p=of.apply(this,arguments);try{var url=(typeof u==="string")?u:(u&&u.url)||"";if(url.indexOf("/api/send-email")!==-1){p.then(function(r){if(r&&r.ok&&typeof gtag==="function"){gtag("event","generate_lead",{event_category:"contact",event_label:"quote_form"});}}).catch(function(){});}}catch(e){}return p;};})();</script>
+  <script>
+/* FABRIOZA CRM form guard: UTM capture, GDPR consent gate, CSRF + enrichment,
+   GA4 generate_lead. Wraps fetch so every SPA form (quote, popup, chat, guide)
+   passes through the same protections without touching the React bundle. */
+(function(){
+  try{var q=new URLSearchParams(location.search);["utm_source","utm_medium","utm_campaign"].forEach(function(k){if(q.get(k))sessionStorage.setItem("fab_"+k,q.get(k));});}catch(e){}
+  var CSRF=null,origFetch=window.fetch;
+  function getCsrf(){if(CSRF)return Promise.resolve(CSRF);
+    return origFetch("/api/csrf.php",{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(j){CSRF=j.token;return CSRF;});}
+  function hasConsent(){try{return sessionStorage.getItem("fabGdprOk")==="1"}catch(e){return false}}
+  function askConsent(){
+    return new Promise(function(resolve){
+      if(hasConsent())return resolve(true);
+      var ov=document.createElement("div");
+      ov.style.cssText="position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:20px";
+      ov.innerHTML='<div style="background:#fff;color:#1a1a1a;max-width:420px;border-radius:14px;padding:26px;font-family:inherit;box-shadow:0 24px 80px rgba(0,0,0,.4)">'+
+        '<h3 style="font-size:17px;margin:0 0 10px">One quick thing</h3>'+
+        '<label style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.5;cursor:pointer">'+
+        '<input type="checkbox" id="fabGdprCb" style="margin-top:3px">'+
+        '<span>I consent to FABRIOZA storing and using my data to respond to this enquiry, per the <a href="/privacy" target="_blank" style="color:#4A7C59">Privacy Policy</a>.</span></label>'+
+        '<div style="display:flex;gap:10px;margin-top:18px">'+
+        '<button id="fabGdprGo" disabled style="flex:1;background:#4A7C59;color:#fff;border:none;border-radius:8px;padding:12px;font-weight:700;cursor:pointer;opacity:.5">Send my enquiry</button>'+
+        '<button id="fabGdprNo" style="background:#eee;border:none;border-radius:8px;padding:12px 16px;cursor:pointer">Cancel</button></div></div>';
+      document.body.appendChild(ov);
+      var cb=ov.querySelector("#fabGdprCb"),go=ov.querySelector("#fabGdprGo");
+      cb.addEventListener("change",function(){go.disabled=!cb.checked;go.style.opacity=cb.checked?"1":".5";});
+      go.addEventListener("click",function(){try{sessionStorage.setItem("fabGdprOk","1")}catch(e){}ov.remove();resolve(true);});
+      ov.querySelector("#fabGdprNo").addEventListener("click",function(){ov.remove();resolve(false);});
+    });
+  }
+  window.fetch=function(u,o){
+    var url=(typeof u==="string")?u:(u&&u.url)||"";
+    if(url.indexOf("/api/send-email")===-1)return origFetch.apply(this,arguments);
+    var self=this;
+    return askConsent().then(function(okC){
+      if(!okC)return Promise.reject(new Error("Consent required to send your enquiry."));
+      return getCsrf().then(function(tok){
+        try{
+          var body={};try{body=JSON.parse((o&&o.body)||"{}")}catch(e){}
+          body.csrf=tok;body.gdpr_consent=true;
+          if(body.website===undefined)body.website="";
+          body.source_page=location.pathname+(location.hash||"");
+          ["utm_source","utm_medium","utm_campaign"].forEach(function(k){var v=sessionStorage.getItem("fab_"+k);if(v)body[k]=v;});
+          o=Object.assign({},o,{body:JSON.stringify(body),credentials:"same-origin"});
+        }catch(e){}
+        var p=origFetch.call(self,u,o);
+        p.then(function(r){if(r&&r.ok&&typeof gtag==="function"){gtag("event","generate_lead",{event_category:"contact",event_label:"quote_form"});}}).catch(function(){});
+        return p;
+      });
+    });
+  };
+})();</script>
 </body>
 </html>
