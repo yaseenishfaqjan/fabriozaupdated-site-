@@ -546,10 +546,22 @@
         }
       }
     </style>
-    <link rel="modulepreload" href="/assets/index-C6-wz3bb.js?v=20260726" />
-    <script type="module" crossorigin src="/assets/index-C6-wz3bb.js?v=20260726"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BGDnZsgf.css?v=20260726">
-  </head>
+    <link rel="modulepreload" href="/assets/index-C6-wz3bb.js?v=20260726b" />
+    <script type="module" crossorigin src="/assets/index-C6-wz3bb.js?v=20260726b"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BGDnZsgf.css?v=20260726b">
+  <style>
+/* fab-float-fix: stack the bottom-right action buttons with clean 16px gaps */
+.fixed.bottom-6.right-6.w-14{bottom:24px!important}
+.fixed.bottom-24.right-6.w-14{bottom:96px!important}
+a.fixed.bottom-36.right-6,.fixed.bottom-36.right-6{bottom:168px!important}
+.fixed.bottom-24.right-6.w-10{bottom:240px!important}
+.fixed.bottom-24.right-6.w-80,.fixed.bottom-24.right-6.w-96{bottom:96px!important}
+.fixed.bottom-52.right-6{bottom:240px!important}
+@media(max-width:640px){
+  .fixed.bottom-24.right-6.w-10{display:none}  /* hide scroll-top pip on phones */
+}
+</style>
+</head>
   <body>
     <div id="root"></div>
 
