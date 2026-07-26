@@ -26,38 +26,65 @@
 <meta property="twitter:image" content="https://fabrioza.com/images/cat-hoodies-hero.jpg">
 
 <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Service",
-      "serviceType": "Custom Hoodie Manufacturing — Your Design, Any Size",
-      "provider": {
-        "@type": "Organization",
-        "name": "FABRIOZA",
-        "url": "https://fabrioza.com",
-        "logo": "https://fabrioza.com/images/fabrioza-logo.jpg",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Sialkot",
-          "addressCountry": "PK"
-        },
-        "telephone": "+92-328-2347875"
-      },
-      "areaServed": ["US", "GB", "CA", "AU", "DE", "FR", "AE"],
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Custom Clothing Manufacturing",
-        "itemListElement": [
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Custom Hoodie Manufacturing — Your Design, Any Size"
-            }
-          }
-        ]
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
+  },
+  {
+   "@type": "Service",
+   "serviceType": "Custom Hoodie Manufacturing — Your Design, Any Size",
+   "provider": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "areaServed": [
+    "US",
+    "GB",
+    "CA",
+    "AU",
+    "DE",
+    "FR",
+    "AE"
+   ],
+   "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Custom Clothing Manufacturing",
+    "itemListElement": [
+     {
+      "@type": "Offer",
+      "itemOffered": {
+       "@type": "Service",
+       "name": "Custom Hoodie Manufacturing — Your Design, Any Size"
       }
+     }
+    ]
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://fabrioza.com"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Custom Hoodie Manufacturer",
+     "item": "https://fabrioza.com/custom-hoodie-manufacturer"
     }
-    </script>
+   ]
+  }
+ ]
+}
+</script>
 
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }

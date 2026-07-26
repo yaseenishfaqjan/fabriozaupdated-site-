@@ -25,90 +25,89 @@
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
- "@type": "Service",
- "name": "Custom Clothing Manufacturing for UAE Brands",
- "serviceType": "Custom clothing manufacturing, private label, cut and sew",
- "provider": {
-  "@type": "Organization",
-  "name": "FABRIOZA",
-  "url": "https://fabrioza.com",
-  "logo": {
-   "@type": "ImageObject",
-   "url": "https://fabrioza.com/images/fabrioza-logo.jpg"
-  }
- },
- "areaServed": {
-  "@type": "Country",
-  "name": "UAE"
- },
- "url": "https://fabrioza.com/clothing-manufacturer-uae",
- "description": "Clothing manufacturer for UAE, Dubai & GCC brands: 50-piece MOQ, 2-4 day delivery, modest fashion & kaftans, gym wear, uniforms. DDP with 5% duty handled. Quotes in 24h."
-}
-</script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "BreadcrumbList",
- "itemListElement": [
+ "@graph": [
   {
-   "@type": "ListItem",
-   "position": 1,
-   "name": "Home",
-   "item": "https://fabrioza.com/"
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
   },
   {
-   "@type": "ListItem",
-   "position": 2,
-   "name": "Custom Clothing Manufacturer for UAE &amp; Gulf Brands",
-   "item": "https://fabrioza.com/clothing-manufacturer-uae"
-  }
- ]
-}
-</script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "FAQPage",
- "mainEntity": [
-  {
-   "@type": "Question",
-   "name": "How fast can you deliver to Dubai?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Express courier reaches the UAE in 2-4 business days - the fastest lane we serve. A full cycle from design to delivered goods can run under 4 weeks."
-   }
+   "@type": "Service",
+   "name": "Custom Clothing Manufacturing for UAE Brands",
+   "serviceType": "Custom clothing manufacturing, private label, cut and sew",
+   "provider": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "areaServed": {
+    "@type": "Country",
+    "name": "UAE"
+   },
+   "url": "https://fabrioza.com/clothing-manufacturer-uae",
+   "description": "Clothing manufacturer for UAE, Dubai & GCC brands: 50-piece MOQ, 2-4 day delivery, modest fashion & kaftans, gym wear, uniforms. DDP with 5% duty handled. Quotes in 24h."
   },
   {
-   "@type": "Question",
-   "name": "Do you manufacture modest fashion?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - kaftans, abaya-style layers, maxi dresses, co-ord sets and loose-fit athleisure are core categories, with digital print and embroidery options."
-   }
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://fabrioza.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Custom Clothing Manufacturer for UAE &amp; Gulf Brands",
+     "item": "https://fabrioza.com/clothing-manufacturer-uae"
+    }
+   ]
   },
   {
-   "@type": "Question",
-   "name": "Do you handle UAE customs?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - DDP shipping includes the 5% GCC customs duty and clearance paperwork for the UAE and wider Gulf."
-   }
-  },
-  {
-   "@type": "Question",
-   "name": "Can you produce staff uniforms for companies in the Gulf?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - corporate, hospitality, gym-staff and delivery uniforms with embroidered branding, from 50 pieces per style with repeat-order consistency."
-   }
-  },
-  {
-   "@type": "Question",
-   "name": "What payment methods do you accept?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Bank transfer, credit card and PayPal, in USD, EUR, GBP, AUD or CAD - with a standard 50% deposit / 50% before shipment structure."
-   }
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How fast can you deliver to Dubai?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Express courier reaches the UAE in 2-4 business days - the fastest lane we serve. A full cycle from design to delivered goods can run under 4 weeks."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do you manufacture modest fashion?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - kaftans, abaya-style layers, maxi dresses, co-ord sets and loose-fit athleisure are core categories, with digital print and embroidery options."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do you handle UAE customs?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - DDP shipping includes the 5% GCC customs duty and clearance paperwork for the UAE and wider Gulf."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can you produce staff uniforms for companies in the Gulf?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - corporate, hospitality, gym-staff and delivery uniforms with embroidered branding, from 50 pieces per style with repeat-order consistency."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What payment methods do you accept?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Bank transfer, credit card and PayPal, in USD, EUR, GBP, AUD or CAD - with a standard 50% deposit / 50% before shipment structure."
+     }
+    }
+   ]
   }
  ]
 }

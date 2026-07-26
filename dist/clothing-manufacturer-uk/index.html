@@ -25,90 +25,89 @@
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
- "@type": "Service",
- "name": "Custom Clothing Manufacturing for British Brands",
- "serviceType": "Custom clothing manufacturing, private label, cut and sew",
- "provider": {
-  "@type": "Organization",
-  "name": "FABRIOZA",
-  "url": "https://fabrioza.com",
-  "logo": {
-   "@type": "ImageObject",
-   "url": "https://fabrioza.com/images/fabrioza-logo.jpg"
-  }
- },
- "areaServed": {
-  "@type": "Country",
-  "name": "United Kingdom"
- },
- "url": "https://fabrioza.com/clothing-manufacturer-uk",
- "description": "Trusted clothing manufacturer for UK brands: 50-piece MOQ, DDP shipping with UK duty & VAT handled, 3-5 day delivery, GB-friendly hours. Free mockups, quotes in 24h."
-}
-</script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "BreadcrumbList",
- "itemListElement": [
+ "@graph": [
   {
-   "@type": "ListItem",
-   "position": 1,
-   "name": "Home",
-   "item": "https://fabrioza.com/"
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
   },
   {
-   "@type": "ListItem",
-   "position": 2,
-   "name": "Custom Clothing Manufacturer for UK Brands",
-   "item": "https://fabrioza.com/clothing-manufacturer-uk"
-  }
- ]
-}
-</script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "FAQPage",
- "mainEntity": [
-  {
-   "@type": "Question",
-   "name": "Do you handle UK import duty and VAT?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - DDP shipping includes the ~12% apparel duty and 20% import VAT with all paperwork done by us. The quote you approve is your final landed cost in GBP terms."
-   }
+   "@type": "Service",
+   "name": "Custom Clothing Manufacturing for British Brands",
+   "serviceType": "Custom clothing manufacturing, private label, cut and sew",
+   "provider": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "areaServed": {
+    "@type": "Country",
+    "name": "United Kingdom"
+   },
+   "url": "https://fabrioza.com/clothing-manufacturer-uk",
+   "description": "Trusted clothing manufacturer for UK brands: 50-piece MOQ, DDP shipping with UK duty & VAT handled, 3-5 day delivery, GB-friendly hours. Free mockups, quotes in 24h."
   },
   {
-   "@type": "Question",
-   "name": "How long is delivery to the UK?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Express courier takes 3-5 business days after production; total from approved sample to UK doorstep is typically 3-5 weeks."
-   }
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://fabrioza.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Custom Clothing Manufacturer for UK Brands",
+     "item": "https://fabrioza.com/clothing-manufacturer-uk"
+    }
+   ]
   },
   {
-   "@type": "Question",
-   "name": "Can you match UK sizing?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - we grade to UK/EU size charts and can replicate the fit of any UK reference garment. Publish our garment measurements on your product pages to cut returns."
-   }
-  },
-  {
-   "@type": "Question",
-   "name": "What is the minimum order?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "50 pieces per style. UK startups typically launch with 2-3 styles at 50 pieces each - about the cost of a single style at a conventional 300-piece factory."
-   }
-  },
-  {
-   "@type": "Question",
-   "name": "Are you certified for UK retail requirements?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "We hold ISO 9001, OEKO-TEX Standard 100 and WRAP certifications and are amfori BSCI audited - the compliance set UK retailers and marketplaces ask suppliers for."
-   }
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Do you handle UK import duty and VAT?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - DDP shipping includes the ~12% apparel duty and 20% import VAT with all paperwork done by us. The quote you approve is your final landed cost in GBP terms."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How long is delivery to the UK?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Express courier takes 3-5 business days after production; total from approved sample to UK doorstep is typically 3-5 weeks."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can you match UK sizing?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - we grade to UK/EU size charts and can replicate the fit of any UK reference garment. Publish our garment measurements on your product pages to cut returns."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is the minimum order?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "50 pieces per style. UK startups typically launch with 2-3 styles at 50 pieces each - about the cost of a single style at a conventional 300-piece factory."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Are you certified for UK retail requirements?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "We hold ISO 9001, OEKO-TEX Standard 100 and WRAP certifications and are amfori BSCI audited - the compliance set UK retailers and marketplaces ask suppliers for."
+     }
+    }
+   ]
   }
  ]
 }

@@ -18,79 +18,160 @@
 
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "Service",
-  "@id": "https://fabrioza.com/sample-order#service",
-  "name": "20-Piece Trial / Sample Order Manufacturing",
-  "serviceType": "Small batch custom clothing manufacturing trial order",
-  "description": "A 20-piece trial production run for brands that want to test manufacturing quality before placing a bulk order. Produced on the same lines, with the same fabrics and the same 4-stage quality control as full production runs. Trial order cost is credited toward the first bulk order of the same design.",
-  "provider": {
-    "@type": "Organization",
-    "name": "FABRIOZA",
-    "url": "https://fabrioza.com"
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
   },
-  "areaServed": ["United States", "United Kingdom", "Canada", "Australia", "Germany", "United Arab Emirates", "Saudi Arabia", "Europe"],
-  "url": "https://fabrioza.com/sample-order",
-  "offers": {
+  {
+   "@type": "Service",
+   "@id": "https://fabrioza.com/sample-order#service",
+   "name": "20-Piece Trial / Sample Order Manufacturing",
+   "serviceType": "Small batch custom clothing manufacturing trial order",
+   "description": "A 20-piece trial production run for brands that want to test manufacturing quality before placing a bulk order. Produced on the same lines, with the same fabrics and the same 4-stage quality control as full production runs. Trial order cost is credited toward the first bulk order of the same design.",
+   "provider": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "areaServed": [
+    "United States",
+    "United Kingdom",
+    "Canada",
+    "Australia",
+    "Germany",
+    "United Arab Emirates",
+    "Saudi Arabia",
+    "Europe"
+   ],
+   "url": "https://fabrioza.com/sample-order",
+   "offers": {
     "@type": "Offer",
     "url": "https://fabrioza.com/sample-order",
     "priceCurrency": "USD",
     "availability": "https://schema.org/InStock",
     "eligibleQuantity": {
-      "@type": "QuantitativeValue",
-      "minValue": 20,
-      "unitText": "pieces"
+     "@type": "QuantitativeValue",
+     "minValue": 20,
+     "unitText": "pieces"
     }
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://fabrioza.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Pricing",
+     "item": "https://fabrioza.com/pricing"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "20-Piece Trial Order",
+     "item": "https://fabrioza.com/sample-order"
+    }
+   ]
+  },
+  {
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Can I order just 20 pieces to test quality first?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. Our trial order tier is exactly for this: 20 finished garments of your design, produced on the same production line as bulk orders. Our standard MOQ for regular production is 50 pieces, and the 20-piece trial exists so you can verify quality in your hands before committing to a bulk run."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do small trial orders get the same quality control as bulk orders?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. 20-piece trial orders go through the same 4-stage QC as a 5,000-piece run: fabric inspection, in-line stitching checks, finished-garment measurement audit, and pre-shipment inspection with photo documentation."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Does my trial order cost count toward a bulk order?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. When you scale the same design to a bulk order, we credit your trial order cost toward that bulk invoice. Ask your project manager for the credit terms with your quote."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How much does a 20-piece trial order cost?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Trial orders are quoted per design within 24 hours. Because small batches carry the same setup work as large ones, the per-unit price is higher than our 50-piece and bulk tiers - and the difference is credited back when you move to bulk. Send your design for an exact number."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How long does a 20-piece trial order take?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Typically 2-3 weeks from approved design to dispatch, plus 3-7 business days DHL/FedEx/UPS delivery. Sublimated sportswear trials are usually at the faster end."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can I split the 20 pieces across sizes and colors?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. 20 pieces means 20 finished garments across your chosen colors and sizes - no hidden per-colorway multipliers. A typical trial is one design in 2 colorways across a size run."
+     }
+    }
+   ]
+  },
+  {
+   "@type": "HowTo",
+   "name": "How to Go From a 20-Piece Trial Order to Bulk Production",
+   "step": [
+    {
+     "@type": "HowToStep",
+     "position": 1,
+     "name": "Send your design",
+     "text": "Sketch, reference photo or tech pack — we build the tech pack free."
+    },
+    {
+     "@type": "HowToStep",
+     "position": 2,
+     "name": "Get your quote",
+     "text": "Trial price + projected bulk price per unit, within 24 hours."
+    },
+    {
+     "@type": "HowToStep",
+     "position": 3,
+     "name": "We produce 20 pieces",
+     "text": "Same line, fabrics and 4-stage QC as bulk. 2–3 weeks."
+    },
+    {
+     "@type": "HowToStep",
+     "position": 4,
+     "name": "You test everything",
+     "text": "Quality, sizing, print durability, customer reaction."
+    },
+    {
+     "@type": "HowToStep",
+     "position": 5,
+     "name": "Scale to bulk",
+     "text": "50+ pieces at volume pricing — trial cost credited."
+    }
+   ]
   }
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://fabrioza.com/"},
-    {"@type": "ListItem", "position": 2, "name": "Pricing", "item": "https://fabrioza.com/pricing"},
-    {"@type": "ListItem", "position": 3, "name": "20-Piece Trial Order", "item": "https://fabrioza.com/sample-order"}
-  ]
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Can I order just 20 pieces to test quality first?",
-      "acceptedAnswer": {"@type": "Answer", "text": "Yes. Our trial order tier is exactly for this: 20 finished garments of your design, produced on the same production line as bulk orders. Our standard MOQ for regular production is 50 pieces, and the 20-piece trial exists so you can verify quality in your hands before committing to a bulk run."}
-    },
-    {
-      "@type": "Question",
-      "name": "Do small trial orders get the same quality control as bulk orders?",
-      "acceptedAnswer": {"@type": "Answer", "text": "Yes. 20-piece trial orders go through the same 4-stage QC as a 5,000-piece run: fabric inspection, in-line stitching checks, finished-garment measurement audit, and pre-shipment inspection with photo documentation."}
-    },
-    {
-      "@type": "Question",
-      "name": "Does my trial order cost count toward a bulk order?",
-      "acceptedAnswer": {"@type": "Answer", "text": "Yes. When you scale the same design to a bulk order, we credit your trial order cost toward that bulk invoice. Ask your project manager for the credit terms with your quote."}
-    },
-    {
-      "@type": "Question",
-      "name": "How much does a 20-piece trial order cost?",
-      "acceptedAnswer": {"@type": "Answer", "text": "Trial orders are quoted per design within 24 hours. Because small batches carry the same setup work as large ones, the per-unit price is higher than our 50-piece and bulk tiers - and the difference is credited back when you move to bulk. Send your design for an exact number."}
-    },
-    {
-      "@type": "Question",
-      "name": "How long does a 20-piece trial order take?",
-      "acceptedAnswer": {"@type": "Answer", "text": "Typically 2-3 weeks from approved design to dispatch, plus 3-7 business days DHL/FedEx/UPS delivery. Sublimated sportswear trials are usually at the faster end."}
-    },
-    {
-      "@type": "Question",
-      "name": "Can I split the 20 pieces across sizes and colors?",
-      "acceptedAnswer": {"@type": "Answer", "text": "Yes. 20 pieces means 20 finished garments across your chosen colors and sizes - no hidden per-colorway multipliers. A typical trial is one design in 2 colorways across a size run."}
-    }
-  ]
+ ]
 }
 </script>
 

@@ -17,16 +17,37 @@
 
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  "name": "MOQ Calculator",
-  "description": "Free tool to estimate clothing manufacturing costs at different quantities",
-  "url": "https://fabrioza.com/moq-calculator",
-  "isPartOf": {
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "WebPage",
+   "name": "MOQ Calculator",
+   "description": "Free tool to estimate clothing manufacturing costs at different quantities",
+   "url": "https://fabrioza.com/moq-calculator",
+   "isPartOf": {
     "@type": "WebSite",
     "name": "FABRIOZA",
     "url": "https://fabrioza.com"
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://fabrioza.com"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "MOQ Calculator",
+     "item": "https://fabrioza.com/moq-calculator"
+    }
+   ]
   }
+ ]
 }
 </script>
 

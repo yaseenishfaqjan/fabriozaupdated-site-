@@ -25,90 +25,89 @@
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
- "@type": "Service",
- "name": "Custom Clothing Manufacturing for Canadian Brands",
- "serviceType": "Custom clothing manufacturing, private label, cut and sew",
- "provider": {
-  "@type": "Organization",
-  "name": "FABRIOZA",
-  "url": "https://fabrioza.com",
-  "logo": {
-   "@type": "ImageObject",
-   "url": "https://fabrioza.com/images/fabrioza-logo.jpg"
-  }
- },
- "areaServed": {
-  "@type": "Country",
-  "name": "Canada"
- },
- "url": "https://fabrioza.com/clothing-manufacturer-canada",
- "description": "Clothing manufacturer for Canadian brands: 50-piece MOQ, DDP shipping with duties handled, heavyweight hoodies & winter-ready fleece, 4-6 day delivery. Quotes in 24h."
-}
-</script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "BreadcrumbList",
- "itemListElement": [
+ "@graph": [
   {
-   "@type": "ListItem",
-   "position": 1,
-   "name": "Home",
-   "item": "https://fabrioza.com/"
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
   },
   {
-   "@type": "ListItem",
-   "position": 2,
-   "name": "Custom Clothing Manufacturer for Canadian Brands",
-   "item": "https://fabrioza.com/clothing-manufacturer-canada"
-  }
- ]
-}
-</script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "FAQPage",
- "mainEntity": [
-  {
-   "@type": "Question",
-   "name": "Do you handle Canadian customs, duty and GST?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - DDP shipping includes the ~17-18% apparel duty and 5% GST with full customs paperwork. Your approved quote is your landed cost."
-   }
+   "@type": "Service",
+   "name": "Custom Clothing Manufacturing for Canadian Brands",
+   "serviceType": "Custom clothing manufacturing, private label, cut and sew",
+   "provider": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "areaServed": {
+    "@type": "Country",
+    "name": "Canada"
+   },
+   "url": "https://fabrioza.com/clothing-manufacturer-canada",
+   "description": "Clothing manufacturer for Canadian brands: 50-piece MOQ, DDP shipping with duties handled, heavyweight hoodies & winter-ready fleece, 4-6 day delivery. Quotes in 24h."
   },
   {
-   "@type": "Question",
-   "name": "How long does shipping to Canada take?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Express courier 4-6 business days; total from sample approval to delivery is typically 3.5-5 weeks. Sea freight to Vancouver or Montreal runs 32-42 days for container-scale orders."
-   }
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://fabrioza.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Custom Clothing Manufacturer for Canadian Brands",
+     "item": "https://fabrioza.com/clothing-manufacturer-canada"
+    }
+   ]
   },
   {
-   "@type": "Question",
-   "name": "Can you make heavyweight winter garments?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - 400-450 GSM fleece hoodies, sherpa-lined pieces, puffer vests and windbreakers are core products for our Canadian clients."
-   }
-  },
-  {
-   "@type": "Question",
-   "name": "What is the minimum order quantity?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "50 pieces per style per colorway. Test small, reorder winners in 2-4 week production cycles."
-   }
-  },
-  {
-   "@type": "Question",
-   "name": "Do you work in French?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Production communication is in English; for Quebec brands we support French care-label and packaging requirements (bilingual labels) as part of private labeling."
-   }
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Do you handle Canadian customs, duty and GST?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - DDP shipping includes the ~17-18% apparel duty and 5% GST with full customs paperwork. Your approved quote is your landed cost."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How long does shipping to Canada take?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Express courier 4-6 business days; total from sample approval to delivery is typically 3.5-5 weeks. Sea freight to Vancouver or Montreal runs 32-42 days for container-scale orders."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can you make heavyweight winter garments?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - 400-450 GSM fleece hoodies, sherpa-lined pieces, puffer vests and windbreakers are core products for our Canadian clients."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is the minimum order quantity?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "50 pieces per style per colorway. Test small, reorder winners in 2-4 week production cycles."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do you work in French?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Production communication is in English; for Quebec brands we support French care-label and packaging requirements (bilingual labels) as part of private labeling."
+     }
+    }
+   ]
   }
  ]
 }

@@ -27,98 +27,110 @@
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
- "@type": "Article",
- "headline": "How Much Does It Cost to Manufacture a T-Shirt in 2026?",
- "description": "Real 2026 t-shirt manufacturing costs: $2.80-$14 per shirt broken down by fabric, GSM, printing, labels, quantity and country. Includes landed-cost examples and margin math.",
- "url": "https://fabrioza.com/blog/tshirt-manufacturing-cost",
- "image": "https://fabrioza.com/images/products-premium/tee-sand.jpg",
- "datePublished": "2026-07-09",
- "dateModified": "2026-07-26",
- "author": {
-  "@type": "Organization",
-  "name": "FABRIOZA",
-  "url": "https://fabrioza.com"
- },
- "publisher": {
-  "@type": "Organization",
-  "name": "FABRIOZA",
-  "logo": {
-   "@type": "ImageObject",
-   "url": "https://fabrioza.com/images/fabrioza-logo.jpg"
-  }
- }
-}
-</script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "BreadcrumbList",
- "itemListElement": [
+ "@graph": [
   {
-   "@type": "ListItem",
-   "position": 1,
-   "name": "Home",
-   "item": "https://fabrioza.com"
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
   },
   {
-   "@type": "ListItem",
-   "position": 2,
-   "name": "Blog",
-   "item": "https://fabrioza.com/blog"
-  },
-  {
-   "@type": "ListItem",
-   "position": 3,
-   "name": "How Much Does It Cost to Manufacture a T-Shirt in 2026?",
-   "item": "https://fabrioza.com/blog/tshirt-manufacturing-cost"
-  }
- ]
-}
-</script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "FAQPage",
- "mainEntity": [
-  {
-   "@type": "Question",
-   "name": "How much does it cost to make one t-shirt?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "At production quantities of 100 pieces, a standard custom brand tee costs $4.00\u20135.50 to manufacture, a heavyweight streetwear tee $5.50\u20139.00, and a basic promotional tee $2.80\u20134.00. One-off single shirts via DTG printing cost $12\u201325 because no production economies apply."
+   "@type": "Article",
+   "headline": "How Much Does It Cost to Manufacture a T-Shirt in 2026?",
+   "description": "Real 2026 t-shirt manufacturing costs: $2.80-$14 per shirt broken down by fabric, GSM, printing, labels, quantity and country. Includes landed-cost examples and margin math.",
+   "url": "https://fabrioza.com/blog/tshirt-manufacturing-cost",
+   "image": "https://fabrioza.com/images/products-premium/tee-sand.jpg",
+   "datePublished": "2026-07-09",
+   "dateModified": "2026-07-26",
+   "author": {
+    "@id": "https://fabrioza.com/#author-primary"
+   },
+   "publisher": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://fabrioza.com/blog/tshirt-manufacturing-cost"
    }
   },
   {
-   "@type": "Question",
-   "name": "Why do heavyweight t-shirts cost more?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "A 240 GSM heavyweight tee contains roughly 50% more cotton than a standard 160 GSM tee, and heavier fabric is slower to cut and sew. Fabric is about half of a t-shirt's cost, so weight moves the price more than any other factor."
-   }
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://fabrioza.com"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Blog",
+     "item": "https://fabrioza.com/blog"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "How Much Does It Cost to Manufacture a T-Shirt in 2026?",
+     "item": "https://fabrioza.com/blog/tshirt-manufacturing-cost"
+    }
+   ]
   },
   {
-   "@type": "Question",
-   "name": "What is the cheapest way to manufacture t-shirts for a brand?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Order factory-direct (no trading company markup), start with 1\u20132 colorways to hit better quantity pricing, use 1\u20132 color screen prints, and ship by sea only when ordering 500+ pieces. Avoid going below 180 GSM to save money \u2014 thin fabric costs you reorders."
-   }
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How much does it cost to make one t-shirt?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "At production quantities of 100 pieces, a standard custom brand tee costs $4.00–5.50 to manufacture, a heavyweight streetwear tee $5.50–9.00, and a basic promotional tee $2.80–4.00. One-off single shirts via DTG printing cost $12–25 because no production economies apply."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why do heavyweight t-shirts cost more?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "A 240 GSM heavyweight tee contains roughly 50% more cotton than a standard 160 GSM tee, and heavier fabric is slower to cut and sew. Fabric is about half of a t-shirt's cost, so weight moves the price more than any other factor."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is the cheapest way to manufacture t-shirts for a brand?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Order factory-direct (no trading company markup), start with 1–2 colorways to hit better quantity pricing, use 1–2 color screen prints, and ship by sea only when ordering 500+ pieces. Avoid going below 180 GSM to save money — thin fabric costs you reorders."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How many t-shirts do I have to order from a factory?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Most overseas factories require 300–1,000 pieces per design. FABRIOZA's minimum is 50 pieces per style, which covers a full size run (S–XXL) and keeps a first order around $300–450 for standard tees."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What profit margin should a t-shirt brand have?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Aim for at least 70% gross margin on landed cost — e.g., a shirt that lands at $8 should retail for $28+. Direct-to-consumer streetwear brands typically run 75–85% gross margins to fund content and paid acquisition."
+     }
+    }
+   ]
   },
   {
-   "@type": "Question",
-   "name": "How many t-shirts do I have to order from a factory?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Most overseas factories require 300\u20131,000 pieces per design. FABRIOZA's minimum is 50 pieces per style, which covers a full size run (S\u2013XXL) and keeps a first order around $300\u2013450 for standard tees."
-   }
-  },
-  {
-   "@type": "Question",
-   "name": "What profit margin should a t-shirt brand have?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Aim for at least 70% gross margin on landed cost \u2014 e.g., a shirt that lands at $8 should retail for $28+. Direct-to-consumer streetwear brands typically run 75\u201385% gross margins to fund content and paid acquisition."
-   }
+   "@type": "Person",
+   "@id": "https://fabrioza.com/#author-primary",
+   "name": "FABRIOZA Editorial Team",
+   "jobTitle": "Clothing Manufacturing Specialists",
+   "worksFor": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "url": "https://fabrioza.com"
   }
  ]
 }

@@ -25,90 +25,89 @@
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
- "@type": "Service",
- "name": "Custom Clothing Manufacturing for Australian Brands",
- "serviceType": "Custom clothing manufacturing, private label, cut and sew",
- "provider": {
-  "@type": "Organization",
-  "name": "FABRIOZA",
-  "url": "https://fabrioza.com",
-  "logo": {
-   "@type": "ImageObject",
-   "url": "https://fabrioza.com/images/fabrioza-logo.jpg"
-  }
- },
- "areaServed": {
-  "@type": "Country",
-  "name": "Australia"
- },
- "url": "https://fabrioza.com/clothing-manufacturer-australia",
- "description": "Clothing manufacturer for Australian brands: 50-piece MOQ, DDP with 5% duty & GST handled, 4-6 day delivery, activewear & streetwear specialists. Quotes in 24h."
-}
-</script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "BreadcrumbList",
- "itemListElement": [
+ "@graph": [
   {
-   "@type": "ListItem",
-   "position": 1,
-   "name": "Home",
-   "item": "https://fabrioza.com/"
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
   },
   {
-   "@type": "ListItem",
-   "position": 2,
-   "name": "Custom Clothing Manufacturer for Australian Brands",
-   "item": "https://fabrioza.com/clothing-manufacturer-australia"
-  }
- ]
-}
-</script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "FAQPage",
- "mainEntity": [
-  {
-   "@type": "Question",
-   "name": "Do you handle Australian import duty and GST?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - DDP includes the 5% apparel duty and 10% GST with all customs paperwork handled. Orders under AUD 1,000 are duty-free, which suits sample shipments."
-   }
+   "@type": "Service",
+   "name": "Custom Clothing Manufacturing for Australian Brands",
+   "serviceType": "Custom clothing manufacturing, private label, cut and sew",
+   "provider": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "areaServed": {
+    "@type": "Country",
+    "name": "Australia"
+   },
+   "url": "https://fabrioza.com/clothing-manufacturer-australia",
+   "description": "Clothing manufacturer for Australian brands: 50-piece MOQ, DDP with 5% duty & GST handled, 4-6 day delivery, activewear & streetwear specialists. Quotes in 24h."
   },
   {
-   "@type": "Question",
-   "name": "How long is shipping to Australia?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Express courier 4-6 business days; total from approved sample to delivery in Sydney, Melbourne, Brisbane or Perth is typically 3.5-5 weeks."
-   }
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://fabrioza.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Custom Clothing Manufacturer for Australian Brands",
+     "item": "https://fabrioza.com/clothing-manufacturer-australia"
+    }
+   ]
   },
   {
-   "@type": "Question",
-   "name": "Can you make sublimated sports uniforms?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - all-over sublimation is a core specialty: rugby, soccer, cricket, netball, basketball and touch football kits with colors that never crack or fade."
-   }
-  },
-  {
-   "@type": "Question",
-   "name": "What is the minimum order?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "50 pieces per style (20 for team uniform categories). Club orders can mix sizes freely within a style."
-   }
-  },
-  {
-   "@type": "Question",
-   "name": "Is the time difference a problem?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "No - Pakistan is only 5-6 hours behind AEST, so your afternoon overlaps our morning. Messages get same-day answers, unlike US-based suppliers."
-   }
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Do you handle Australian import duty and GST?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - DDP includes the 5% apparel duty and 10% GST with all customs paperwork handled. Orders under AUD 1,000 are duty-free, which suits sample shipments."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How long is shipping to Australia?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Express courier 4-6 business days; total from approved sample to delivery in Sydney, Melbourne, Brisbane or Perth is typically 3.5-5 weeks."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can you make sublimated sports uniforms?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - all-over sublimation is a core specialty: rugby, soccer, cricket, netball, basketball and touch football kits with colors that never crack or fade."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is the minimum order?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "50 pieces per style (20 for team uniform categories). Club orders can mix sizes freely within a style."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is the time difference a problem?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No - Pakistan is only 5-6 hours behind AEST, so your afternoon overlaps our morning. Messages get same-day answers, unlike US-based suppliers."
+     }
+    }
+   ]
   }
  ]
 }

@@ -25,90 +25,89 @@
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
- "@type": "Service",
- "name": "Custom Clothing Manufacturing for American Brands",
- "serviceType": "Custom clothing manufacturing, private label, cut and sew",
- "provider": {
-  "@type": "Organization",
-  "name": "FABRIOZA",
-  "url": "https://fabrioza.com",
-  "logo": {
-   "@type": "ImageObject",
-   "url": "https://fabrioza.com/images/fabrioza-logo.jpg"
-  }
- },
- "areaServed": {
-  "@type": "Country",
-  "name": "USA"
- },
- "url": "https://fabrioza.com/clothing-manufacturer-usa",
- "description": "ISO 9001 clothing manufacturer for US brands & startups: 50-piece MOQ, DDP shipping with US duties handled, 3-5 day DHL delivery, US office in Georgia. Quotes in 24h."
-}
-</script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "BreadcrumbList",
- "itemListElement": [
+ "@graph": [
   {
-   "@type": "ListItem",
-   "position": 1,
-   "name": "Home",
-   "item": "https://fabrioza.com/"
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
   },
   {
-   "@type": "ListItem",
-   "position": 2,
-   "name": "Custom Clothing Manufacturer for USA Brands",
-   "item": "https://fabrioza.com/clothing-manufacturer-usa"
-  }
- ]
-}
-</script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "FAQPage",
- "mainEntity": [
-  {
-   "@type": "Question",
-   "name": "Do you handle US customs and duties?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - we ship DDP (Delivered Duty Paid): export clearance, freight, US duties (~16.5% on cotton knits) and delivery are all included in your quote. You receive the cartons with nothing extra to pay."
-   }
+   "@type": "Service",
+   "name": "Custom Clothing Manufacturing for American Brands",
+   "serviceType": "Custom clothing manufacturing, private label, cut and sew",
+   "provider": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "areaServed": {
+    "@type": "Country",
+    "name": "USA"
+   },
+   "url": "https://fabrioza.com/clothing-manufacturer-usa",
+   "description": "ISO 9001 clothing manufacturer for US brands & startups: 50-piece MOQ, DDP shipping with US duties handled, 3-5 day DHL delivery, US office in Georgia. Quotes in 24h."
   },
   {
-   "@type": "Question",
-   "name": "How fast is shipping from Pakistan to the USA?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "DHL/FedEx express takes 3-5 business days door-to-door. Air freight 7-10 days, sea freight 30-40 days for large orders. Total timeline from approved sample to US delivery is typically 3-5 weeks."
-   }
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://fabrioza.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Custom Clothing Manufacturer for USA Brands",
+     "item": "https://fabrioza.com/clothing-manufacturer-usa"
+    }
+   ]
   },
   {
-   "@type": "Question",
-   "name": "Do you use American sizing?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes. We grade patterns on US size blocks (true S-XXL and plus sizes) and can match the fit of any US reference garment you send us."
-   }
-  },
-  {
-   "@type": "Question",
-   "name": "What is your minimum order for US brands?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "50 pieces per style per colorway - a full size run. Most US brands start with 50-150 pieces to test, then reorder winners in 2-4 week cycles."
-   }
-  },
-  {
-   "@type": "Question",
-   "name": "Do you have a US location?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - a US office at 157 Everett Sq, McDonough, GA 30252 (visits by appointment), with production at our ISO 9001 factory in Sialkot, Pakistan."
-   }
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Do you handle US customs and duties?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - we ship DDP (Delivered Duty Paid): export clearance, freight, US duties (~16.5% on cotton knits) and delivery are all included in your quote. You receive the cartons with nothing extra to pay."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How fast is shipping from Pakistan to the USA?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "DHL/FedEx express takes 3-5 business days door-to-door. Air freight 7-10 days, sea freight 30-40 days for large orders. Total timeline from approved sample to US delivery is typically 3-5 weeks."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do you use American sizing?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. We grade patterns on US size blocks (true S-XXL and plus sizes) and can match the fit of any US reference garment you send us."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is your minimum order for US brands?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "50 pieces per style per colorway - a full size run. Most US brands start with 50-150 pieces to test, then reorder winners in 2-4 week cycles."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do you have a US location?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - a US office at 157 Everett Sq, McDonough, GA 30252 (visits by appointment), with production at our ISO 9001 factory in Sialkot, Pakistan."
+     }
+    }
+   ]
   }
  ]
 }

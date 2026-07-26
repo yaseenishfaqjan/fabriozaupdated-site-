@@ -25,90 +25,89 @@
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
- "@type": "Service",
- "name": "Custom Clothing Manufacturing for German Brands",
- "serviceType": "Custom clothing manufacturing, private label, cut and sew",
- "provider": {
-  "@type": "Organization",
-  "name": "FABRIOZA",
-  "url": "https://fabrioza.com",
-  "logo": {
-   "@type": "ImageObject",
-   "url": "https://fabrioza.com/images/fabrioza-logo.jpg"
-  }
- },
- "areaServed": {
-  "@type": "Country",
-  "name": "Germany"
- },
- "url": "https://fabrioza.com/clothing-manufacturer-germany",
- "description": "Clothing manufacturer for German and EU brands: 50-piece MOQ, DDP with EU duty & VAT handled, OEKO-TEX certified fabrics, sustainable options, 3-5 day delivery."
-}
-</script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "BreadcrumbList",
- "itemListElement": [
+ "@graph": [
   {
-   "@type": "ListItem",
-   "position": 1,
-   "name": "Home",
-   "item": "https://fabrioza.com/"
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
   },
   {
-   "@type": "ListItem",
-   "position": 2,
-   "name": "Custom Clothing Manufacturer for German &amp; EU Brands",
-   "item": "https://fabrioza.com/clothing-manufacturer-germany"
-  }
- ]
-}
-</script>
-<script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "FAQPage",
- "mainEntity": [
-  {
-   "@type": "Question",
-   "name": "Do you handle EU customs, duty and VAT?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - DDP shipping includes the ~12% apparel duty and 19% German VAT (or your member state's rate) with compliant import paperwork. Your quote equals your landed cost."
-   }
+   "@type": "Service",
+   "name": "Custom Clothing Manufacturing for German Brands",
+   "serviceType": "Custom clothing manufacturing, private label, cut and sew",
+   "provider": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "areaServed": {
+    "@type": "Country",
+    "name": "Germany"
+   },
+   "url": "https://fabrioza.com/clothing-manufacturer-germany",
+   "description": "Clothing manufacturer for German and EU brands: 50-piece MOQ, DDP with EU duty & VAT handled, OEKO-TEX certified fabrics, sustainable options, 3-5 day delivery."
   },
   {
-   "@type": "Question",
-   "name": "Are your fabrics OEKO-TEX certified?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - we work with OEKO-TEX Standard 100 certified fabrics, are amfori BSCI audited, and hold ISO 9001 certification, with documentation supplied for retailer and marketplace onboarding."
-   }
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://fabrioza.com/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Custom Clothing Manufacturer for German &amp; EU Brands",
+     "item": "https://fabrioza.com/clothing-manufacturer-germany"
+    }
+   ]
   },
   {
-   "@type": "Question",
-   "name": "Can you produce sustainable garments?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - organic cotton, recycled polyester, hemp, Tencel and bamboo garments through our dedicated sustainable line, relevant to the EU textile rules arriving from 2027."
-   }
-  },
-  {
-   "@type": "Question",
-   "name": "How long is delivery to Germany?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Express courier 3-5 business days; sample-to-delivery is typically 3.5-5 weeks, or 26-34 days by sea to Hamburg for large orders."
-   }
-  },
-  {
-   "@type": "Question",
-   "name": "What is the minimum order for EU brands?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "50 pieces per style per colorway - full size run included. Most EU startups begin with 100-150 total pieces across 2-3 styles."
-   }
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Do you handle EU customs, duty and VAT?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - DDP shipping includes the ~12% apparel duty and 19% German VAT (or your member state's rate) with compliant import paperwork. Your quote equals your landed cost."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Are your fabrics OEKO-TEX certified?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - we work with OEKO-TEX Standard 100 certified fabrics, are amfori BSCI audited, and hold ISO 9001 certification, with documentation supplied for retailer and marketplace onboarding."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can you produce sustainable garments?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - organic cotton, recycled polyester, hemp, Tencel and bamboo garments through our dedicated sustainable line, relevant to the EU textile rules arriving from 2027."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How long is delivery to Germany?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Express courier 3-5 business days; sample-to-delivery is typically 3.5-5 weeks, or 26-34 days by sea to Hamburg for large orders."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What is the minimum order for EU brands?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "50 pieces per style per colorway - full size run included. Most EU startups begin with 100-150 total pieces across 2-3 styles."
+     }
+    }
+   ]
   }
  ]
 }

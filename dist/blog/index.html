@@ -21,18 +21,43 @@
 
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "Blog",
-  "@id": "https://fabrioza.com/blog",
-  "name": "FABRIOZA Clothing Manufacturing Blog",
-  "description": "Practical guides on clothing manufacturing for startups and established brands.",
-  "url": "https://fabrioza.com/blog",
-  "publisher": {
-    "@type": "Organization",
-    "name": "FABRIOZA",
-    "url": "https://fabrioza.com",
-    "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
+  },
+  {
+   "@type": "Blog",
+   "@id": "https://fabrioza.com/blog",
+   "name": "FABRIOZA Clothing Manufacturing Blog",
+   "description": "Practical guides on clothing manufacturing for startups and established brands.",
+   "url": "https://fabrioza.com/blog",
+   "publisher": {
+    "@id": "https://fabrioza.com/#organization"
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://fabrioza.com"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Clothing Manufacturing Blog: Guides for Brands",
+     "item": "https://fabrioza.com/blog"
+    }
+   ]
   }
+ ]
 }
 </script>
 

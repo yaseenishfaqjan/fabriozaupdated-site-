@@ -16,38 +16,330 @@
 <meta property="og:image" content="https://fabrioza.com/images/fabrioza-logo.jpg">
 <meta property="og:site_name" content="FABRIOZA">
 
-<script type="application/ld+json">
-{
+<script type="application/ld+json">{
  "@context": "https://schema.org",
- "@type": "FAQPage",
- "mainEntity": [
+ "@graph": [
   {
-   "@type": "Question",
-   "name": "Can I order just 20 pieces to test quality first?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes. Our 20-piece trial tier exists exactly for this - 20 finished garments of your design from the same production line, before you commit to the standard 50-piece MOQ. See fabrioza.com/sample-order."
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
+  },
+  {
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Can I order just 20 pieces to test quality first?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. Our 20-piece trial tier exists exactly for this - 20 finished garments of your design from the same production line, before you commit to the standard 50-piece MOQ. See fabrioza.com/sample-order."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Do small trial orders get the same quality control?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes - 20-piece trial orders get the same 4-stage QC as a 5,000-piece run: fabric inspection, in-line checks, measurement audit, and pre-shipment inspection with photos."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Does my trial order cost count toward a bulk order?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. When you scale the same design to bulk, the trial cost is credited toward your bulk invoice - details come with your quote."
+     }
+    }
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Home",
+     "item": "https://fabrioza.com"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Custom Apparel Pricing 2026",
+     "item": "https://fabrioza.com/pricing"
+    }
+   ]
+  },
+  {
+   "@type": "Product",
+   "name": "Custom Heavyweight T-Shirt",
+   "description": "180-220gsm cotton, oversized/boxy fit - custom manufactured with private labeling by FABRIOZA.",
+   "image": "https://fabrioza.com/images/products-premium/tee-sand.jpg",
+   "brand": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "3.85",
+    "highPrice": "5.50",
+    "offerCount": "2",
+    "availability": "https://schema.org/InStock",
+    "priceValidUntil": "2026-12-31",
+    "url": "https://fabrioza.com/pricing"
    }
   },
   {
-   "@type": "Question",
-   "name": "Do small trial orders get the same quality control?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes - 20-piece trial orders get the same 4-stage QC as a 5,000-piece run: fabric inspection, in-line checks, measurement audit, and pre-shipment inspection with photos."
+   "@type": "Product",
+   "name": "Custom Premium Hoodie",
+   "description": "280-350gsm French terry/fleece - custom manufactured with private labeling by FABRIOZA.",
+   "image": "https://fabrioza.com/images/products-premium/hoodie-bone.jpg",
+   "brand": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "8.40",
+    "highPrice": "12.00",
+    "offerCount": "2",
+    "availability": "https://schema.org/InStock",
+    "priceValidUntil": "2026-12-31",
+    "url": "https://fabrioza.com/pricing"
    }
   },
   {
-   "@type": "Question",
-   "name": "Does my trial order cost count toward a bulk order?",
-   "acceptedAnswer": {
-    "@type": "Answer",
-    "text": "Yes. When you scale the same design to bulk, the trial cost is credited toward your bulk invoice - details come with your quote."
+   "@type": "Product",
+   "name": "Custom Crewneck Sweatshirt",
+   "description": "260-300gsm fleece lined - custom manufactured with private labeling by FABRIOZA.",
+   "image": "https://fabrioza.com/images/products-premium/ziphoodie-charcoal.jpg",
+   "brand": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "7.70",
+    "highPrice": "11.00",
+    "offerCount": "2",
+    "availability": "https://schema.org/InStock",
+    "priceValidUntil": "2026-12-31",
+    "url": "https://fabrioza.com/pricing"
+   }
+  },
+  {
+   "@type": "Product",
+   "name": "Custom Sports Jersey (Sublimated)",
+   "description": "Polyester, all-over print, names/numbers - custom manufactured with private labeling by FABRIOZA.",
+   "image": "https://fabrioza.com/images/products-premium/sublimation-shirt.jpg",
+   "brand": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "9.80",
+    "highPrice": "14.00",
+    "offerCount": "2",
+    "availability": "https://schema.org/InStock",
+    "priceValidUntil": "2026-12-31",
+    "url": "https://fabrioza.com/pricing"
+   }
+  },
+  {
+   "@type": "Product",
+   "name": "Custom Soccer Kit (Full Set)",
+   "description": "Jersey + shorts + socks, sublimated - custom manufactured with private labeling by FABRIOZA.",
+   "image": "https://fabrioza.com/images/sc-kit-01-blue-pinstripe.jpg",
+   "brand": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "11.20",
+    "highPrice": "16.00",
+    "offerCount": "2",
+    "availability": "https://schema.org/InStock",
+    "priceValidUntil": "2026-12-31",
+    "url": "https://fabrioza.com/pricing"
+   }
+  },
+  {
+   "@type": "Product",
+   "name": "Custom Tracksuit Set",
+   "description": "Zip jacket + matching joggers - custom manufactured with private labeling by FABRIOZA.",
+   "image": "https://fabrioza.com/images/products-premium/activewear-sage.jpg",
+   "brand": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "12.60",
+    "highPrice": "18.00",
+    "offerCount": "2",
+    "availability": "https://schema.org/InStock",
+    "priceValidUntil": "2026-12-31",
+    "url": "https://fabrioza.com/pricing"
+   }
+  },
+  {
+   "@type": "Product",
+   "name": "Custom Gym / Activewear Set",
+   "description": "Leggings + sports bra, seamless - custom manufactured with private labeling by FABRIOZA.",
+   "image": "https://fabrioza.com/images/products-premium/activewear-sage.jpg",
+   "brand": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "7.70",
+    "highPrice": "11.00",
+    "offerCount": "2",
+    "availability": "https://schema.org/InStock",
+    "priceValidUntil": "2026-12-31",
+    "url": "https://fabrioza.com/pricing"
+   }
+  },
+  {
+   "@type": "Product",
+   "name": "Custom Corporate Polo Shirt",
+   "description": "Cotton pique, embroidered logo - custom manufactured with private labeling by FABRIOZA.",
+   "image": "https://fabrioza.com/images/products-premium/henley-black.jpg",
+   "brand": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "6.30",
+    "highPrice": "9.00",
+    "offerCount": "2",
+    "availability": "https://schema.org/InStock",
+    "priceValidUntil": "2026-12-31",
+    "url": "https://fabrioza.com/pricing"
+   }
+  },
+  {
+   "@type": "Product",
+   "name": "Custom Bomber / Varsity Jacket",
+   "description": "Wool body, leather sleeves, chenille - custom manufactured with private labeling by FABRIOZA.",
+   "image": "https://fabrioza.com/images/products-premium/hoodie-embroidery.jpg",
+   "brand": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "19.60",
+    "highPrice": "28.00",
+    "offerCount": "2",
+    "availability": "https://schema.org/InStock",
+    "priceValidUntil": "2026-12-31",
+    "url": "https://fabrioza.com/pricing"
+   }
+  },
+  {
+   "@type": "Product",
+   "name": "Custom Baseball Cap",
+   "description": "3D puff embroidery, snapback - custom manufactured with private labeling by FABRIOZA.",
+   "image": "https://fabrioza.com/images/fabrioza-logo.jpg",
+   "brand": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "3.15",
+    "highPrice": "4.50",
+    "offerCount": "2",
+    "availability": "https://schema.org/InStock",
+    "priceValidUntil": "2026-12-31",
+    "url": "https://fabrioza.com/pricing"
+   }
+  },
+  {
+   "@type": "Product",
+   "name": "Custom Streetwear Acid Wash Tee",
+   "description": "Garment dyed, vintage finish, boxy - custom manufactured with private labeling by FABRIOZA.",
+   "image": "https://fabrioza.com/images/products-premium/tee-sand.jpg",
+   "brand": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "5.95",
+    "highPrice": "8.50",
+    "offerCount": "2",
+    "availability": "https://schema.org/InStock",
+    "priceValidUntil": "2026-12-31",
+    "url": "https://fabrioza.com/pricing"
+   }
+  },
+  {
+   "@type": "Product",
+   "name": "Custom Windbreaker Jacket",
+   "description": "Lightweight nylon, water-resistant - custom manufactured with private labeling by FABRIOZA.",
+   "image": "https://fabrioza.com/images/products-premium/ziphoodie-charcoal.jpg",
+   "brand": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "10.50",
+    "highPrice": "15.00",
+    "offerCount": "2",
+    "availability": "https://schema.org/InStock",
+    "priceValidUntil": "2026-12-31",
+    "url": "https://fabrioza.com/pricing"
+   }
+  },
+  {
+   "@type": "Product",
+   "name": "Custom Cut & Sew Custom Design",
+   "description": "From pattern to finished garment - custom manufactured with private labeling by FABRIOZA.",
+   "image": "https://fabrioza.com/images/blog-factory.jpg",
+   "brand": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "5.60",
+    "highPrice": "8.00",
+    "offerCount": "2",
+    "availability": "https://schema.org/InStock",
+    "priceValidUntil": "2026-12-31",
+    "url": "https://fabrioza.com/pricing"
+   }
+  },
+  {
+   "@type": "Product",
+   "name": "Custom Cycling Jersey",
+   "description": "Full sublimation, 3 rear pockets - custom manufactured with private labeling by FABRIOZA.",
+   "image": "https://fabrioza.com/images/products-premium/sublimation-shirt.jpg",
+   "brand": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "USD",
+    "lowPrice": "10.50",
+    "highPrice": "15.00",
+    "offerCount": "2",
+    "availability": "https://schema.org/InStock",
+    "priceValidUntil": "2026-12-31",
+    "url": "https://fabrioza.com/pricing"
    }
   }
  ]
-}
-</script>
+}</script>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
