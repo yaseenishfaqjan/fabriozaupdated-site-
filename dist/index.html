@@ -859,5 +859,6 @@
         }
       })();
     </script>
-  </body>
+  <script>(function(){var of=window.fetch;window.fetch=function(u,o){var p=of.apply(this,arguments);try{var url=(typeof u==="string")?u:(u&&u.url)||"";if(url.indexOf("/api/send-email")!==-1){p.then(function(r){if(r&&r.ok&&typeof gtag==="function"){gtag("event","generate_lead",{event_category:"contact",event_label:"quote_form"});}}).catch(function(){});}}catch(e){}return p;};})();</script>
+</body>
 </html>
