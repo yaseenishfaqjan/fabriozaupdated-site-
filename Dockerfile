@@ -9,7 +9,12 @@ FROM php:8.3-apache
 # deflate  -> gzip compression
 RUN a2enmod rewrite headers expires deflate \
     && sed -ri 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf \
-    && echo "ServerName fabrioza.com" >> /etc/apache2/apache2.conf
+    && echo "ServerName https://fabrioza.com" >> /etc/apache2/apache2.conf \
+    && echo "UseCanonicalName On" >> /etc/apache2/apache2.conf
+# ServerName with https scheme + UseCanonicalName On makes Apache build ALL
+# self-referential redirect Locations as https://fabrioza.com/... even though
+# SSL terminates at the fronting nginx. Without this, every 301 pointed at
+# http:// first and cost a second hop through the https redirect.
 
 COPY dist/ /var/www/html/
 

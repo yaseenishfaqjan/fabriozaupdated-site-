@@ -54,65 +54,65 @@ ErrorDocument 404 /404.html
   # /about, /contact, /products, /moq exist on disk only as client-side
   # redirect stubs; crawlers flagged them as "Page with redirect".
   RewriteRule ^about/?$    https://fabrioza.com/#factory    [R=301,NE,L]
-  RewriteRule ^services/?$ /what-we-make                    [R=301,L]
+  RewriteRule ^services/?$ https://fabrioza.com/what-we-make                    [R=301,L]
   RewriteRule ^contact/?$  https://fabrioza.com/#contact    [R=301,NE,L]
   RewriteRule ^products/?$ https://fabrioza.com/#catalog    [R=301,NE,L]
   RewriteRule ^moq/?$      https://fabrioza.com/#calculator [R=301,NE,L]
 
   # --- 4b. Removed womenswear pages (client design conflict / catalog reset).
   # All 301 to the collections hub; retarget if replacements are built. ---
-  RewriteRule ^fashion-wear/?$ /what-we-make [R=301,L]
-  RewriteRule ^premium-fashion/?$ /what-we-make [R=301,L]
-  RewriteRule ^femme-collection/?$ /what-we-make [R=301,L]
-  RewriteRule ^luxury-blazers/?$ /what-we-make [R=301,L]
+  RewriteRule ^fashion-wear/?$ https://fabrioza.com/what-we-make [R=301,L]
+  RewriteRule ^premium-fashion/?$ https://fabrioza.com/what-we-make [R=301,L]
+  RewriteRule ^femme-collection/?$ https://fabrioza.com/what-we-make [R=301,L]
+  RewriteRule ^luxury-blazers/?$ https://fabrioza.com/what-we-make [R=301,L]
 
   # --- 5. Legacy blog slugs superseded by consolidated articles ---
-  RewriteRule ^blog/how-to-find-clothing-manufacturer/?$      /blog/how-to-find-reliable-clothing-manufacturer [R=301,L]
-  RewriteRule ^blog/oem-vs-odm-vs-private-label/?$            /blog/oem-odm-clothing-manufacturer [R=301,L]
-  RewriteRule ^blog/sports-team-uniform-manufacturing-guide/?$ /team-uniform-manufacturer [R=301,L]
-  RewriteRule ^blog/clothing-manufacturing-costs-breakdown/?$ /blog/clothing-manufacturing-costs-guide [R=301,L]
-  RewriteRule ^blog/how-to-start-clothing-brand-2025/?$       /blog/how-to-start-clothing-brand [R=301,L]
-  RewriteRule ^blog/sustainable-fashion-manufacturing-guide/?$ /blog/sustainable-clothing-manufacturer-pakistan [R=301,L]
+  RewriteRule ^blog/how-to-find-clothing-manufacturer/?$      https://fabrioza.com/blog/how-to-find-reliable-clothing-manufacturer [R=301,L]
+  RewriteRule ^blog/oem-vs-odm-vs-private-label/?$            https://fabrioza.com/blog/oem-odm-clothing-manufacturer [R=301,L]
+  RewriteRule ^blog/sports-team-uniform-manufacturing-guide/?$ https://fabrioza.com/team-uniform-manufacturer [R=301,L]
+  RewriteRule ^blog/clothing-manufacturing-costs-breakdown/?$ https://fabrioza.com/blog/clothing-manufacturing-costs-guide [R=301,L]
+  RewriteRule ^blog/how-to-start-clothing-brand-2025/?$       https://fabrioza.com/blog/how-to-start-clothing-brand [R=301,L]
+  RewriteRule ^blog/sustainable-fashion-manufacturing-guide/?$ https://fabrioza.com/blog/sustainable-clothing-manufacturer-pakistan [R=301,L]
 
   # --- 5b. Cannibalization consolidation (2026-07-26): twin/near-twin posts
   # merged into their canonical winners. Keep single-hop, longest slug first. ---
-  RewriteRule ^blog/custom-clothing-manufacturer-sialkot-pakistan/?$ /blog/custom-clothing-manufacturer-pakistan [R=301,L]
-  RewriteRule ^blog/private-label-clothing-manufacturer-pakistan/?$ /private-label-clothing-manufacturer [R=301,L]
-  RewriteRule ^blog/clothing-manufacturer-for-startups-pakistan/?$ /clothing-manufacturer-for-startups [R=301,L]
-  RewriteRule ^blog/clothing-manufacturer-usa-startups-pakistan/?$ /blog/clothing-manufacturer-usa-brands [R=301,L]
-  RewriteRule ^blog/clothing-manufacturing-costs-breakdown-2026/?$ /blog/clothing-manufacturing-costs-guide [R=301,L]
-  RewriteRule ^blog/how-to-find-clothing-manufacturer-pakistan/?$ /blog/how-to-find-reliable-clothing-manufacturer [R=301,L]
-  RewriteRule ^blog/sublimation-printing-manufacturer-pakistan/?$ /sublimation-clothing-manufacturer [R=301,L]
-  RewriteRule ^blog/screen-print-embroidery-sublimation-guide/?$ /blog/screen-print-vs-embroidery-vs-sublimation [R=301,L]
-  RewriteRule ^blog/clothing-manufacturer-uk-brands-pakistan/?$ /blog/clothing-manufacturer-uk-brands [R=301,L]
-  RewriteRule ^blog/clothing-manufacturer-australia-pakistan/?$ /blog/clothing-manufacturer-australia-brands [R=301,L]
-  RewriteRule ^blog/how-to-start-clothing-brand-manufacturer/?$ /blog/how-to-start-clothing-brand [R=301,L]
-  RewriteRule ^blog/custom-sportswear-manufacturer-pakistan/?$ /custom-sportswear-manufacturer [R=301,L]
-  RewriteRule ^blog/fabric-gsm-guide-clothing-manufacturing/?$ /blog/fabric-gsm-guide [R=301,L]
-  RewriteRule ^blog/oem-odm-clothing-manufacturer-pakistan/?$ /blog/oem-odm-clothing-manufacturer [R=301,L]
-  RewriteRule ^blog/tech-pack-clothing-manufacturing-guide/?$ /blog/tech-pack-clothing-guide [R=301,L]
-  RewriteRule ^blog/custom-hoodie-manufacturer-pakistan/?$ /custom-hoodie-manufacturer [R=301,L]
-  RewriteRule ^blog/private-label-clothing-manufacturer/?$ /private-label-clothing-manufacturer [R=301,L]
-  RewriteRule ^blog/team-uniform-manufacturer-pakistan/?$ /team-uniform-manufacturer [R=301,L]
-  RewriteRule ^blog/clothing-manufacturer-for-startups/?$ /clothing-manufacturer-for-startups [R=301,L]
-  RewriteRule ^blog/what-is-moq-clothing-manufacturing/?$ /blog/what-is-moq-clothing [R=301,L]
-  RewriteRule ^blog/sublimation-clothing-manufacturer/?$ /sublimation-clothing-manufacturer [R=301,L]
-  RewriteRule ^blog/activewear-manufacturer-pakistan/?$ /blog/gym-wear-manufacturer [R=301,L]
-  RewriteRule ^blog/streetwear-manufacturer-pakistan/?$ /streetwear-manufacturer [R=301,L]
-  RewriteRule ^blog/gym-wear-manufacturer-pakistan/?$ /blog/gym-wear-manufacturer [R=301,L]
-  RewriteRule ^blog/custom-sportswear-manufacturer/?$ /custom-sportswear-manufacturer [R=301,L]
-  RewriteRule ^blog/cut-sew-manufacturer-pakistan/?$ /cut-and-sew-manufacturer [R=301,L]
-  RewriteRule ^blog/custom-hoodie-manufacturer/?$ /custom-hoodie-manufacturer [R=301,L]
-  RewriteRule ^blog/team-uniform-manufacturer/?$ /team-uniform-manufacturer [R=301,L]
-  RewriteRule ^blog/cut-and-sew-manufacturer/?$ /cut-and-sew-manufacturer [R=301,L]
-  RewriteRule ^blog/streetwear-manufacturer/?$ /streetwear-manufacturer [R=301,L]
+  RewriteRule ^blog/custom-clothing-manufacturer-sialkot-pakistan/?$ https://fabrioza.com/blog/custom-clothing-manufacturer-pakistan [R=301,L]
+  RewriteRule ^blog/private-label-clothing-manufacturer-pakistan/?$ https://fabrioza.com/private-label-clothing-manufacturer [R=301,L]
+  RewriteRule ^blog/clothing-manufacturer-for-startups-pakistan/?$ https://fabrioza.com/clothing-manufacturer-for-startups [R=301,L]
+  RewriteRule ^blog/clothing-manufacturer-usa-startups-pakistan/?$ https://fabrioza.com/blog/clothing-manufacturer-usa-brands [R=301,L]
+  RewriteRule ^blog/clothing-manufacturing-costs-breakdown-2026/?$ https://fabrioza.com/blog/clothing-manufacturing-costs-guide [R=301,L]
+  RewriteRule ^blog/how-to-find-clothing-manufacturer-pakistan/?$ https://fabrioza.com/blog/how-to-find-reliable-clothing-manufacturer [R=301,L]
+  RewriteRule ^blog/sublimation-printing-manufacturer-pakistan/?$ https://fabrioza.com/sublimation-clothing-manufacturer [R=301,L]
+  RewriteRule ^blog/screen-print-embroidery-sublimation-guide/?$ https://fabrioza.com/blog/screen-print-vs-embroidery-vs-sublimation [R=301,L]
+  RewriteRule ^blog/clothing-manufacturer-uk-brands-pakistan/?$ https://fabrioza.com/blog/clothing-manufacturer-uk-brands [R=301,L]
+  RewriteRule ^blog/clothing-manufacturer-australia-pakistan/?$ https://fabrioza.com/blog/clothing-manufacturer-australia-brands [R=301,L]
+  RewriteRule ^blog/how-to-start-clothing-brand-manufacturer/?$ https://fabrioza.com/blog/how-to-start-clothing-brand [R=301,L]
+  RewriteRule ^blog/custom-sportswear-manufacturer-pakistan/?$ https://fabrioza.com/custom-sportswear-manufacturer [R=301,L]
+  RewriteRule ^blog/fabric-gsm-guide-clothing-manufacturing/?$ https://fabrioza.com/blog/fabric-gsm-guide [R=301,L]
+  RewriteRule ^blog/oem-odm-clothing-manufacturer-pakistan/?$ https://fabrioza.com/blog/oem-odm-clothing-manufacturer [R=301,L]
+  RewriteRule ^blog/tech-pack-clothing-manufacturing-guide/?$ https://fabrioza.com/blog/tech-pack-clothing-guide [R=301,L]
+  RewriteRule ^blog/custom-hoodie-manufacturer-pakistan/?$ https://fabrioza.com/custom-hoodie-manufacturer [R=301,L]
+  RewriteRule ^blog/private-label-clothing-manufacturer/?$ https://fabrioza.com/private-label-clothing-manufacturer [R=301,L]
+  RewriteRule ^blog/team-uniform-manufacturer-pakistan/?$ https://fabrioza.com/team-uniform-manufacturer [R=301,L]
+  RewriteRule ^blog/clothing-manufacturer-for-startups/?$ https://fabrioza.com/clothing-manufacturer-for-startups [R=301,L]
+  RewriteRule ^blog/what-is-moq-clothing-manufacturing/?$ https://fabrioza.com/blog/what-is-moq-clothing [R=301,L]
+  RewriteRule ^blog/sublimation-clothing-manufacturer/?$ https://fabrioza.com/sublimation-clothing-manufacturer [R=301,L]
+  RewriteRule ^blog/activewear-manufacturer-pakistan/?$ https://fabrioza.com/blog/gym-wear-manufacturer [R=301,L]
+  RewriteRule ^blog/streetwear-manufacturer-pakistan/?$ https://fabrioza.com/streetwear-manufacturer [R=301,L]
+  RewriteRule ^blog/gym-wear-manufacturer-pakistan/?$ https://fabrioza.com/blog/gym-wear-manufacturer [R=301,L]
+  RewriteRule ^blog/custom-sportswear-manufacturer/?$ https://fabrioza.com/custom-sportswear-manufacturer [R=301,L]
+  RewriteRule ^blog/cut-sew-manufacturer-pakistan/?$ https://fabrioza.com/cut-and-sew-manufacturer [R=301,L]
+  RewriteRule ^blog/custom-hoodie-manufacturer/?$ https://fabrioza.com/custom-hoodie-manufacturer [R=301,L]
+  RewriteRule ^blog/team-uniform-manufacturer/?$ https://fabrioza.com/team-uniform-manufacturer [R=301,L]
+  RewriteRule ^blog/cut-and-sew-manufacturer/?$ https://fabrioza.com/cut-and-sew-manufacturer [R=301,L]
+  RewriteRule ^blog/streetwear-manufacturer/?$ https://fabrioza.com/streetwear-manufacturer [R=301,L]
 
   # --- 7. Strip ".../index.html" from direct requests ---
   # Old internal links pointed at /page/index.html; canonicalize them.
   # THE_REQUEST (the raw client request line) guard prevents a loop with
   # the internal directory-serve rewrite in step 9.
   RewriteCond %{THE_REQUEST} \s/([^?\s]*)index\.html[?\s]
-  RewriteRule ^(.*?)/?index\.html$ /$1 [R=301,L]
+  RewriteRule ^(.*?)/?index\.html$ https://fabrioza.com/$1 [R=301,L]
 
   # --- 8. Strip trailing slashes (canonical URLs have none; root exempt) ---
   # Must run BEFORE the directory-serve and SPA-fallback rules, otherwise
@@ -121,7 +121,7 @@ ErrorDocument 404 /404.html
   RewriteCond %{REQUEST_URI} !^/$
   RewriteCond %{REQUEST_URI} !^/api/
   RewriteCond %{REQUEST_URI} ^/(.+)/$
-  RewriteRule ^ /%1 [R=301,L]
+  RewriteRule ^ https://fabrioza.com/%1 [R=301,L]
 
   # --- 9. Serve folder/index.html for extensionless page URLs (200, no hop) ---
   RewriteCond %{REQUEST_FILENAME} -d
