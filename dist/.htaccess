@@ -13,7 +13,7 @@
 # ============================================
 
 Options -Indexes
-DirectoryIndex index.html
+DirectoryIndex index.html index.php
 
 # Serve folder pages without mod_dir's automatic /page -> /page/ 301
 # (canonical URLs on this site have NO trailing slash)
@@ -114,12 +114,16 @@ ErrorDocument 404 /404.html
   RewriteCond %{THE_REQUEST} \s/([^?\s]*)index\.html[?\s]
   RewriteRule ^(.*?)/?index\.html$ https://fabrioza.com/$1 [R=301,L]
 
+  # --- 7b. CRM admin app (PHP; keep out of the slash-strip below) ---
+  RewriteRule ^admin/?$ /admin/index.php [L]
+
   # --- 8. Strip trailing slashes (canonical URLs have none; root exempt) ---
   # Must run BEFORE the directory-serve and SPA-fallback rules, otherwise
   # /page/ and /page both answer 200 as duplicate URLs. No !-d condition:
   # real pages ARE directories here (folder/index.html structure).
   RewriteCond %{REQUEST_URI} !^/$
   RewriteCond %{REQUEST_URI} !^/api/
+  RewriteCond %{REQUEST_URI} !^/admin/
   RewriteCond %{REQUEST_URI} ^/(.+)/$
   RewriteRule ^ https://fabrioza.com/%1 [R=301,L]
 
