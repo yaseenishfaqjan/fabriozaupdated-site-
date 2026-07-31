@@ -87,6 +87,12 @@ function crm_db(): PDO {
         CREATE INDEX IF NOT EXISTS idx_email_lead    ON email_log(lead_id);
         ");
         $pdo->exec('PRAGMA user_version = 1');
+        $version = 1;
+    }
+    if ($version < 2) {
+        // Phase C: pause flag stops automated follow-up sequences per lead
+        $pdo->exec('ALTER TABLE leads ADD COLUMN sequences_paused INTEGER DEFAULT 0');
+        $pdo->exec('PRAGMA user_version = 2');
     }
     return $pdo;
 }

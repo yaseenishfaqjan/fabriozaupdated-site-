@@ -23,6 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
            ->execute([$st, $fu, $as !== '' ? $as : null, $id]);
         if ($oldSt !== $st) { adm_audit($db, "status_changed:$st", $id); }
     }
+    if ($act === 'log_reply') {
+        // lead replied to an auto-mail: promote to quoted + stop sequences
+        $db->prepare("UPDATE leads SET status = 'quoted', sequences_paused = 1 WHERE id = ?")->execute([$id]);
+        $db->prepare('INSERT INTO notes (lead_id, author, body) VALUES (?,?,?)')
+           ->execute([$id, getenv('ADMIN_USER') ?: 'admin', 'Reply received - moved to quoted, sequences paused']);
+        adm_audit($db, 'reply_received', $id);
+    }
     if ($act === 'note' && trim((string)($_POST['body'] ?? '')) !== '') {
         $db->prepare('INSERT INTO notes (lead_id, author, body) VALUES (?,?,?)')
            ->execute([$id, getenv('ADMIN_USER') ?: 'admin', mb_substr(trim($_POST['body']), 0, 4000)]);
@@ -76,8 +83,17 @@ adm_head('Lead #' . $L['id']);
       <?php if ($L['message']): ?>
         <div class="mt-4 p-4 bg-stone-50 rounded-xl text-sm whitespace-pre-wrap"><?= e($L['message']) ?></div>
       <?php endif; ?>
-      <a class="inline-block mt-4 text-sm bg-emerald-700 text-white px-4 py-2 rounded-lg hover:bg-emerald-800"
-         href="mailto:<?= e($L['email']) ?>?subject=Re: your FABRIOZA enquiry">Reply by email</a>
+      <div class="mt-4 flex flex-wrap gap-2 items-center">
+        <a class="inline-block text-sm bg-emerald-700 text-white px-4 py-2 rounded-lg hover:bg-emerald-800"
+           href="mailto:<?= e($L['email']) ?>?subject=Re: your FABRIOZA enquiry">Reply by email</a>
+        <form method="post" class="inline"><?= adm_csrf_field() ?>
+          <input type="hidden" name="action" value="log_reply"><input type="hidden" name="lead_id" value="<?= $id ?>">
+          <button class="text-sm border border-emerald-700 text-emerald-800 px-4 py-2 rounded-lg hover:bg-emerald-50">Log reply received</button>
+        </form>
+        <?php if (!empty($L['sequences_paused'])): ?>
+          <span class="text-xs bg-stone-200 text-stone-600 px-2 py-1 rounded-full font-semibold">auto follow-ups paused</span>
+        <?php endif; ?>
+      </div>
     </div>
 
     <div class="bg-white rounded-2xl shadow p-6">
