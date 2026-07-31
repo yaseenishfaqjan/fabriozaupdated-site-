@@ -39,6 +39,8 @@ if (empty($data)) { http_response_code(400); echo json_encode(['success' => fals
 /* ---- 1. Honeypot: hidden "website" field. Bots fill it; humans never see it.
         Respond as if successful so bots learn nothing. No side effects. ---- */
 if (!empty($data['website'])) {
+    crm_file_log('SPAM(honeypot) form=' . substr((string)($data['form_type'] ?? '?'), 0, 40)
+        . ' email=' . substr((string)($data['email'] ?? '?'), 0, 60));
     echo json_encode(['success' => true, 'message' => 'Thank you! We will get back to you within 24 hours.']);
     exit;
 }
@@ -60,6 +62,30 @@ $sourcePage  = mb_substr(sanitize($data['source_page'] ?? ($_SERVER['HTTP_REFERE
 
 if ($clientName === '') { http_response_code(400); echo json_encode(['success' => false, 'message' => 'Your name is required']); exit; }
 if ($clientEmail === '' || !filter_var($clientEmail, FILTER_VALIDATE_EMAIL)) { http_response_code(400); echo json_encode(['success' => false, 'message' => 'A valid email is required']); exit; }
+
+/* ---- 2b. Email domain must actually receive mail (MX / A record) ---- */
+if (!crm_email_domain_ok($clientEmail)) {
+    crm_file_log("REJECT(no-mx) form=$formType email=$clientEmail");
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'That email domain does not appear to accept mail - please double-check the address.']);
+    exit;
+}
+
+/* ---- 2c. Bot heuristics (gibberish names, numeric messages, disposable
+        domains). Fake success so bots learn nothing; nothing is stored. ---- */
+$spamReason = crm_spam_reason($clientName, $clientEmail, $message, $company);
+if ($spamReason !== null) {
+    crm_file_log("SPAM($spamReason) form=$formType name=$clientName email=$clientEmail");
+    echo json_encode(['success' => true, 'message' => 'Thank you! We will get back to you within 24 hours.']);
+    exit;
+}
+
+/* ---- 2d. reCAPTCHA v3 (active only once RECAPTCHA_SECRET is set) ---- */
+if (!crm_recaptcha_ok($data['recaptcha_token'] ?? null, 0.5)) {
+    crm_file_log("SPAM(recaptcha) form=$formType email=$clientEmail");
+    echo json_encode(['success' => true, 'message' => 'Thank you! We will get back to you within 24 hours.']);
+    exit;
+}
 
 /* ---- 3. CSRF: token issued by /api/csrf.php, bound to the session ---- */
 crm_session_start();
@@ -83,9 +109,9 @@ if (!$consentGiven) {
 try {
     $db = crm_db();
     $ipHash = crm_ip_hash();
-    if (!crm_rate_limit_ok($db, $ipHash, 5, 3600)) {
+    if (!crm_rate_limit_ok($db, $ipHash, (int)(getenv('CRM_RATE_MAX') ?: 3), 3600)) {
         http_response_code(429);
-        echo json_encode(['success' => false, 'message' => 'Too many submissions - please try again in an hour, or email info@fabrioza.com directly.']);
+        echo json_encode(['success' => false, 'message' => 'Too many requests. Please try again later.']);
         exit;
     }
 } catch (Throwable $e) {
@@ -116,7 +142,12 @@ if ($db) {
         $leadId = (int)$db->lastInsertId();
     } catch (Throwable $e) {
         error_log('FABRIOZA CRM lead insert failed: ' . $e->getMessage());
+        crm_failed_lead_dump($payload ?? ['name' => $clientName, 'email' => $clientEmail,
+            'form_type' => $formType, 'message' => $message]);
     }
+} else {
+    crm_failed_lead_dump(['name' => $clientName, 'email' => $clientEmail,
+        'form_type' => $formType, 'message' => $message, 'reason' => 'db unavailable']);
 }
 
 /* ---- 7. Best-effort email (notification + auto-reply), fully logged ---- */
@@ -149,6 +180,7 @@ if ($SMTP_PASS !== '') {
 }
 
 /* ---- 8. Respond. The lead is stored; email failure is an internal problem. ---- */
+crm_file_log('LEAD' . ($leadId ? " #$leadId" : ' (DB-FAILED)') . " form=$formType email=$clientEmail notif=" . ($notifSent ? 'sent' : 'FAILED'));
 if ($leadId !== null || $notifSent) {
     echo json_encode(['success' => true, 'message' => 'Thank you! We will get back to you within 24 hours.']);
 } else {
@@ -169,6 +201,20 @@ function logEmail(?PDO $db, ?int $leadId, string $recipient, string $subject, bo
 }
 
 function smtpSend($host, $port, $user, $pass, $from, $to, $toName, $subject, $htmlBody, $replyTo = '', $replyToName = ''): array {
+    // Retry up to 3 attempts. Delay is 3s (not 5s) and SMTP timeout 8s so the
+    // absolute worst case (3x8s + 2x3s = 30s) stays inside PHP's request
+    // budget - and the lead is already saved in SQLite before we ever get here.
+    $attempts = 3; $delay = 3; $lastErr = '';
+    for ($i = 1; $i <= $attempts; $i++) {
+        [$ok, $err] = smtpSendOnce($host, $port, $user, $pass, $from, $to, $toName, $subject, $htmlBody, $replyTo, $replyToName);
+        if ($ok) { return [true, $i > 1 ? "succeeded on attempt $i" : '']; }
+        $lastErr = $err;
+        if ($i < $attempts) { sleep($delay); }
+    }
+    return [false, "after $attempts attempts: $lastErr"];
+}
+
+function smtpSendOnce($host, $port, $user, $pass, $from, $to, $toName, $subject, $htmlBody, $replyTo = '', $replyToName = ''): array {
     try {
         $mail = new PHPMailer(true);
         $mail->isSMTP();
@@ -178,7 +224,7 @@ function smtpSend($host, $port, $user, $pass, $from, $to, $toName, $subject, $ht
         $mail->Password   = $pass;
         $mail->Port       = $port;
         $mail->SMTPSecure = ($port === 587) ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
-        $mail->Timeout    = 15;
+        $mail->Timeout    = 8;
         $mail->CharSet    = 'UTF-8';
         $mail->setFrom($from, 'FABRIOZA');
         $mail->addAddress($to, $toName);

@@ -155,3 +155,89 @@ function crm_session_start(): void {
     session_name('FABSESS');
     session_start();
 }
+
+/* ======================= anti-spam layer (2026-07-27) ======================= */
+
+/** Append a line to the persistent form log (inside the /var/data volume,
+ *  because /var/log inside the container is wiped on every rebuild). */
+function crm_file_log(string $line): void {
+    $dir = (getenv('CRM_DATA_DIR') ?: '/var/data') . '/logs';
+    if (!is_dir($dir)) { @mkdir($dir, 0770, true); }
+    @file_put_contents($dir . '/form_submissions.log',
+        '[' . gmdate('Y-m-d H:i:s') . ' UTC] ' . $line . "\n", FILE_APPEND | LOCK_EX);
+}
+
+/** Last-resort lead dump used only when the DATABASE insert itself failed. */
+function crm_failed_lead_dump(array $payload): void {
+    $dir = (getenv('CRM_DATA_DIR') ?: '/var/data') . '/logs';
+    if (!is_dir($dir)) { @mkdir($dir, 0770, true); }
+    $payload['_failed_at'] = gmdate('c');
+    @file_put_contents($dir . '/failed_leads.json',
+        json_encode($payload, JSON_UNESCAPED_UNICODE) . "\n", FILE_APPEND | LOCK_EX);
+}
+
+/** Heuristic bot detection. Returns a short reason string, or null if clean. */
+function crm_spam_reason(string $name, string $email, string $message, string $company = ''): ?string {
+    // gibberish name: "UuKQdGJNJImxNGUYM" style
+    foreach ([['name', $name], ['company', $company]] as [$label, $v]) {
+        $letters = preg_replace('/[^A-Za-z]/', '', $v);
+        if ($letters !== '') {
+            $noVowels = !preg_match('/[aeiouAEIOU]/', $letters);
+            if ($noVowels && strlen($letters) >= 7) { return "$label-no-vowels"; }
+            if (strlen($v) > 20 && strpos(trim($v), ' ') === false) { return "$label-long-no-space"; }
+            // random case flips (UuKQdG...): count transitions between cases
+            $flips = 0; $prevUpper = null;
+            foreach (str_split($letters) as $c) {
+                $u = ctype_upper($c);
+                if ($prevUpper !== null && $u !== $prevUpper) { $flips++; }
+                $prevUpper = $u;
+            }
+            if ($flips >= 6 && strpos(trim($v), ' ') === false) { return "$label-random-case"; }
+        }
+    }
+    // message that is only a number ("5631488187")
+    if (preg_match('/^\d{4,}$/', trim($message))) { return 'message-only-digits'; }
+    // disposable email domains
+    $domain = strtolower(substr(strrchr($email, '@') ?: '', 1));
+    static $disposable = ['mailinator.com','guerrillamail.com','guerrillamail.info','10minutemail.com',
+        'tempmail.com','temp-mail.org','yopmail.com','trashmail.com','sharklasers.com','getnada.com',
+        'dispostable.com','maildrop.cc','fakeinbox.com','throwawaymail.com','mohmal.com','emailondeck.com',
+        'mintemail.com','tempinbox.com','spamgourmet.com','mytemp.email','burnermail.io','tempmailo.com'];
+    if ($domain !== '' && in_array($domain, $disposable, true)) { return 'disposable-email'; }
+    return null;
+}
+
+/** DNS-level email deliverability check: the domain must have MX (or at
+ *  least A/AAAA - some small but legitimate domains receive mail on A). */
+function crm_email_domain_ok(string $email): bool {
+    $domain = substr(strrchr($email, '@') ?: '', 1);
+    if ($domain === '') { return false; }
+    if (function_exists('checkdnsrr')) {
+        if (checkdnsrr($domain, 'MX')) { return true; }
+        if (checkdnsrr($domain, 'A') || checkdnsrr($domain, 'AAAA')) { return true; }
+        return false;
+    }
+    return true; // cannot check - do not block
+}
+
+/** reCAPTCHA v3 server verification. Returns true when:
+ *  - no secret configured (feature off until keys are added), or
+ *  - Google confirms the token with score >= threshold. */
+function crm_recaptcha_ok(?string $token, float $threshold = 0.5): bool {
+    $secret = getenv('RECAPTCHA_SECRET') ?: '';
+    if ($secret === '') { return true; }           // not enabled yet
+    if (!$token) { return false; }                 // enabled but no token = bot
+    try {
+        $ctx = stream_context_create(['http' => [
+            'method' => 'POST', 'timeout' => 6,
+            'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
+            'content' => http_build_query(['secret' => $secret, 'response' => $token]),
+        ]]);
+        $res = file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, $ctx);
+        $j = json_decode((string)$res, true);
+        return !empty($j['success']) && (float)($j['score'] ?? 0) >= $threshold;
+    } catch (Throwable $e) {
+        error_log('FABRIOZA recaptcha verify error: ' . $e->getMessage());
+        return true; // verification outage must not block real customers
+    }
+}

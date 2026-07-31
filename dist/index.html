@@ -862,6 +862,13 @@ a.fixed.bottom-36.right-6,.fixed.bottom-36.right-6{bottom:168px!important}
       })();
     </script>
   <script>
+/* TODO(fabrioza): paste your reCAPTCHA v3 SITE key between the quotes to
+   activate invisible bot scoring on all forms (secret key goes in the VPS
+   .env as RECAPTCHA_SECRET). Leave empty = feature off. */
+window.FAB_RECAPTCHA_KEY="";
+if(window.FAB_RECAPTCHA_KEY){var s=document.createElement("script");s.src="https://www.google.com/recaptcha/api.js?render="+window.FAB_RECAPTCHA_KEY;document.head.appendChild(s);}
+</script>
+<script>
 /* FABRIOZA CRM form guard: UTM capture, GDPR consent gate, CSRF + enrichment,
    GA4 generate_lead. Wraps fetch so every SPA form (quote, popup, chat, guide)
    passes through the same protections without touching the React bundle. */
@@ -897,10 +904,13 @@ a.fixed.bottom-36.right-6,.fixed.bottom-36.right-6{bottom:168px!important}
     var self=this;
     return askConsent().then(function(okC){
       if(!okC)return Promise.reject(new Error("Consent required to send your enquiry."));
-      return getCsrf().then(function(tok){
+      var tokP=getCsrf();
+      var capP=(window.FAB_RECAPTCHA_KEY&&window.grecaptcha)?new Promise(function(res){grecaptcha.ready(function(){grecaptcha.execute(window.FAB_RECAPTCHA_KEY,{action:"lead"}).then(res,function(){res(null)});})}):Promise.resolve(null);
+      return Promise.all([tokP,capP]).then(function(pair){var tok=pair[0],cap=pair[1];
         try{
           var body={};try{body=JSON.parse((o&&o.body)||"{}")}catch(e){}
           body.csrf=tok;body.gdpr_consent=true;
+          if(cap)body.recaptcha_token=cap;
           if(body.website===undefined)body.website="";
           body.source_page=location.pathname+(location.hash||"");
           ["utm_source","utm_medium","utm_campaign"].forEach(function(k){var v=sessionStorage.getItem("fab_"+k);if(v)body[k]=v;});
