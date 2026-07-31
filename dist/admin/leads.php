@@ -55,6 +55,11 @@ $pages = max(1, (int)ceil($total / $per));
 $st = $db->prepare("SELECT * FROM leads WHERE $W ORDER BY $sort $dir LIMIT $per OFFSET " . (($page - 1) * $per));
 $st->execute($p);
 $rows = $st->fetchAll();
+/* stale = new for 7+ days with no notes and no status change (visual flag only) */
+$staleIds = array_column($db->query("SELECT id FROM leads l WHERE status='new'
+    AND created_at <= datetime('now','-7 days')
+    AND NOT EXISTS (SELECT 1 FROM notes n WHERE n.lead_id = l.id)
+    AND NOT EXISTS (SELECT 1 FROM audit_log a WHERE a.lead_id = l.id AND a.action LIKE 'status_changed%')")->fetchAll(), 'id');
 $formTypes = $db->query("SELECT DISTINCT form_type FROM leads WHERE form_type != '' ORDER BY 1")->fetchAll(PDO::FETCH_COLUMN);
 
 function sortlink(string $key, string $label): string {
@@ -105,6 +110,7 @@ adm_head('Leads');
       <td class="p-3 whitespace-nowrap text-stone-500"><?= e(substr($r['created_at'], 0, 10)) ?></td>
       <td class="p-3 <?= $r['status'] === 'new' ? 'font-bold' : '' ?>">
         <a class="hover:underline" href="/admin/lead.php?id=<?= $r['id'] ?>"><?= e($r['name']) ?></a>
+        <?php if (in_array($r['id'], $staleIds)): ?><span class="ml-1 text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded-full font-bold uppercase">needs attention</span><?php endif; ?>
         <div class="text-xs text-stone-400"><?= e($r['email']) ?></div></td>
       <td class="p-3"><?= e($r['company']) ?></td>
       <td class="p-3 text-xs"><?= e($r['form_type']) ?></td>

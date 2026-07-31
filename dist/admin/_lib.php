@@ -98,6 +98,7 @@ function adm_head(string $title): void {
           <a class="hover:text-emerald-400" href="/admin/">Dashboard</a>
           <a class="hover:text-emerald-400" href="/admin/leads.php">Leads</a>
           <a class="hover:text-emerald-400" href="/admin/followups.php">Follow-ups</a>
+          <a class="hover:text-emerald-400" href="/admin/add-lead.php">+ Add lead</a>
           <a class="hover:text-emerald-400 text-stone-400" href="/admin/logout.php">Log out</a>
         </nav>
       </div></header><main class="max-w-6xl mx-auto px-4 py-6">';
