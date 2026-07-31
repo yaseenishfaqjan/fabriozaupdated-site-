@@ -12,6 +12,11 @@ services:
       SMTP_USER: ${SMTP_USER:-sales@fabrioza.com}
       SMTP_PASS: ${SMTP_PASS:-}
       MAIL_TO: ${MAIL_TO:-sales@fabrioza.com}
+      CRM_IP_SALT: ${CRM_IP_SALT:-}
+      CRM_RATE_MAX: ${CRM_RATE_MAX:-3}
+      RECAPTCHA_SECRET: ${RECAPTCHA_SECRET:-}
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASS_HASH: ${ADMIN_PASS_HASH:-}
     volumes:
       # CRM SQLite database - OUTSIDE the web root, survives rebuilds
       - crm_data:/var/data
