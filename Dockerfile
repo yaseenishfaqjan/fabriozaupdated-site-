@@ -16,6 +16,9 @@ RUN a2enmod rewrite headers expires deflate \
 # SSL terminates at the fronting nginx. Without this, every 301 pointed at
 # http:// first and cost a second hop through the https redirect.
 
+# CRM data dir (named volume mounts here; ownership seeded from the image)
+RUN mkdir -p /var/data && chown www-data:www-data /var/data
+
 COPY dist/ /var/www/html/
 
 EXPOSE 80
