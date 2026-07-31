@@ -9,7 +9,7 @@ function fab_tpl_wrap(string $inner): string {
 <p style='margin:4px 0 0;font-size:13px'>Premium Private Label Clothing Manufacturer</p></div>
 <div style='background:#fff;padding:28px 20px;border:1px solid #ddd'>$inner
 <p>Best regards,<br><strong>The FABRIOZA Team</strong></p>
-<p style='font-size:12px;color:#666'>USA Office: 157 Everett Sq, McDonough, GA 30252<br>
+<p style='font-size:12px;color:#666'>USA Office: McDonough, Georgia (by appointment)<br>
 Factory: Saro Street, near Fateh Garh Road, Sialkot 51310, Pakistan<br>Email: info@fabrioza.com</p></div>
 <div style='text-align:center;padding:16px;color:#999;font-size:11px'>
 &copy; 2026 FABRIOZA &middot; You received this because you contacted us via fabrioza.com.

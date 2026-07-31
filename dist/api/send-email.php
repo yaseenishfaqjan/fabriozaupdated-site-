@@ -314,7 +314,7 @@ body{font-family:Arial,sans-serif;line-height:1.6;color:#333}
 </div>
 <p>In the meantime, feel free to explore our website or book a meeting directly using the link above.</p>
 <p>Best regards,<br><strong>The FABRIOZA Team</strong></p>
-<p style='font-size:12px;color:#666'>USA Office: 157 Everett Sq, McDonough, GA 30252<br>Factory / Head Office: Saro Street, near Fateh Garh Road, Sialkot 51310, Pakistan<br>Email: info@fabrioza.com</p>
+<p style='font-size:12px;color:#666'>USA Office: McDonough, Georgia (by appointment)<br>Factory / Head Office: Saro Street, near Fateh Garh Road, Sialkot 51310, Pakistan<br>Email: info@fabrioza.com</p>
 </div>
 <div class='footer'>
 <p>This is an automated response. Please do not reply to this email.</p>
