@@ -53,7 +53,6 @@ ErrorDocument 404 /404.html
   # --- 4. Old thin "meta refresh" stub pages -> single-hop server 301s ---
   # /about, /contact, /products, /moq exist on disk only as client-side
   # redirect stubs; crawlers flagged them as "Page with redirect".
-  RewriteRule ^about/?$    https://fabrioza.com/#factory    [R=301,NE,L]
   RewriteRule ^services/?$ https://fabrioza.com/what-we-make                    [R=301,L]
   RewriteRule ^contact/?$  https://fabrioza.com/#contact    [R=301,NE,L]
   RewriteRule ^products/?$ https://fabrioza.com/#catalog    [R=301,NE,L]
