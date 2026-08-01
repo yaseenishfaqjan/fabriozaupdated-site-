@@ -559,6 +559,12 @@ a.fixed.bottom-36.right-6,.fixed.bottom-36.right-6{bottom:168px!important}
   .fixed.bottom-24.right-6.w-10{display:none}  /* hide scroll-top pip on phones */
 }
 </style>
+<style>/* fab-mobile-calm: phones get only the app's own modal;
+   injected welcome popup + spotlight are desktop-only */
+@media(max-width:767px){
+  #fab-popup,#fab-spotlight{display:none!important}
+}
+</style>
 </head>
   <body>
     <div id="root"></div>

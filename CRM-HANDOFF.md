@@ -25,8 +25,19 @@ lockout per IP, sessions expire after 2 idle hours.
 0 6 * * *   docker exec fabrioza-web php /var/www/html/api/daily-digest.php       # morning summary email
 30 6 * * *  docker exec fabrioza-web php /var/www/html/api/process-sequences.php  # automated follow-ups
 ```
-Check them with `crontab -l`; logs in `/var/log/fabrioza-digest.log` and
-`/var/log/fabrioza-sequences.log`. Preview what sequences WOULD send:
+```
+*/30 * * * * docker exec fabrioza-web php /var/www/html/api/import-inbox.php   # Gmail inbox -> CRM
+```
+The inbox importer logs replies from known leads onto their CRM record
+(pauses sequences, promotes new->quoted) and creates leads from unknown
+senders (form_type "Inbox Email"). One-time historic backfill:
+`docker exec fabrioza-web php /var/www/html/api/import-inbox.php --all`
+Preview safely first with `--dry-run`. GDPR note: imported emails are
+processed under legitimate interest (they wrote to us); the erasure
+procedure applies to them like any lead.
+
+Check crons with `crontab -l`; logs in `/var/log/fabrioza-digest.log`,
+`/var/log/fabrioza-sequences.log` and `/var/log/fabrioza-inbox.log`. Preview what sequences WOULD send:
 `docker exec fabrioza-web php /var/www/html/api/process-sequences.php --dry-run`
 
 ## 3. Backups

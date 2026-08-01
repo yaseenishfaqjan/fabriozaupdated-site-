@@ -93,6 +93,14 @@ function crm_db(): PDO {
         // Phase C: pause flag stops automated follow-up sequences per lead
         $pdo->exec('ALTER TABLE leads ADD COLUMN sequences_paused INTEGER DEFAULT 0');
         $pdo->exec('PRAGMA user_version = 2');
+        $version = 2;
+    }
+    if ($version < 3) {
+        // Inbox importer: processed-message dedup
+        $pdo->exec('CREATE TABLE IF NOT EXISTS mail_seen (
+            message_id TEXT PRIMARY KEY,
+            processed_at DATETIME DEFAULT CURRENT_TIMESTAMP)');
+        $pdo->exec('PRAGMA user_version = 3');
     }
     return $pdo;
 }
