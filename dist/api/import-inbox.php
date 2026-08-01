@@ -34,10 +34,18 @@ $SKIP_PATTERNS = ['noreply', 'no-reply', 'no_reply', 'mailer-daemon', 'postmaste
     '@linkedin.com', '@amazonses.com', '@sendgrid', '@mailchimp', 'support@', 'billing@', 'accounts@',
     // bulk-mail subdomains (send.calendly.com, mail.consensus.app, email.heygen.com ...)
     '@send.', '@mail.', '@email.', '@e.', '@news.', '@marketing.', '@updates.', '@notify.',
+    '@info.', '@go.', '@hello.', '@reply.', '@post.', '@em.', '@mailer.', '@newsletter.',
     // known SaaS/marketing senders + own other businesses
     'calendly', 'heygen', 'consensus.app', '@cal.com', 'nodevant',
     'stripe.com', 'paypal.com', 'payoneer', 'shopify', 'wix.com', 'godaddy', 'namecheap',
-    'hostinger', 'contabo', 'cloudflare', 'semrush', 'canva', 'figma', 'openai', 'anthropic'];
+    'hostinger', 'contabo', 'cloudflare', 'semrush', 'canva', 'figma', 'openai', 'anthropic',
+    'pinterest', 'instagram', 'facebook', 'twitter.com', 'x.com', 'tiktok', 'meta.com', 'snapchat',
+    'upwork', 'fiverr', 'freelancer.com', 'alibaba', 'aliexpress', 'made-in-china', 'dhgate',
+    'indeed', 'glassdoor', 'zoom.us', 'slack.com', 'notion.so', 'dropbox', 'adobe.com',
+    'microsoft.com', 'apple.com', 'amazon.com', 'ebay.com', 'etsy.com', 'reddit.com', 'quora.com',
+    'medium.com', 'substack', 'mailchimp', 'hubspot', 'salesforce', 'zendesk', 'intercom',
+    'marketing@', 'promo', 'deals@', 'offers@', 'digest@', 'team@', 'community@', 'events@',
+    'webinar', 'invoice', 'receipt'];
 // extra skips without code changes: CRM_INBOX_SKIP=comma,separated,patterns in .env
 foreach (array_filter(array_map('trim', explode(',', getenv('CRM_INBOX_SKIP') ?: ''))) as $extra) {
     $SKIP_PATTERNS[] = strtolower($extra);
@@ -81,6 +89,29 @@ function parse_from(string $from): array {
 }
 
 $db = crm_db();
+
+/* --prune: delete previously imported Inbox Email leads whose sender
+   matches the (now stricter) skip list. Safe to run repeatedly; pruned
+   messages stay in mail_seen so they are never re-imported. */
+if (in_array('--prune', $argv, true)) {
+    $pruned = 0;
+    foreach ($db->query("SELECT id, email FROM leads WHERE form_type = 'Inbox Email'")->fetchAll() as $r) {
+        $addr = strtolower($r['email']);
+        $bad = in_array($addr, $SKIP_SENDERS, true);
+        foreach ($SKIP_PATTERNS as $p) { if (!$bad && strpos($addr, $p) !== false) { $bad = true; } }
+        if ($bad) {
+            $db->prepare('DELETE FROM leads WHERE id = ?')->execute([$r['id']]);
+            $db->prepare('INSERT INTO audit_log (action, lead_id, actor) VALUES (?,?,?)')
+               ->execute(['lead_pruned_junk', $r['id'], 'inbox-import']);
+            echo "pruned junk lead #{$r['id']} <{$r['email']}>
+";
+            $pruned++;
+        }
+    }
+    echo "prune done: $pruned junk lead(s) removed
+";
+    exit(0);
+}
 
 /* 1. UID SEARCH */
 $criteria = $all ? 'UID SEARCH ALL' : 'UID SEARCH SINCE ' . date('j-M-Y', strtotime('-3 days'));
