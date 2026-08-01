@@ -29,9 +29,19 @@ $all = in_array('--all', $argv, true);
 $dry = in_array('--dry-run', $argv, true);
 
 $SKIP_SENDERS = ['fabriozadotcom@gmail.com', 'info@fabrioza.com', 'sales@fabrioza.com'];
-$SKIP_PATTERNS = ['noreply', 'no-reply', 'mailer-daemon', 'postmaster', 'notification', 'newsletter',
-    'donotreply', 'automated', '@google.com', '@youtube.com', '@facebookmail.com', '@linkedin.com',
-    '@amazonses.com', '@sendgrid', '@mailchimp', 'support@', 'billing@', 'accounts@'];
+$SKIP_PATTERNS = ['noreply', 'no-reply', 'no_reply', 'mailer-daemon', 'postmaster', 'notification',
+    'newsletter', 'donotreply', 'automated', '@google.com', '@youtube.com', '@facebookmail.com',
+    '@linkedin.com', '@amazonses.com', '@sendgrid', '@mailchimp', 'support@', 'billing@', 'accounts@',
+    // bulk-mail subdomains (send.calendly.com, mail.consensus.app, email.heygen.com ...)
+    '@send.', '@mail.', '@email.', '@e.', '@news.', '@marketing.', '@updates.', '@notify.',
+    // known SaaS/marketing senders + own other businesses
+    'calendly', 'heygen', 'consensus.app', '@cal.com', 'nodevant',
+    'stripe.com', 'paypal.com', 'payoneer', 'shopify', 'wix.com', 'godaddy', 'namecheap',
+    'hostinger', 'contabo', 'cloudflare', 'semrush', 'canva', 'figma', 'openai', 'anthropic'];
+// extra skips without code changes: CRM_INBOX_SKIP=comma,separated,patterns in .env
+foreach (array_filter(array_map('trim', explode(',', getenv('CRM_INBOX_SKIP') ?: ''))) as $extra) {
+    $SKIP_PATTERNS[] = strtolower($extra);
+}
 
 /** One IMAP command via curl. $urlPath is appended to the mailbox URL. */
 function imap_curl(string $user, string $pass, string $urlPath = '', ?string $customRequest = null): ?string {
