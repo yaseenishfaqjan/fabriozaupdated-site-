@@ -45,7 +45,9 @@ $SKIP_PATTERNS = ['noreply', 'no-reply', 'no_reply', 'mailer-daemon', 'postmaste
     'microsoft.com', 'apple.com', 'amazon.com', 'ebay.com', 'etsy.com', 'reddit.com', 'quora.com',
     'medium.com', 'substack', 'mailchimp', 'hubspot', 'salesforce', 'zendesk', 'intercom',
     'marketing@', 'promo', 'deals@', 'offers@', 'digest@', 'team@', 'community@', 'events@',
-    'webinar', 'invoice', 'receipt'];
+    'webinar', 'invoice', 'receipt', 'welcome@', 'hello@tradingview', 'tradingview',
+    'shotstack', 'cloudinary', 'supabase', 'columbia.edu', 'coursera', 'udemy', 'vercel',
+    'netlify', 'github', 'gitlab', 'digitalocean', 'aws.amazon', 'railway.app', 'render.com'];
 // extra skips without code changes: CRM_INBOX_SKIP=comma,separated,patterns in .env
 foreach (array_filter(array_map('trim', explode(',', getenv('CRM_INBOX_SKIP') ?: ''))) as $extra) {
     $SKIP_PATTERNS[] = strtolower($extra);
