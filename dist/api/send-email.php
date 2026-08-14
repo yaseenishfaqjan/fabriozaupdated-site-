@@ -140,6 +140,14 @@ if ($db) {
         $stmt->execute([$clientName, $clientEmail, $company, $country, $productType, $quantity,
             $message, $formType, $sourcePage, $utmSource, $utmMedium, $utmCampaign, $score, $ipHash]);
         $leadId = (int)$db->lastInsertId();
+        crm_notify("🟢 NEW LEAD #$leadId ($formType)
+$clientName" . ($company !== '' ? " - $company" : '')
+            . "
+$clientEmail" . ($quantity !== '' ? "
+Qty: $quantity" : '') . "
+Score: $score"
+            . "
+https://fabrioza.com/admin/lead.php?id=$leadId");
     } catch (Throwable $e) {
         error_log('FABRIOZA CRM lead insert failed: ' . $e->getMessage());
         crm_failed_lead_dump($payload ?? ['name' => $clientName, 'email' => $clientEmail,

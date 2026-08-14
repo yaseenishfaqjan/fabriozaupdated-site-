@@ -255,3 +255,22 @@ function crm_recaptcha_ok(?string $token, float $threshold = 0.5): bool {
         return true; // verification outage must not block real customers
     }
 }
+
+/** Instant push notification for new leads via Telegram (free).
+ *  Configure in VPS .env: TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID
+ *  (setup steps in CRM-HANDOFF.md). Silent no-op when unset. */
+function crm_notify(string $text): void {
+    $token = getenv('TELEGRAM_BOT_TOKEN') ?: '';
+    $chat  = getenv('TELEGRAM_CHAT_ID') ?: '';
+    if ($token === '' || $chat === '') { return; }
+    try {
+        $ch = curl_init('https://api.telegram.org/bot' . $token . '/sendMessage');
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query(['chat_id' => $chat, 'text' => $text]),
+            CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 6,
+        ]);
+        curl_exec($ch);
+        curl_close($ch);
+    } catch (Throwable $e) { error_log('crm_notify: ' . $e->getMessage()); }
+}

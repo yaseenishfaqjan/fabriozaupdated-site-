@@ -40,6 +40,22 @@ Check crons with `crontab -l`; logs in `/var/log/fabrioza-digest.log`,
 `/var/log/fabrioza-sequences.log` and `/var/log/fabrioza-inbox.log`. Preview what sequences WOULD send:
 `docker exec fabrioza-web php /var/www/html/api/process-sequences.php --dry-run`
 
+## 2b. Instant lead notifications on your phone (Telegram)
+
+Gmail hides self-sent notification emails, so the CRM pushes new leads to
+Telegram instead. One-time setup (5 minutes):
+1. In Telegram, message **@BotFather** -> /newbot -> pick a name ->
+   copy the **token** (looks like 123456:ABC-DEF...).
+2. Message your new bot anything (e.g. "hi").
+3. Open https://api.telegram.org/bot<TOKEN>/getUpdates in a browser -
+   copy the number at "chat":{"id": ... } - that is your **chat id**.
+4. On the VPS:
+   echo "TELEGRAM_BOT_TOKEN=thetoken" >> /opt/fabrioza/.env
+   echo "TELEGRAM_CHAT_ID=thechatid" >> /opt/fabrioza/.env
+   cd /opt/fabrioza && docker compose up -d
+From then on every new form lead, inbox lead and detected reply pings your
+phone instantly with a direct link to the lead. Unset = feature off.
+
 ## 3. Backups
 
 The whole CRM is one file. Daily snapshot + 30-day retention:
