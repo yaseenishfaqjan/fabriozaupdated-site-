@@ -130,3 +130,31 @@ Full grep of `MOQ`, `50 pieces`, `50 pcs`, `from 50`, `20 sets` across `dist/`:
 **TODO(fabrioza) items for the owner:** ① confirm held certifications + numbers (BSCI / OEKO-TEX / WRAP / SEDEX / GOTS, ISO 9001 cert no.); ② confirm the 20-piece MOQ business decision and the 20-tier per-unit prices before Phase 2 (do NOT want to publish invented prices); ③ decide keep-vs-merge preference defaults for the twin posts ahead of Phase 3 review.
 
 — End of Phase 0. No site files modified. Awaiting review before Phase 1.
+
+---
+
+## 2026-08-23 — Homepage professionalisation + price uplift
+
+**Homepage (`dist/index.html` + bundle):** `<main>` cut from 28 stacked sections to 18
+(Hero · Trust bar · What We Manufacture · Catalog · Process · Services · Factory · Quality ·
+Premium gallery · Comparison · Cost calculator · Industries · Risk-free guarantee · Pricing-guide
+lead magnet · Blog · FAQ · Contact · Final CTA). Removed from the render list (components still
+in the bundle, one-line restore each): ClientLogos stats strip (duplicate of trust bar),
+CategoryShowcase (duplicate "8 production lines"), CaseStudies + Testimonials (fictional
+clients — never reinstate without real, consented quotes), MoqCalculator, AIDesignTool,
+WhyFABRIOZA, ConfidentialityGuarantee, ProductionTimeline, WorldMap, FreeGuidePopup,
+emptied SocialProofToast; injected activewear band + rotating spotlight toast dropped.
+"8 Specialized Production Lines" (8 tabs × 16 photos) replaced by a 16-tile
+**What We Manufacture** grid linking every collection page. Catalog curated 63 → 40 products
+(only items whose photo matches the product; 13 reused photos and 12 mislabelled photos
+removed/renamed), 15 categories, 12 shown + "View all". Footer "Case Studies" → /about.
+
+**Prices (+$4 on every garment list price, sitewide, same 30 % 500+ rule):** homepage catalog,
+`/pricing` (title, meta, chips, table), `/small-batch-clothing-manufacturer`, homepage schema
+offers (16.00 / 9.50 / 10.00), comparison table tee ($9.50), cost calculator bases, premium
+gallery ranges, `/streetwear-collection` (29), `/sportswear-catalog` (27, socks kept),
+hoodie + t-shirt cost articles (FABRIOZA-specific figures only; market ranges untouched),
+DDP example in costs-guide + pakistan-vs-china ($17 DDP vs China $15 FOB → 20 % saving),
+custom-hoodie FAQ ($16-29), cricket/rugby ($18-20/set), netball ($15-18), team-uniform
+($14-26), custom-sportswear ($12-22). Accessories: caps +$4, socks $4.50, packaging unchanged.
+Streetwear band "from" prices now read from the real catalog minimums ($24 / $20 / $16).
