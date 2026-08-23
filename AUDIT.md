@@ -158,3 +158,30 @@ DDP example in costs-guide + pakistan-vs-china ($17 DDP vs China $15 FOB → 20 
 custom-hoodie FAQ ($16-29), cricket/rugby ($18-20/set), netball ($15-18), team-uniform
 ($14-26), custom-sportswear ($12-22). Accessories: caps +$4, socks $4.50, packaging unchanged.
 Streetwear band "from" prices now read from the real catalog minimums ($24 / $20 / $16).
+
+### Same day — homepage design pass (no sections removed)
+
+Benchmarked 12 B2B apparel-manufacturer homepages (Appareify, Berunwear, Ninghow,
+BELLA+CANVAS, AS Colour, Sewport, Printful Enterprise, plus the Sialkot set:
+xsportswears, Somine, Core Sportswears, Karsan). Findings applied here: MOQ in the
+hero, trust strip directly under it, one photographic family for category tiles,
+2 colours + neutrals, one card frame, no duplicate price on a card, and named
+client brands (the strongest gap vs. local competitors, none of whom show any).
+
+New `dist/assets/fab-ui.css` (loaded after the app stylesheet, so no rebuild):
+vertical rhythm is vw-based instead of `10vh` (which stacked into ~280px voids
+between neighbouring sections); one H2 scale; one radius scale; `.fab-dark` lifts
+body copy on ink bands from #6B6B6B to rgba(255,255,255,.70); `.btn-outline`
+added because `.btn-secondary` is white-on-transparent and was **invisible** on
+light sections (it hid "View all 40 products" and "Book a consultation"); the
+blue volume-discount pill, the amber cost warning and the green/black/green stat
+trio are folded back into the two-colour palette; `.fab-tile` gives every
+collection tile one aspect ratio, one scrim and one type scale.
+
+Bundle: hero pills lead with "MOQ 50 pcs · trials from 20"; trust bar is a dark
+shelf instead of a green slab; product cards show one price instead of two and a
+neutral SKU chip; 7 collection tiles re-pointed at the `sw-*` studio set so all
+16 read as one product family; new `#clients` section — **Southern Heritage Co.**
+and **APOLLO IX Official**, brand names supplied by the owner, described by the
+work done rather than with invented quotes (no fabricated testimonial copy —
+swap in real statements when the brands provide them).

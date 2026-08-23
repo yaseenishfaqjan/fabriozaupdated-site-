@@ -1,0 +1,297 @@
+/* ==========================================================================
+   FABRIOZA — homepage design layer  (2026-08-23)
+   Loaded AFTER the app stylesheet so it wins without touching the build.
+   Rules of the system:
+     · two colours — forest green #4A7C59 and ink #0A0A0A — plus neutrals
+     · one vertical rhythm, one radius scale, one card frame
+     · every tile the same shape, same scrim, same type sizes
+   ========================================================================== */
+
+:root {
+  --fab-ink: #0A0A0A;
+  --fab-ink-soft: #141715;
+  --fab-green: #4A7C59;
+  --fab-green-deep: #3D6B52;
+  --fab-paper: #F7F7F5;
+  --fab-line: #E4E4DE;
+  --fab-line-dark: rgba(255, 255, 255, .10);
+  --fab-body: #5C625D;
+  --fab-body-dark: rgba(255, 255, 255, .70);
+  --fab-mute-dark: rgba(255, 255, 255, .50);
+  --fab-r-sm: 8px;
+  --fab-r: 12px;
+  --fab-r-lg: 16px;
+}
+
+/* ---------------------------------------------------------------- rhythm */
+/* was clamp(80px,10vh,140px): viewport-height based, so it ballooned on tall
+   screens and stacked into 280px voids between neighbouring sections. */
+#root .section-padding {
+  padding-top: clamp(56px, 6.2vw, 92px);
+  padding-bottom: clamp(56px, 6.2vw, 92px);
+}
+#root .content-container { max-width: 1180px; }
+
+/* consecutive same-colour sections shouldn't read as one giant gap */
+#root section + section { position: relative; }
+
+/* ---------------------------------------------------------------- type */
+#root h2.font-serif {
+  font-size: clamp(1.8rem, 1.05rem + 1.55vw, 2.45rem) !important;
+  line-height: 1.14 !important;
+  letter-spacing: -.006em;
+}
+#root h1.hero-headline {
+  letter-spacing: -.012em;
+  font-size: clamp(2rem, 1.1rem + 2.9vw, 3.5rem) !important;
+  line-height: 1.06 !important;
+}
+#root .text-label {
+  font-size: .6875rem;
+  font-weight: 600;
+  letter-spacing: .155em;
+}
+/* section intro paragraph: one measure everywhere.
+   Colour is set only for the grey utility classes — never blanket-coloured, or
+   white copy on the ink and green bands turns unreadable. */
+#root section h2.font-serif + p,
+#root section h2.font-serif ~ p.max-w-xl,
+#root section h2.font-serif ~ p.max-w-2xl {
+  max-width: 620px;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: .9375rem;
+  line-height: 1.7;
+}
+#root section h2.font-serif + p.text-cool-gray { color: var(--fab-body); }
+.fab-dark h2.font-serif + p.text-cool-gray { color: var(--fab-body-dark) !important; }
+#root .font-serif { font-weight: 400; }
+
+/* ---------------------------------------------------------------- buttons */
+#root .btn-primary,
+#root .btn-secondary,
+#root .btn-outline {
+  border-radius: var(--fab-r-sm);
+  padding: .95rem 1.75rem;
+  font-size: .75rem;
+  letter-spacing: .09em;
+  font-weight: 600;
+}
+#root .btn-primary { box-shadow: 0 1px 2px rgba(10, 10, 10, .08); }
+#root .btn-primary:hover { box-shadow: 0 8px 22px rgba(74, 124, 89, .28); }
+/* .btn-secondary is white-on-transparent — correct on dark, invisible on light.
+   .btn-outline is its light-background twin (used by "View all products" and
+   "Book a consultation", both of which were unreadable before). */
+#root .btn-outline {
+  background: transparent;
+  color: var(--fab-ink);
+  border: 1px solid rgba(10, 10, 10, .22);
+  font-family: Inter, sans-serif;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all .22s ease;
+}
+#root .btn-outline:hover {
+  border-color: rgba(10, 10, 10, .55);
+  background: rgba(10, 10, 10, .035);
+}
+
+/* ---------------------------------------------------------------- surfaces */
+#root .rounded-lg { border-radius: var(--fab-r); }
+#root .rounded-xl, #root .rounded-2xl { border-radius: var(--fab-r-lg); }
+#root .border-silver-gray { border-color: var(--fab-line); }
+#root .bg-silver-gray { background-color: #ECECE8; }
+
+/* dark bands: lift body copy off the floor (was #6B6B6B on #0A0A0A) */
+.fab-dark .text-cool-gray { color: var(--fab-body-dark) !important; }
+.fab-dark .text-medium-gray { color: var(--fab-mute-dark) !important; }
+.fab-dark .border-silver-gray { border-color: var(--fab-line-dark); }
+
+/* ---------------------------------------------------------------- hero */
+#root #hero .hero-trust {
+  color: rgba(255, 255, 255, .74) !important;
+  letter-spacing: .14em;
+}
+#root #hero .hero-sub { color: rgba(255, 255, 255, .74); }
+#root #hero .hero-pills span {
+  background: rgba(255, 255, 255, .08);
+  border-color: rgba(255, 255, 255, .16);
+  color: rgba(255, 255, 255, .82);
+  letter-spacing: .02em;
+}
+
+/* trust strip directly under the hero — one dark shelf, not a green slab */
+.fab-trustbar { background: #0E100E !important; border-top: 1px solid var(--fab-line-dark); }
+.fab-trustbar .font-serif { letter-spacing: -.01em; }
+
+/* ---------------------------------------------------------------- tiles */
+.fab-tile {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--fab-r);
+  background: #E7E7E3;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--fab-line);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.fab-tile img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .65s cubic-bezier(.2, .6, .2, 1);
+}
+.fab-tile:hover { transform: translateY(-3px); box-shadow: 0 14px 34px rgba(10, 10, 10, .13); }
+.fab-tile:hover img { transform: scale(1.045); }
+/* identical scrim on every tile so light and dark photography read the same */
+.fab-tile img { filter: saturate(.94) contrast(1.02); }
+.fab-tile-scrim {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(6, 9, 7, .10) 0%, rgba(6, 9, 7, 0) 34%,
+                    rgba(6, 9, 7, .58) 68%, rgba(6, 9, 7, .90) 100%);
+}
+.fab-tile-body { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 16px; }
+.fab-tile-body h3 {
+  font-family: Inter, sans-serif;
+  font-weight: 600;
+  font-size: .875rem;
+  line-height: 1.25;
+  color: #fff;
+}
+.fab-tile-body p {
+  font-family: Inter, sans-serif;
+  font-size: .6875rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, .72);
+  margin-top: 4px;
+}
+
+/* ---------------------------------------------------------------- catalog */
+#root .prod-card > div:first-child { border-radius: var(--fab-r) var(--fab-r) 0 0; }
+#root .prod-card > div:last-child {
+  border-color: var(--fab-line);
+  border-radius: 0 0 var(--fab-r) var(--fab-r);
+  padding: 10px 12px;
+}
+#root .prod-card .fab-sku {
+  background: rgba(10, 10, 10, .55);
+  color: rgba(255, 255, 255, .92);
+  font-weight: 500;
+  letter-spacing: .06em;
+  backdrop-filter: blur(3px);
+}
+#root .prod-card h3 { text-shadow: 0 1px 10px rgba(0, 0, 0, .35); }
+/* filter chips: quiet by default, green only for the active one */
+#root #catalog button.text-label {
+  border-radius: 999px;
+  font-size: .6875rem;
+  letter-spacing: .08em;
+  background: transparent;
+  border: 1px solid var(--fab-line);
+  color: #6B6B6B;
+}
+#root #catalog button.text-label:hover { border-color: rgba(74, 124, 89, .5); color: var(--fab-green); }
+#root #catalog button.text-label.bg-fabrioza-green {
+  background: var(--fab-green);
+  border-color: var(--fab-green);
+  color: #fff;
+}
+/* the blue "volume discounts" pill was the only blue on the page */
+#root #catalog .bg-blue-50 {
+  background: rgba(74, 124, 89, .07) !important;
+  color: var(--fab-green) !important;
+}
+
+/* ---------------------------------------------------------------- comparison */
+#root #comparison .bg-amber-50 {
+  background: #F6F5F1 !important;
+  border-color: var(--fab-line) !important;
+}
+#root #comparison .text-amber-800, #root #comparison .text-amber-700 { color: #4A4A44 !important; }
+#root #comparison .text-amber-600, #root #comparison .text-amber-500 { color: var(--fab-green) !important; }
+#root #comparison .text-red-500, #root #comparison .text-red-400 { color: #A2564F !important; }
+
+/* ---------------------------------------------------------------- clients */
+.fab-clients { background: var(--fab-paper); }
+.fab-client-card {
+  background: #fff;
+  border: 1px solid var(--fab-line);
+  border-radius: var(--fab-r-lg);
+  padding: 28px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.fab-client-card .fab-client-name {
+  font-family: "Instrument Serif", "Times New Roman", serif;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  color: var(--fab-ink);
+}
+.fab-client-card .fab-client-meta {
+  font-family: Inter, sans-serif;
+  font-size: .6875rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--fab-green);
+}
+.fab-client-card p {
+  font-family: Inter, sans-serif;
+  font-size: .9rem;
+  line-height: 1.7;
+  color: var(--fab-body);
+}
+.fab-client-card ul { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+.fab-client-card li {
+  font-family: Inter, sans-serif;
+  font-size: .6875rem;
+  color: #61665F;
+  border: 1px solid var(--fab-line);
+  border-radius: 999px;
+  padding: 5px 11px;
+}
+
+
+/* adjacent ink sections stacked two paddings deep and read as a void */
+#root .fab-dark + .fab-dark {
+  padding-top: clamp(40px, 4vw, 58px);
+  border-top: 1px solid rgba(255, 255, 255, .07);
+}
+
+/* ---------------------------------------------------------------- misc polish */
+/* hero eyebrow badge was green-on-glass over a photo: nearly unreadable */
+#root #hero .hero-badge {
+  background: rgba(8, 12, 9, .55);
+  border-color: rgba(255, 255, 255, .22);
+  backdrop-filter: blur(6px);
+}
+#root #hero .hero-badge .text-label { color: #fff !important; }
+
+/* section headers: consistent gap to the content that follows */
+#root section .mb-14 { margin-bottom: 2.75rem; }
+#root section .mb-12 { margin-bottom: 2.5rem; }
+#root section .mb-10 { margin-bottom: 2.25rem; }
+
+/* comparison summary: three stats, one treatment (was green / black / green) */
+#root #comparison .bg-ink-black,
+#root #comparison .bg-fabrioza-green {
+  background: #12150F !important;
+  border: 1px solid rgba(255, 255, 255, .08);
+}
+#root #comparison .bg-ink-black .font-serif,
+#root #comparison .bg-fabrioza-green .font-serif { color: #8FBF9E !important; }
+
+/* dark cards inside ink sections: hairline instead of a filled slab */
+.fab-dark .bg-charcoal { background: rgba(255, 255, 255, .035) !important; border: 1px solid rgba(255, 255, 255, .08); }
+
+/* ---------------------------------------------------------------- mobile */
+@media (max-width: 640px) {
+  #root .section-padding { padding-top: 48px; padding-bottom: 48px; }
+  .fab-tile { aspect-ratio: 3 / 2; }
+  .fab-tile-body { padding: 11px 12px; }
+  .fab-client-card { padding: 22px 20px; }
+}
