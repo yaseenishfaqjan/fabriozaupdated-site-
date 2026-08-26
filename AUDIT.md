@@ -218,3 +218,39 @@ so Google recrawls. schema_verify 80/80; all six JSON-LD blocks parse.
 **Not done yet:** Tier 2 (new pages for softball, wrestling singlets, golf polos, cheer,
 track, flag football, volleyball, lacrosse ≈ 10,400/mo at KD 4-33), Tier 3 (custom jerseys
 pillar 18,100/mo + UK set), Tier 4 (sportswear listicle + third-party citations).
+
+---
+
+## 2026-08-24 — Sportswear SEO Tier 2: eight new sport pages
+
+Built on the /netball-dress-manufacturer template (text-only, no fabricated product
+photography): Organization + Service + BreadcrumbList + FAQPage in one @graph, 6 product
+cards, a 4-row spec table, a why-direct section and 5 FAQs each.
+
+| New page | Targets (US monthly / KD) | Combined |
+|---|---|---|
+| /custom-wrestling-singlets | wrestling singlets 9,900/20 · custom wrestling singlets 1,900/11 · custom wrestling gear 390/10 | 12,190 |
+| /custom-bowling-shirts | custom bowling shirts 3,600/26 · custom bowling jerseys 1,900/29 | 5,500 |
+| /custom-golf-polos | custom golf shirts 2,400/23 · custom golf polos 1,600/17 · custom golf apparel 720/11 | 4,720 |
+| /custom-cheer-uniforms | custom cheer uniforms 1,600/33 · custom cheerleading uniforms 1,300/31 | 2,900 |
+| /custom-volleyball-uniforms | custom volleyball jerseys 1,300/10 · custom volleyball uniforms 260/10 | 1,560 |
+| /custom-track-uniforms | custom track uniforms 720/21 · track and field 390/14 · running singlets 390/4 | 1,500 |
+| /custom-lacrosse-uniforms | custom lacrosse jerseys 390/14 · custom lacrosse uniforms 210/11 | 600 |
+| /custom-esports-jerseys | custom esports jerseys 480/9 · custom gaming jerseys 110/16 | 590 |
+
+**≈29,560 searches/month, most of it at KD 4-26.**
+
+**Deviation from the published Tier 2 plan, deliberately:** the plan listed softball and
+flag football pages. Tier 1 gave those terms to /baseball-kits and /football-kits, so
+separate pages would have cannibalised the pages just fixed (the same mistake Phase 3
+cleaned up in July). Replaced with bowling (5,500) and esports (590) — no overlap with any
+existing page, and higher combined volume than the two dropped.
+
+Discovery wiring: 8 sitemap entries (85 total, lastmod 2026-08-24), 8 links added to the
+sportswear-catalog "Dedicated sport programs" row, 8 entries in llms.txt for AI crawlers,
+and each page cross-links two related sports. schema_verify 88/88; all 19 internal link
+targets return 200; trailing-slash variants 301 to canonical.
+
+Prices quoted on these pages reference the /pricing baselines only — no new numbers
+invented. No product photos: the template is text-only rather than reusing mismatched
+stock, which is why og:image falls back to generic sublimation shots.
