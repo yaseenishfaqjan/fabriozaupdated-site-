@@ -185,3 +185,36 @@ neutral SKU chip; 7 collection tiles re-pointed at the `sw-*` studio set so all
 and **APOLLO IX Official**, brand names supplied by the owner, described by the
 work done rather than with invented quotes (no fabricated testimonial copy —
 swap in real statements when the brands provide them).
+
+---
+
+## 2026-08-24 — Sportswear SEO Tier 1: buyer-language retargeting
+
+**Research (Semrush US/UK/AU + live SERP, 24 Aug 2026):** fabrioza.com ranks for 16 US
+keywords, 0 estimated traffic, best position #20, and **zero sportswear keywords**. Root
+cause is not missing SEO but wrong target words: the sport pages were written in factory
+language ("basketball uniform manufacturer", 10 searches/mo) instead of buyer language
+("custom basketball jerseys", 6,600/mo). Terms the sport pages targeted ≈ 110 searches/mo;
+the same products in buyer language ≈ 52,000/mo.
+
+**Tier 1 (this commit) — six pages retargeted. URLs, canonicals, images, product data and
+prices all unchanged; only title / meta / og / twitter / H1 / hero copy / section H2 /
+schema names changed, so no redirects and no lost equity.**
+
+| Page | Now targets (US monthly unless noted) |
+|---|---|
+| /basketball-kits | custom basketball jerseys 6,600 · uniforms 2,900 · youth 320 · design your own 320 |
+| /baseball-kits | custom baseball jerseys 9,900 · softball jerseys 2,400 · uniforms 1,300 · softball uniforms 720 |
+| /football-kits | custom football jerseys 6,600 · uniforms 880 · flag football jerseys 590 (KD 8) |
+| /soccer-kits | custom soccer jerseys 5,400 · uniforms 1,300 · kits 390 (UK "kits" kept in body copy) |
+| /fightwear-manufacturer | boxing shorts 1,300 (KD 6) · rash guards 880 · MMA shorts 480 · BJJ gi 390 (KD 3) |
+| /netball-dress-manufacturer | AU: netball uniforms 260 (KD 5) · custom netball dresses 140 · custom netball uniforms 110 (KD 2) |
+
+Netball stays targeted at Australia/NZ — AU volume and difficulty (KD 2-6) beat the UK,
+checked rather than assumed. Also removed the unverifiable "USA's #1 basketball kit
+supplier" claim from basketball meta. Sitemap lastmod refreshed to 2026-08-24 on all six
+so Google recrawls. schema_verify 80/80; all six JSON-LD blocks parse.
+
+**Not done yet:** Tier 2 (new pages for softball, wrestling singlets, golf polos, cheer,
+track, flag football, volleyball, lacrosse ≈ 10,400/mo at KD 4-33), Tier 3 (custom jerseys
+pillar 18,100/mo + UK set), Tier 4 (sportswear listicle + third-party citations).
