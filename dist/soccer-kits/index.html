@@ -13,6 +13,13 @@
  "@context": "https://schema.org",
  "@graph": [
   {
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
+  },
+  {
    "@type": "BreadcrumbList",
    "itemListElement": [
     {
@@ -876,6 +883,33 @@
      }
     }
    ]
+  },
+  {
+   "@type": "Service",
+   "@id": "https://fabrioza.com/soccer-kits#service",
+   "name": "Custom Soccer Jersey and Team Kit Manufacturing",
+   "serviceType": "Custom soccer jerseys, shorts, socks and full team kit manufacturing",
+   "description": "Custom soccer jerseys, uniforms and full team kits — sublimated shirts, shorts and socks for clubs, schools and academies. Youth and adult sizes, from 15 sets, free mockup in 48h.",
+   "provider": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "areaServed": [
+    "United States",
+    "Canada",
+    "United Kingdom",
+    "Australia"
+   ],
+   "url": "https://fabrioza.com/soccer-kits",
+   "offers": {
+    "@type": "Offer",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock",
+    "eligibleQuantity": {
+     "@type": "QuantitativeValue",
+     "minValue": 15,
+     "unitText": "sets"
+    }
+   }
   }
  ]
 }

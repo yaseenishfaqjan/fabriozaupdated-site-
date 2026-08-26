@@ -13,6 +13,13 @@
  "@context": "https://schema.org",
  "@graph": [
   {
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
+  },
+  {
    "@type": "BreadcrumbList",
    "itemListElement": [
     {
@@ -1136,6 +1143,33 @@
      }
     }
    ]
+  },
+  {
+   "@type": "Service",
+   "@id": "https://fabrioza.com/basketball-kits#service",
+   "name": "Custom Basketball Jersey and Uniform Manufacturing",
+   "serviceType": "Custom basketball jerseys, uniforms and reversibles manufacturing",
+   "description": "Custom basketball jerseys and uniforms, sublimated to your design. Reversible sets, shooting shirts, youth and adult sizes YXS-3XL. 40 designs, MOQ 20 sets, free mockup in 48h.",
+   "provider": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "areaServed": [
+    "United States",
+    "Canada",
+    "United Kingdom",
+    "Australia"
+   ],
+   "url": "https://fabrioza.com/basketball-kits",
+   "offers": {
+    "@type": "Offer",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock",
+    "eligibleQuantity": {
+     "@type": "QuantitativeValue",
+     "minValue": 20,
+     "unitText": "sets"
+    }
+   }
   }
  ]
 }

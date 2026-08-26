@@ -293,3 +293,43 @@ schema_verify 91/91; 27 internal link targets all 200.
 **Tier 1+2+3 combined reach ≈ 100,000 searches/month** that the site was invisible for on
 22 Aug. Remaining: Tier 4 (sportswear listicle + third-party citations), per-sport product
 photography, and the pending owner items (real quote sheet, ISO cert number, client quotes).
+
+---
+
+## 2026-08-24 — Sportswear SEO Tier 4: citation play
+
+**A. Machine-readable MOQ on the four kit pages.** basketball/baseball/football/soccer had
+CollectionPage schema only. Added an Organization node plus a Service node carrying
+offers.eligibleQuantity (20/20/20/15 sets), matching the other 15 sport pages — so all 19
+now expose MOQ and lead time to machines. Deliberately NOT Product schema: Product without
+a correctly formed offers block is what caused the GSC product-snippet failures in July.
+
+**B. /blog/best-custom-sportswear-manufacturers** — 9-entry comparison article, the format
+AI demonstrably quotes back (an AI engine cited our low-MOQ article verbatim on 24 Aug).
+Entries: FABRIOZA (disclosed as ours, #1 on our own list, stated as such in the intro),
+Ready One, Wooter Apparel, the brand team programmes, US catalogue brands, Chinese OEM
+factories, sourcing platforms, local print shops, nearshore specialists. Comparison table,
+per-entry "best for" and "the catch", 5 FAQs, Article + FAQPage + Person schema.
+
+**Accuracy rule applied:** every claim about another company is what that company publicly
+states about itself, verified before publishing (Wooter's 3-4 week turnaround and Staten
+Island address fetched from their own page; Ready One's MOQ 50/style/colourway, 2012
+founding, ISO 9001 + BSCI + SEDEX and Sialkot base from their own published material).
+The article dates the data and tells readers to confirm before ordering. No invented
+numbers about competitors — that is both dishonest and legally exposed.
+
+**Honest note on volume:** listicle keywords barely register (`best custom sportswear
+manufacturers` ~0/mo, `sportswear manufacturers` 590, `custom sportswear suppliers` 480).
+This page is not a traffic play. It exists because AI engines quote this format, which is
+measurable: our low-MOQ article is already being cited.
+
+**C. OUTREACH.md (repo root, not published).** The citation gap can only be closed by a
+human. A search for "FABRIOZA" clothing manufacturer returns zero third-party mentions,
+while Ready One and Novex Apparel appear on manufacturer.clothing, accio.com and
+textileinfomedia.com. The file lists priority-ordered directories (Google Business Profile
+first), roundup sites that already list competitors, a factual submission template, a
+copy-paste company data block, an explicit do-not list (no paid links, no fake reviews, no
+undocumented certifications), and a monthly tracking check with the 24 Aug baseline.
+
+Wiring: blog index, sitemap (89 URLs), llms.txt. schema_verify 92/92; 19 article links all
+200; no orphan FAQ questions.

@@ -12,6 +12,13 @@
  "@context": "https://schema.org",
  "@graph": [
   {
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
+  },
+  {
    "@type": "BreadcrumbList",
    "itemListElement": [
     {
@@ -511,6 +518,33 @@
      }
     }
    ]
+  },
+  {
+   "@type": "Service",
+   "@id": "https://fabrioza.com/football-kits#service",
+   "name": "Custom Football Jersey and Uniform Manufacturing",
+   "serviceType": "Custom tackle and flag football jerseys, pants and uniform manufacturing",
+   "description": "Custom football jerseys and uniforms for tackle and flag football: sublimated and tackle-twill home and away kits, matching pants, compression layers. Youth and adult sizes, MOQ 20 sets.",
+   "provider": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "areaServed": [
+    "United States",
+    "Canada",
+    "United Kingdom",
+    "Australia"
+   ],
+   "url": "https://fabrioza.com/football-kits",
+   "offers": {
+    "@type": "Offer",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock",
+    "eligibleQuantity": {
+     "@type": "QuantitativeValue",
+     "minValue": 20,
+     "unitText": "sets"
+    }
+   }
   }
  ]
 }

@@ -12,6 +12,13 @@
  "@context": "https://schema.org",
  "@graph": [
   {
+   "@type": "Organization",
+   "@id": "https://fabrioza.com/#organization",
+   "name": "FABRIOZA",
+   "url": "https://fabrioza.com",
+   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg"
+  },
+  {
    "@type": "BreadcrumbList",
    "itemListElement": [
     {
@@ -719,6 +726,33 @@
      }
     }
    ]
+  },
+  {
+   "@type": "Service",
+   "@id": "https://fabrioza.com/baseball-kits#service",
+   "name": "Custom Baseball and Softball Jersey Manufacturing",
+   "serviceType": "Custom baseball and softball jerseys, pants and uniform manufacturing",
+   "description": "Custom baseball and softball jerseys and uniforms: pinstripes, button-front and two-button jerseys with matching pants. Fastpitch and slowpitch, youth and adult. MOQ 20 sets, free mockup in 48h.",
+   "provider": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "areaServed": [
+    "United States",
+    "Canada",
+    "United Kingdom",
+    "Australia"
+   ],
+   "url": "https://fabrioza.com/baseball-kits",
+   "offers": {
+    "@type": "Offer",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock",
+    "eligibleQuantity": {
+     "@type": "QuantitativeValue",
+     "minValue": 20,
+     "unitText": "sets"
+    }
+   }
   }
  ]
 }
