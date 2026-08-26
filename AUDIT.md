@@ -254,3 +254,42 @@ targets return 200; trailing-slash variants 301 to canonical.
 Prices quoted on these pages reference the /pricing baselines only — no new numbers
 invented. No product photos: the template is text-only rather than reusing mismatched
 stock, which is why og:image falls back to generic sublimation shots.
+
+---
+
+## 2026-08-24 — Sportswear SEO Tier 3: pillar, UK set, AEO answer blocks
+
+**A. /custom-jerseys — the pillar.** Hub page linking all 16 sport programmes, with a
+how-it-works sequence, a sublimation/embroidery/screen-print comparison table and 6 FAQs.
+Targets custom jerseys 18,100 · custom jersey maker 3,600 · custom uniforms 1,900 ·
+sublimated jerseys 1,300 · custom sports uniforms 720 · custom team uniforms 720 (KD 32-56;
+hard terms, but the pillar accumulates the internal-link equity of every sport page).
+
+**B. /custom-football-kits — UK football (soccer).** custom football shirts 1,900 (KD 19) ·
+custom football kits 1,600 (KD 19) · bespoke football kits 210 (KD 13) · grassroots football
+kits 210 · sublimated football kits 70 ≈ **3,990/mo**. Deliberately cross-linked both ways
+with /football-kits (American football) with explicit anchor text, so neither page nor a
+visitor confuses the two.
+
+**C. /custom-teamwear — UK teamwear hub.** teamwear 480 · custom teamwear 480 (KD 26) ·
+custom kit 390 (KD 22) · school sports kit 210 (KD 12) · bespoke teamwear 90 · custom sports
+kits 90 ≈ **1,740/mo**. Links the 9 sport pages that matter in the UK.
+
+**D. Rugby + cricket retargeted** to the same buyer-language pattern:
+rugby → custom rugby kits 320 (KD 5) + custom rugby shirts 320 (KD 5) + custom rugby jerseys
+320 (KD 15) ≈ 960; cricket → custom cricket shirts 210 (KD 5) + custom cricket kits 90 (KD 9)
++ custom cricket jerseys 90 (KD 3) ≈ 390.
+
+**E. AEO answer blocks** on basketball / baseball / football / soccer kit pages — the four
+that had no FAQPage at all. Five questions each, taken from real question data rather than
+invented: lead time, the 15-day rush, how to design a jersey, MOQ, cost. Visible h3 blocks
+plus a FAQPage node appended to each existing @graph (verifier requires every schema question
+to match a visible heading — it does).
+
+Wiring: +3 sitemap entries (88 total), +3 llms.txt entries, pillar promoted at the top of the
+sportswear-catalog programme row, and pillar cross-links added to all 12 sport pages.
+schema_verify 91/91; 27 internal link targets all 200.
+
+**Tier 1+2+3 combined reach ≈ 100,000 searches/month** that the site was invisible for on
+22 Aug. Remaining: Tier 4 (sportswear listicle + third-party citations), per-sport product
+photography, and the pending owner items (real quote sheet, ISO cert number, client quotes).
