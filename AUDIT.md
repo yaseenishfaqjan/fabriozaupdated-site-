@@ -333,3 +333,41 @@ undocumented certifications), and a monthly tracking check with the 24 Aug basel
 
 Wiring: blog index, sitemap (89 URLs), llms.txt. schema_verify 92/92; 19 article links all
 200; no orphan FAQ questions.
+
+---
+
+## 2026-09-08 — GSC "150 not indexed" investigated; duplicate-H1 bug fixed
+
+**Diagnosis first: 121 of the 150 are intentional and correct.**
+- *Page with redirect* (91) — every example verified as a clean single-hop 301:
+  http->https, www->non-www, trailing-slash, /index.html, plus the deliberately removed
+  pages (/fashion-wear, /services, /products, /moq, /home, /femme-collection,
+  /premium-fashion). "Not indexed" is the desired outcome for a redirect source.
+- *Alternative page with proper canonical* (30) — the twin blog posts. Checked eight; each
+  either 301s to the primary or self-canonicals. Google is obeying our instruction.
+
+Both categories show "Validation Failed" in GSC because someone ran Validate Fix on them.
+Validation on an intentional redirect can never pass. **Do not re-run it on those two** —
+that red status is self-inflicted and is what makes the report look broken.
+
+**Full live crawl of all 89 sitemap URLs** (scratchpad/crawl_audit.py) found:
+- 0 dead internal links (so the 2 GSC 404s are historic/external, not linked from the site)
+- 0 internal links that redirect, 0 redirect chains
+- 0 duplicate titles, 0 duplicate meta descriptions
+- every sitemap page self-canonicals correctly
+- 0 near-duplicate bodies above 70% shingle overlap
+
+**Real bug found and fixed: 12 pages carried the logo as `<h1>FABRIOZA</h1>` *before* their
+real H1.** Those pages had two H1s, and the first one was identical across all 12 — one of
+the strongest signals that makes Google override a canonical, which is the likely source of
+"Duplicate, Google chose different canonical than user" (21). Logo changed to
+`<div class="fab-brandmark">`; computed styles were measured in the live browser first and
+reproduced exactly (35.2px / 700 / #1a1a1a / margin 30px 0 10px / centered), verified
+pixel-identical after the change. Each page now has exactly one unique descriptive H1:
+low-moq-50-pieces, clothing-manufacturer-for-startups, custom-hoodie-manufacturer,
+custom-sportswear-manufacturer, cut-and-sew-manufacturer, moq-calculator, privacy,
+private-label-clothing-manufacturer, streetwear-manufacturer,
+sublimation-clothing-manufacturer, team-uniform-manufacturer, tech-pack-template.
+
+schema_verify 92/92. Still needs the per-issue URL export from GSC to close out the
+remaining 21 duplicate-canonical, 2 404 and 1 redirect-error rows definitively.
