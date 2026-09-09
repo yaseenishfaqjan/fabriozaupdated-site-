@@ -15,16 +15,16 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require __DIR__ . '/lib/Exception.php';
-require __DIR__ . '/lib/PHPMailer.php';
-require __DIR__ . '/lib/SMTP.php';
-require __DIR__ . '/db.php';
+require __DIR__. '/lib/Exception.php';
+require __DIR__. '/lib/PHPMailer.php';
+require __DIR__. '/lib/SMTP.php';
+require __DIR__. '/db.php';
 
 header('Content-Type: application/json');
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 $allowedOrigins = ['https://fabrioza.com', 'https://www.fabrioza.com', 'http://localhost:8080', 'http://localhost:8085'];
 if (in_array($origin, $allowedOrigins, true)) {
-    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Access-Control-Allow-Origin: '. $origin);
     header('Access-Control-Allow-Credentials: true');
 }
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -39,8 +39,8 @@ if (empty($data)) { http_response_code(400); echo json_encode(['success' => fals
 /* ---- 1. Honeypot: hidden "website" field. Bots fill it; humans never see it.
         Respond as if successful so bots learn nothing. No side effects. ---- */
 if (!empty($data['website'])) {
-    crm_file_log('SPAM(honeypot) form=' . substr((string)($data['form_type'] ?? '?'), 0, 40)
-        . ' email=' . substr((string)($data['email'] ?? '?'), 0, 60));
+    crm_file_log('SPAM(honeypot) form='. substr((string)($data['form_type'] ?? '?'), 0, 40)
+     . ' email='. substr((string)($data['email'] ?? '?'), 0, 60));
     echo json_encode(['success' => true, 'message' => 'Thank you! We will get back to you within 24 hours.']);
     exit;
 }
@@ -116,7 +116,7 @@ try {
     }
 } catch (Throwable $e) {
     // DB unavailable: fall through - we would rather send the email than drop the lead entirely.
-    error_log('FABRIOZA CRM db error (pre-insert): ' . $e->getMessage());
+    error_log('FABRIOZA CRM db error (pre-insert): '. $e->getMessage());
     $db = null;
     $ipHash = '';
 }
@@ -141,15 +141,15 @@ if ($db) {
             $message, $formType, $sourcePage, $utmSource, $utmMedium, $utmCampaign, $score, $ipHash]);
         $leadId = (int)$db->lastInsertId();
         crm_notify("🟢 NEW LEAD #$leadId ($formType)
-$clientName" . ($company !== '' ? " - $company" : '')
-            . "
-$clientEmail" . ($quantity !== '' ? "
-Qty: $quantity" : '') . "
+$clientName". ($company !== '' ? " - $company" : '')
+         . "
+$clientEmail". ($quantity !== '' ? "
+Qty: $quantity" : ''). "
 Score: $score"
-            . "
+         . "
 https://fabrioza.com/admin/lead.php?id=$leadId");
     } catch (Throwable $e) {
-        error_log('FABRIOZA CRM lead insert failed: ' . $e->getMessage());
+        error_log('FABRIOZA CRM lead insert failed: '. $e->getMessage());
         crm_failed_lead_dump($payload ?? ['name' => $clientName, 'email' => $clientEmail,
             'form_type' => $formType, 'message' => $message]);
     }
@@ -167,7 +167,7 @@ $TO_EMAILS  = array_filter(array_map('trim', explode(',', getenv('MAIL_TO') ?: $
 $TO_EMAIL   = $TO_EMAILS[0];
 $FROM_EMAIL = $SMTP_USER;
 
-$notifSubject = "New Lead" . ($leadId ? " #$leadId" : "") . ": $formType - $clientName";
+$notifSubject = "New Lead". ($leadId ? " #$leadId" : ""). ": $formType - $clientName";
 $notifBody = buildNotificationEmail($leadId, $formType, $clientName, $clientEmail, $company, $country, $productType, $quantity, $message, $source, $sourcePage);
 
 $notifSent = false;
@@ -188,7 +188,7 @@ if ($SMTP_PASS !== '') {
 }
 
 /* ---- 8. Respond. The lead is stored; email failure is an internal problem. ---- */
-crm_file_log('LEAD' . ($leadId ? " #$leadId" : ' (DB-FAILED)') . " form=$formType email=$clientEmail notif=" . ($notifSent ? 'sent' : 'FAILED'));
+crm_file_log('LEAD'. ($leadId ? " #$leadId" : ' (DB-FAILED)'). " form=$formType email=$clientEmail notif=". ($notifSent ? 'sent' : 'FAILED'));
 if ($leadId !== null || $notifSent) {
     echo json_encode(['success' => true, 'message' => 'Thank you! We will get back to you within 24 hours.']);
 } else {
@@ -204,7 +204,7 @@ function logEmail(?PDO $db, ?int $leadId, string $recipient, string $subject, bo
         $db->prepare('INSERT INTO email_log (lead_id, recipient, subject, status, error) VALUES (?,?,?,?,?)')
            ->execute([$leadId, $recipient, mb_substr($subject, 0, 200), $ok ? 'sent' : 'failed', mb_substr($err, 0, 500)]);
     } catch (Throwable $e) {
-        error_log('FABRIOZA CRM email_log failed: ' . $e->getMessage());
+        error_log('FABRIOZA CRM email_log failed: '. $e->getMessage());
     }
 }
 
@@ -243,7 +243,7 @@ function smtpSendOnce($host, $port, $user, $pass, $from, $to, $toName, $subject,
         $mail->AltBody = strip_tags(preg_replace('/<br\s*\/?>/i', "\n", $htmlBody));
         return [$mail->send(), ''];
     } catch (Exception $e) {
-        error_log('FABRIOZA mailer: ' . $e->getMessage());
+        error_log('FABRIOZA mailer: '. $e->getMessage());
         return [false, $e->getMessage()];
     }
 }
@@ -308,14 +308,14 @@ body{font-family:Arial,sans-serif;line-height:1.6;color:#333}
 <p>Premium Private Label Clothing Manufacturer</p>
 </div>
 <div class='content'>
-<p>Hi " . h($firstName) . ",</p>
+<p>Hi ". h($firstName). ",</p>
 <p>Thank you for reaching out to FABRIOZA! We've received your inquiry and a member of our team will personally respond within <strong>24 hours</strong>.</p>
 <div class='features'>
 <div class='feature'>MOQ starts at just <strong>50 pieces</strong> (20-piece trial orders available)</div>
-<div class='feature'>Free design mockups within 24-48 hours</div>
+<div class='feature'>Design mockups within 24-48 hours</div>
 <div class='feature'>Sample production in 5-7 business days</div>
 <div class='feature'>Factory-direct pricing (save 30-50%)</div>
-<div class='feature'>ISO 9001 certified &amp; amfori BSCI audited</div>
+<div class='feature'> &amp; amfori BSCI audited</div>
 </div>
 <div class='cta'>
 <a href='https://calendly.com/fabrioza/30min'>Book a Free 30-Minute Consultation</a>

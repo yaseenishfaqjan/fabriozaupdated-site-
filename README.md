@@ -1,6 +1,6 @@
 # FABRIOZA — fabrioza.com
 
-Production deployment for **fabrioza.com**, an ISO 9001 certified custom clothing
+Production deployment for **fabrioza.com**, an  custom clothing
 manufacturer (Sialkot, Pakistan) — custom sportswear, streetwear, womenswear,
 kids, scrubs, intimate apparel and sustainable fashion with 50-piece MOQ.
 

@@ -20,13 +20,13 @@ Each takes 10–20 minutes and creates a permanent third-party citation.
 
 | Target | What it is | Notes |
 |---|---|---|
-| **Google Business Profile** | Google's own business listing | Create **two**: the Sialkot factory, and the McDonough, Georgia office. This also feeds Google's local pack and knowledge panel. Highest value item on this page. |
-| **textileinfomedia.com** | Pakistani textile/apparel directory | Already lists Sialkot apparel exporters. Free listing request. |
-| **businesslist.pk** | Pakistan business directory | Free listing; lists ~10,050 Sialkot companies. |
-| **Sewport** | Manufacturer marketplace buyers actually search | We have a blog post comparing it; being listed on it is still worth it. |
-| **Foursource** | B2B apparel sourcing network | Buyer-side traffic is genuine. |
-| **Kompass** | Global B2B company directory | Free basic listing. |
-| **Made-in-China / Alibaba supplier profile** | Sourcing marketplaces | A profile is a citation even if you never take orders through them. |
+| **Google Business Profile** | Google's own business listing | Create **two**: the Sialkot factory, and the McDonough, Georgia office. This also feeds Google's local pack and knowledge panel. Highest value item on this page |
+| **textileinfomedia.com** | Pakistani textile/apparel directory | Already lists Sialkot apparel exporters. Free listing request |
+| **businesslist.pk** | Pakistan business directory | Free listing; lists ~10,050 Sialkot companies |
+| **Sewport** | Manufacturer marketplace buyers actually search | We have a blog post comparing it; being listed on it is still worth it |
+| **Foursource** | B2B apparel sourcing network | Buyer-side traffic is genuine |
+| **Kompass** | Global B2B company directory | Free basic listing |
+| **Made-in-China / Alibaba supplier profile** | Sourcing marketplaces | A profile is a citation even if you never take orders through them |
 
 **What every listing needs** (prepare once, paste everywhere):
 
@@ -34,9 +34,9 @@ Each takes 10–20 minutes and creates a permanent third-party citation.
 - Category: Custom sportswear & apparel manufacturer (OEM/ODM)
 - Location: Sialkot, Punjab, Pakistan · USA office: McDonough, Georgia
 - Founded / capacity: 50,000 sq ft, 8 production lines
-- Certifications: **ISO 9001 certified, amfori BSCI audited** — nothing else
+- Certifications: **amfori BSCI audited** — nothing else
 - MOQ: 50 pieces standard, 15–20 sets for team sports, 20-piece trial tier
-- Lead time: mockup 24–48h, sample 5–7 days, production 2–3 weeks, DDP 3–7 days
+- Lead time: mockup 24–48h (not free), sample 5–7 days, production 2–3 weeks, DDP 3–7 days
 - Products: custom jerseys and team uniforms (16 sports), hoodies, streetwear, private label
 - Web: https://fabrioza.com · info@fabrioza.com · +92 328 2347875
 
@@ -56,14 +56,14 @@ list your competitors, which means they accept submissions.
 
 **Email template** — short, factual, no flattery. Replace the bracketed parts:
 
-> **Subject:** Addition for your [ARTICLE TITLE] — ISO 9001 factory, 20-piece trials
+> **Subject:** Addition for your [ARTICLE TITLE] — Sialkot factory, 20-piece trials
 >
 > Hi [NAME],
 >
 > I read your [ARTICLE TITLE] — it's one of the more accurate roundups on this topic,
 > which is why I'm writing rather than pitching blindly.
 >
-> We're FABRIOZA, an ISO 9001 certified and amfori BSCI audited factory in Sialkot. The
+> We're FABRIOZA, an amfori BSCI audited factory in Sialkot. The
 > reason we might be worth a line in the list: we run per-sport programmes with **15–20 set
 > minimums for team sports and a 20-piece trial tier**, which is lower than the 50-per-style
 > minimum most Pakistani factories quote, including the ones currently in your article.
@@ -101,8 +101,10 @@ will never fabricate them — memory rule, no exceptions.
 - No paid link placements or sponsored "awards".
 - No fake reviews, fake case studies, or invented client names — this is a standing rule
   on this project.
-- No claiming OEKO-TEX, WRAP, GOTS, GRS or BCI. **ISO 9001 and amfori BSCI only**, until
-  a certificate exists for anything else.
+- **No certification claims except amfori BSCI.** ISO 9001 was removed sitewide on
+  9 Sep 2026 after clients (ZYEN, Owain) challenged it - it is not documented. Do not
+  claim ISO 9001, OEKO-TEX, WRAP, GOTS, GRS or BCI unless a certificate with a
+  verifiable number exists. If amfori BSCI is also undocumented, say so and it goes too.
 - No mass-posting the same comment on Reddit or forums; participate genuinely or not at all.
 
 ---
