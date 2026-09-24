@@ -103,5 +103,20 @@ function adm_head(string $title): void {
           <a class="hover:text-emerald-400 text-stone-400" href="/admin/logout.php">Log out</a>
         </nav>
       </div></header><main class="max-w-6xl mx-auto px-4 py-6">';
+    adm_flash_render();
+}
+
+/**
+ * One-shot status message shown after a POST/redirect.
+ * Set with $_SESSION['flash'] = '...'; rendered and cleared on the next page.
+ * A message containing "fail"/"cannot" renders red, otherwise green.
+ */
+function adm_flash_render(): void {
+    if (empty($_SESSION['flash'])) { return; }
+    $msg = (string)$_SESSION['flash'];
+    unset($_SESSION['flash']);
+    $bad = (bool)preg_match('/(fail|failed|cannot|error)/i', $msg);
+    $cls = $bad ? 'bg-red-50 border-red-200 text-red-800' : 'bg-emerald-50 border-emerald-200 text-emerald-800';
+    echo '<div class="' . $cls . ' border rounded-xl px-4 py-3 mb-5 text-sm">' . e($msg) . '</div>';
 }
 function adm_foot(): void { echo '</main></body></html>'; }

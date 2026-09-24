@@ -156,3 +156,24 @@ admin for the exact SMTP error, then:
 
 No Gmail address is referenced in the code any more. `IMAP_HOST` controls which
 mailbox the inbox importer reads; it defaults to the same server.
+
+## 9. Resend notification button (added 24 Sep 2026)
+
+Every lead page has a **Resend notification** button under Email history. It
+re-sends the internal "new lead" email using the current SMTP settings.
+
+Use it when a lead's Email history shows `failed` - the lead was always saved
+(the CRM writes to SQLite before it tries to send), only the mail failed.
+
+- The button turns green when any previous send for that lead failed.
+- Result appears as a banner at the top of the page, and a new row is written
+  to Email history with "(resent)" in the subject.
+- Audited as `notification_resent` / `notification_resend_failed`.
+- It makes **one** send attempt, not the three the public form uses - an admin
+  is waiting on the browser, and a bad password will not fix itself on retry.
+  Takes a few seconds; click again if you hit a transient failure.
+
+**Shared mailer:** `dist/api/mailer.php` holds the single implementation of
+`smtpSend` / `smtpSendOnce` / `logEmail` / `buildNotificationEmail`, used by
+both `api/send-email.php` and `admin/lead.php`. Do not copy these functions
+into a page - a second copy will drift from the first.

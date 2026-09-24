@@ -30,6 +30,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
            ->execute([$id, getenv('ADMIN_USER') ?: 'admin', 'Reply received - moved to quoted, sequences paused']);
         adm_audit($db, 'reply_received', $id);
     }
+    if ($act === 'resend_notify') {
+        // Re-send the internal "new lead" notification. Used when the original
+        // send failed (bad SMTP password, server unreachable) - the lead itself
+        // was always saved, only the mail failed. Uses the SAME shared mailer as
+        // the public form so there is one implementation, never a second copy.
+        require_once __DIR__ . '/../api/mailer.php';
+        $r = $db->prepare('SELECT * FROM leads WHERE id = ?'); $r->execute([$id]); $LD = $r->fetch();
+        if ($LD) {
+            $cfg = fab_smtp_config();
+            $subject = 'New Lead #' . $id . ': ' . ($LD['form_type'] ?: 'Enquiry') . ' - ' . $LD['name'];
+            $body = buildNotificationEmail($id, $LD['form_type'], $LD['name'], $LD['email'],
+                        $LD['company'], $LD['country'], $LD['product_type'], $LD['quantity'],
+                        $LD['message'], $LD['source'] ?? '', $LD['source_page'] ?? '');
+            if ($cfg['pass'] === '') {
+                $_SESSION['flash'] = 'Cannot resend: SMTP_PASS is not configured on the server.';
+            } else {
+                $okAny = false; $errs = [];
+                foreach (fab_mail_to() as $to) {
+                    // One attempt, not smtpSend()'s three: an admin is watching the
+                    // browser, and 3 x 8s timeouts + 2 x 3s delays = a 30-second hang.
+                    // A persistent fault (bad password) will not fix itself on retry,
+                    // and a transient one is one more click away.
+                    [$sent, $err] = smtpSendOnce($cfg['host'], $cfg['port'], $cfg['user'], $cfg['pass'],
+                        $cfg['user'], $to, 'FABRIOZA Leads', $subject, $body, $LD['email'], $LD['name']);
+                    logEmail($db, $id, $to, $subject . ' (resent)', $sent, $err);
+                    if ($sent) { $okAny = true; } else { $errs[] = $to . ': ' . $err; }
+                }
+                $_SESSION['flash'] = $okAny
+                    ? 'Notification resent to ' . implode(', ', fab_mail_to()) . '.'
+                    : 'Resend failed - ' . implode(' | ', $errs);
+                adm_audit($db, $okAny ? 'notification_resent' : 'notification_resend_failed', $id);
+            }
+        }
+    }
     if ($act === 'note' && trim((string)($_POST['body'] ?? '')) !== '') {
         $db->prepare('INSERT INTO notes (lead_id, author, body) VALUES (?,?,?)')
            ->execute([$id, getenv('ADMIN_USER') ?: 'admin', mb_substr(trim($_POST['body']), 0, 4000)]);
@@ -118,6 +152,19 @@ adm_head('Lead #' . $L['id']);
         </div>
         <?php if ($m['error']): ?><div class="text-xs text-red-500 pb-1"><?= e($m['error']) ?></div><?php endif; ?>
       <?php endforeach; if (!$emails) { echo '<p class="text-sm text-stone-400">No emails logged.</p>'; } ?>
+      <?php $anyFailed = false; foreach ($emails as $m) { if ($m['status'] !== 'sent') { $anyFailed = true; break; } } ?>
+      <form method="post" class="border-t pt-3 mt-1">
+        <?= adm_csrf_field() ?>
+        <input type="hidden" name="action" value="resend_notify">
+        <input type="hidden" name="lead_id" value="<?= $id ?>">
+        <button class="text-sm px-3 py-2 rounded-lg <?= $anyFailed ? 'bg-emerald-700 text-white' : 'bg-stone-100 text-stone-700' ?>">
+          Resend notification
+        </button>
+        <span class="text-xs text-stone-400 ml-2">
+          <?= $anyFailed ? 'A previous send failed - retry it now.' : 'Sends the lead details to your inbox again.' ?>
+          Takes a few seconds.</span><span class="text-xs text-stone-400">
+        </span>
+      </form>
     </div>
   </div>
 
