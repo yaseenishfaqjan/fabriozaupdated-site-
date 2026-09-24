@@ -107,8 +107,9 @@ open their CRM page and click **"Log reply received"** — moves them to
 
 | Var | Purpose |
 |---|---|
-| SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASS | Gmail SMTP (App Password) |
+| SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASS | cPanel mailbox (s99.veladns.com:465, info@fabrioza.com) |
 | MAIL_TO | comma-separated notification recipients |
+| IMAP_HOST | mailbox the inbox importer reads (default s99.veladns.com) |
 | ADMIN_USER / ADMIN_PASS_HASH | admin login ($ doubled as $$) |
 | CRM_IP_SALT | secret for IP hashing — set once, never change |
 | CRM_RATE_MAX | form submissions per IP per hour (default 3) |
@@ -128,3 +129,30 @@ open their CRM page and click **"Log reply received"** — moves them to
   heuristics in `dist/api/db.php > crm_spam_reason()` are easy to extend.
 - **Everything on fire** — leads are in `/var/data` (volume) + backups; the
   site itself redeploys from GitHub with the usual two commands.
+
+## 8. Mail transport (changed 24 Sep 2026)
+
+Outbound mail used to go through Gmail SMTP with an App Password. Google began
+rejecting it ("SMTP Error: Could not authenticate"), and lead notifications
+silently failed - the leads themselves were still saved, because the CRM writes
+to the database before it tries to send.
+
+Mail now goes through the **cPanel mailbox on the veladns server**:
+
+```
+SMTP_HOST=s99.veladns.com   SMTP_PORT=465
+SMTP_USER=info@fabrioza.com SMTP_PASS=<mailbox password>
+```
+
+Why this is better: cPanel's Email Deliverability page shows **SPF and DKIM valid**
+for fabrioza.com on that server, so mail is authenticated and sends *as* the
+business address instead of relaying through a personal Gmail.
+
+**If notifications start failing again**, check the lead's Email history in the
+admin for the exact SMTP error, then:
+- "Could not authenticate" -> the mailbox password changed; update SMTP_PASS
+- "Connection refused/timed out" -> the VPS cannot reach port 465 outbound
+- Confirm the mailbox still exists in cPanel -> Email Accounts
+
+No Gmail address is referenced in the code any more. `IMAP_HOST` controls which
+mailbox the inbox importer reads; it defaults to the same server.

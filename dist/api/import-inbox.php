@@ -1,9 +1,12 @@
 <?php
 /**
- * FABRIOZA CRM - Gmail inbox -> CRM importer (CLI only).
+ * FABRIOZA CRM - mailbox -> CRM importer (CLI only).
+ *
+ * Reads the info@fabrioza.com mailbox on the cPanel server (IMAP_HOST, default
+ * s99.veladns.com) using the same credentials as SMTP.
  *
  * Uses PHP's built-in curl over IMAPS (no imap extension needed).
- * Every run scans the Gmail INBOX with the same App Password as SMTP:
+ * Every run scans the INBOX with the same credentials as SMTP:
  *   - Sender matches an existing lead -> logs an "Inbox email" note on the
  *     lead, pauses sequences, promotes new -> quoted (same effect as the
  *     manual "Log reply received" button), audits reply_received_auto.
@@ -57,7 +60,7 @@ foreach (array_filter(array_map('trim', explode(',', getenv('CRM_INBOX_SKIP') ?:
 function imap_curl(string $user, string $pass, string $urlPath = '', ?string $customRequest = null): ?string {
     $ch = curl_init();
     curl_setopt_array($ch, [
-        CURLOPT_URL => 'imaps://imap.gmail.com:993/' . $urlPath,
+        CURLOPT_URL => 'imaps://' . (getenv('IMAP_HOST') ?: 's99.veladns.com') . ':993/' . $urlPath,
         CURLOPT_USERPWD => $user . ':' . $pass,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_TIMEOUT => 60,
@@ -188,7 +191,7 @@ foreach ($uids as $uid) {
         $db->prepare('INSERT INTO leads (name, email, message, form_type, source_page, lead_score, status, gdpr_consent, ip_hash)
                       VALUES (?,?,?,?,?,?,?,0,?)')
            ->execute([$name, $fromAddr, mb_substr("\"$subject\" - $snippet", 0, 5000),
-                      'Inbox Email', 'gmail-inbox', $score, 'new', '']);
+                      'Inbox Email', 'mailbox-import', $score, 'new', '']);
         echo 'NEW lead #' . $db->lastInsertId() . " <$fromAddr> | $subject\n";
         $created++;
     }

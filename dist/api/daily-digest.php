@@ -38,7 +38,7 @@ $body = '<h2 style="color:#4A7C59">FABRIOZA CRM - Daily Digest ' . gmdate('Y-m-d
   . '<h3>High-score new leads: ' . count($hot) . '</h3>' . rows($hot, fn($r) => "{$r['name']} ({$r['company']}) - score {$r['lead_score']}")
   . '<p><a href="https://fabrioza.com/admin/">Open the CRM &rarr;</a></p>';
 
-$host = getenv('SMTP_HOST') ?: 'smtp.gmail.com';
+$host = getenv('SMTP_HOST') ?: 's99.veladns.com';
 $port = (int)(getenv('SMTP_PORT') ?: 587);
 $user = getenv('SMTP_USER') ?: '';
 $pass = getenv('SMTP_PASS') ?: '';

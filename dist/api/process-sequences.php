@@ -31,7 +31,7 @@ $SEQUENCES = [
 ];
 
 $db = crm_db();
-$host = getenv('SMTP_HOST') ?: 'smtp.gmail.com';
+$host = getenv('SMTP_HOST') ?: 's99.veladns.com';
 $port = (int)(getenv('SMTP_PORT') ?: 587);
 $user = getenv('SMTP_USER') ?: '';
 $pass = getenv('SMTP_PASS') ?: '';

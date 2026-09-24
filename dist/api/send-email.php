@@ -159,9 +159,9 @@ https://fabrioza.com/admin/lead.php?id=$leadId");
 }
 
 /* ---- 7. Best-effort email (notification + auto-reply), fully logged ---- */
-$SMTP_HOST = getenv('SMTP_HOST') ?: 'smtp.hostinger.com';
+$SMTP_HOST = getenv('SMTP_HOST') ?: 's99.veladns.com';
 $SMTP_PORT = (int)(getenv('SMTP_PORT') ?: 465);
-$SMTP_USER = getenv('SMTP_USER') ?: 'sales@fabrioza.com';
+$SMTP_USER = getenv('SMTP_USER') ?: 'info@fabrioza.com';
 $SMTP_PASS = getenv('SMTP_PASS') ?: '';
 $TO_EMAILS  = array_filter(array_map('trim', explode(',', getenv('MAIL_TO') ?: $SMTP_USER)));
 $TO_EMAIL   = $TO_EMAILS[0];
