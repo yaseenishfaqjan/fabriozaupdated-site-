@@ -424,3 +424,36 @@ zero JS errors, all key pages 200.
   certification claim left on the site.
 - **"Free sample"** — the instruction called it "the free sample issue you keep facing with
   leads" but did not say to remove it. ~33 instances remain, untouched pending a decision.
+
+---
+
+## 2026-09-27 — Homepage: collection cards replace the SKU catalog
+
+Owner's call: the homepage should lead with categories, the way /what-we-make
+does, not with a wall of 40 individual products and prices.
+
+**Removed:** the "40 Custom Apparel Products With Transparent Pricing" section
+(component `Nj`) from the homepage render list. The component and its data stay
+in the bundle, so restoring it is a one-line change; individual products remain
+reachable one click deeper on each collection page and on /pricing.
+
+**Replaced:** the simple 16-tile grid with the /what-we-make card design -
+image, count badge ("30 Designs"), a real description and spec chips
+("MOQ: 20 sets", "Sublimation", "From $32"). All 15 cards copied verbatim from
+that page so the homepage and the collections page now agree; no new product
+claims or prices were invented.
+
+**Kept the internal links.** The 15 category cards do not cover the dedicated
+sport pages (wrestling, golf, cheer, bowling, track, volleyball, lacrosse,
+esports, cricket, rugby, netball, fightwear, custom-jerseys, UK teamwear), and
+dropping the SKU grid would have removed their only homepage links along with
+the Tier 1-3 SEO work behind them. Added a compact "Dedicated sport programmes"
+link row under the grid - 14 links preserved.
+
+New CSS lives in `dist/assets/fab-ui.css` (`.fab-cat*`), not in the bundle, so
+the card styling can be tuned without another JS patch. Cache-bust `?v=20260927`.
+
+Verified in a browser: homepage renders 20 sections with **zero JS errors**,
+15 cards with correct badges/chips, all 15 images decode (1024x1024 or 864x1184),
+catalog section absent, 14 sport links present, single column and no horizontal
+overflow at 375px, every card link returns 200, schema_verify 92/92.
