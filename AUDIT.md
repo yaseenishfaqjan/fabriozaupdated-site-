@@ -457,3 +457,66 @@ Verified in a browser: homepage renders 20 sections with **zero JS errors**,
 15 cards with correct badges/chips, all 15 images decode (1024x1024 or 864x1184),
 catalog section absent, 14 sport links present, single column and no horizontal
 overflow at 375px, every card link returns 200, schema_verify 92/92.
+
+---
+
+## 30 Sep 2026 - /portfolio: real production work, by brand
+
+**Why.** Buyers asked to see previous work and there was nothing to send them.
+Until now every one of the 300 images on the site was AI-generated (Vertex
+Gemini, via `fabrioza-marketing/generate_fab_images.py`) - fine for ads and
+category cards, not acceptable on a page headed "Our Work". The owner supplied
+82 genuine factory photographs, which this page is built from.
+
+**Provenance note.** These photos also carry no camera EXIF, but for a different
+reason: WhatsApp strips EXIF in transit and re-encodes to 960x1280. Content
+confirms they are real - factory floor tiling, poly bags, cutting tables,
+offcuts. Do not treat "no EXIF" alone as evidence either way.
+
+**Built.** `dist/portfolio/index.html` (static, prerendered, same design system
+as the other catalog pages). 82 photos processed to two sizes in
+`dist/images/portfolio/` - 640px thumbs for the grid (3.8 MB total, lazy) and
+1400px for the lightbox (12.7 MB, loaded on click only), from 24 MB of source.
+
+Grouped into 6 brand sections, each with its own count and outbound site link:
+
+| Brand | Pieces | Link |
+|---|---|---|
+| OTRACE | 33 | https://otrace.co |
+| Kool World Global | 15 | https://koolworldglobal.com |
+| Southern Heritage Co. | 15 | https://shopsouthernheritageco.com |
+| House of A&D | 3 | https://houseofad.com |
+| DAY | 2 | no site supplied yet |
+| Other Production | 14 | unnamed brands |
+
+Filter buttons set `#brand` on the URL, so a single brand can be sent as a deep
+link (`/portfolio#kwg`) instead of asking a buyer to scroll. Lightbox navigation
+stays inside the filtered set.
+
+**Copy rule applied.** No prices, no certification claims, no sample or mockup
+offers - each is either client-specific or still unresolved with the owner. A
+generator-level assertion fails the build if "ISO 9001", "free sample" or
+"free mockup" appear on this page.
+
+**Regression fixed in the same pass.** Removing the 40-product SKU grid on
+27 Sep also removed the element with `id="catalog"`, leaving every `#catalog`
+link scrolling nowhere: the SPA nav "Products" item, a footer button, the
+`^products/?$` .htaccess redirect and 20 blog pages. All now point at
+`#collections`. The nav item became "Our Work" -> /portfolio.
+
+**Wiring.** Nav link on 29 static pages (inserted after the Home item only -
+navs vary across 11 distinct blocks, so whole navs were never rewritten);
+sitemap entry (90 urls); `/our-work` and `/gallery` 301 to `/portfolio`;
+homepage nav plus a "See our work" link under the collection cards.
+Cache-bust `?v=20260930`.
+
+Verified in a browser: 82 items in 6 sections, **zero JS errors**, all 82 thumbs
+decode, filter + deep-link hash + lightbox (forward, backward-wrap, Escape,
+scroll lock) all correct, 2 columns and no horizontal overflow at 375px, sticky
+filter bar reduced from 157px to 31px on mobile by scrolling horizontally
+instead of wrapping to four rows, schema_verify 93/93.
+
+**Open.** DAY has no website link yet. Naming Kool World Global, House of A&D
+and DAY publicly should be confirmed with each client - OTRACE and Southern
+Heritage Co. are the owner's own brands. 9 factory videos in the source folder
+are not yet used.
