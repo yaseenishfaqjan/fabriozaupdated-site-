@@ -38,7 +38,7 @@ Each takes 10–20 minutes and creates a permanent third-party citation.
 - MOQ: 50 pieces standard, 15–20 sets for team sports, 20-piece trial tier
 - Lead time: mockup 24–48h (not free), sample 5–7 days, production 2–3 weeks, DDP 3–7 days
 - Products: custom jerseys and team uniforms (16 sports), hoodies, streetwear, private label
-- Web: https://fabrioza.com · info@fabrioza.com · +92 328 2347875
+- Web: https://fabrioza.com · info@fabrioza.com · +92 312 4815601
 
 ---
 

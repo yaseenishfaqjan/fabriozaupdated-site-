@@ -520,3 +520,40 @@ instead of wrapping to four rows, schema_verify 93/93.
 and DAY publicly should be confirmed with each client - OTRACE and Southern
 Heritage Co. are the owner's own brands. 9 factory videos in the source folder
 are not yet used.
+
+---
+
+## 1 Oct 2026 - phone number changed sitewide
+
+Old `+92 328 2347875` replaced with `+92 312 4815601` everywhere, in the same
+four spellings the site already used, so nothing changed shape - only digits:
+
+| Spelling | Where | Count |
+|---|---|---|
+| `+92-312-4815601` | schema `telephone`, footers | 23 |
+| `+92 312 4815601` | body/display text | 22 |
+| `wa.me/923124815601` | WhatsApp links | 4 |
+| `+923124815601` | bundle const `Wx` (floating WhatsApp button) | 1 |
+
+41 files: 39 static pages, the SPA bundle, and OUTREACH.md. Old number: 0
+occurrences remaining in any file type. Cache-bust `?v=20261001` on both the
+modulepreload and the script tag (they must match or the browser fetches twice).
+
+**Script gotcha worth remembering.** The first pass filtered files on the
+contiguous run `3282347875` and silently skipped 36 of 41 files, because the
+human-readable spellings (`+92 328 2347875`) break that run with spaces and
+dashes - and the script's own final check used the same token, so it reported a
+false all-clear. Filter on the unique 7-digit tail instead, and always confirm
+with an independent grep rather than trusting the script that did the edit.
+
+Verified in a browser: homepage 20 sections, 15 cards, **zero JS errors**, both
+schema `telephone` values updated, WhatsApp hrefs resolve to the new number, old
+number absent from rendered text; schema_verify 93/93.
+
+**Not verified and not verifiable from here:** whether the new number is
+registered on WhatsApp. `wa.me` returns an identical page for valid and invalid
+numbers, so the floating button must be tapped once on a phone to confirm.
+
+**Off-site copies still to change by hand:** Google Business Profile, email
+signatures, social profiles, any directory listings from OUTREACH.md, and
+printed material.
