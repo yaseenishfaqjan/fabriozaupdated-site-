@@ -557,3 +557,66 @@ numbers, so the floating button must be tapped once on a phone to confirm.
 **Off-site copies still to change by hand:** Google Business Profile, email
 signatures, social profiles, any directory listings from OUTREACH.md, and
 printed material.
+
+---
+
+## 1 Oct 2026 - /print-on-demand-alternative
+
+**Why.** Nick sent tapstitch.com with "we should do this for fabrioza asap".
+Tapstitch is not a factory competitor - it is a print-on-demand platform
+(founded 2024, $24.8M Series A) fulfilling from Los Angeles and Guangzhou, with
+500+ stock blanks, a drag-and-drop design tool and tees from $2.99. Copying it
+would need US blank inventory, a US fulfilment centre, single-unit print
+economics and Shopify/Etsy app integrations. The site is maybe 20% of it, and
+at $5.99 a unit you cannot ship singles from Sialkot - the freight exceeds the
+product. There is no US warehouse: McDonough GA is an office, by appointment.
+
+So instead of competing with POD, this page catches brands **leaving** it.
+
+**The honest position, which the page states outright:** print-on-demand is
+cheaper than us at low volume, has no minimum, no upfront cost and no inventory
+risk. Pretending otherwise would be the ISO 9001 mistake again, and any brand
+running POD knows its unit cost to the cent. We win on unit cost AT VOLUME and
+on controlling the garment itself - fabric, GSM, fit, wash, trims - which POD
+structurally cannot do, because it prints on a blank that already exists.
+
+**Calculator design.** It asks the buyer for THEIR current per-unit cost rather
+than quoting a rival's price. That keeps it accurate permanently, avoids
+publishing competitor pricing we cannot stand behind, and never goes stale.
+Prices are the real /pricing figures: linear interpolation between the MOQ
+price and the 500+ price, flat above 500, and below MOQ it says so and tells
+them to stay on POD.
+
+Three output branches, all verified against hand arithmetic:
+
+| Case | Output |
+|---|---|
+| Below MOQ | names the MOQ and price, says POD is the right tool |
+| POD cheaper, crossover exists | "we start beating that at around N units a month" |
+| POD cheaper at every tier | states our floor and says the reason to move is the garment, not the price |
+| We are cheaper | monthly and annual saving |
+
+Endpoints confirmed exact against the published list: tee $11.00 at 50 and
+$7.70 at 500 and at 1000; sweatshirt $10.50 at 500; soccer kit $20.00 at 15;
+cut & sew $12.00 at 100.
+
+**Wiring.** Nav on 30 pages, sitemap (91 urls), contextual callouts on the
+three pages that already discussed POD. No twin-content risk - no dedicated POD
+page existed and /print-on-demand-alternative was free.
+
+**Mobile bug caught and fixed:** form inputs were 14px. iOS Safari auto-zooms
+any focused input below 16px, so on a page built around tapping fields the
+layout would jump on every tap. Inputs are 16px under 768px.
+
+Verified in a browser: zero JS errors, all four calculator branches correct,
+9 products, 9 price rows, 6 FAQs, schema BreadcrumbList + WebPage + FAQPage,
+1-column form and 2-column stats with no horizontal overflow at 375px,
+schema_verify 94/94.
+
+**Semrush had no API units left**, so this round has no search-volume data -
+keyword targeting is from buyer language in published comparisons, not measured
+volume. Worth re-checking the terms once units are topped up.
+
+**Open:** the separate storefront being built on Cursor. If it replaces
+fabrioza.com it takes out 94 pages, the Tier 1-4 SEO, the CRM and the
+portfolio. Owner is checking with Nick before any DNS change.
