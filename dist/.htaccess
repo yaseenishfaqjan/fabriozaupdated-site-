@@ -53,9 +53,13 @@ ErrorDocument 404 /404.html
   # --- 4. Old thin "meta refresh" stub pages -> single-hop server 301s ---
   # /about, /contact, /products, /moq exist on disk only as client-side
   # redirect stubs; crawlers flagged them as "Page with redirect".
-  # Portfolio: the natural alternate spelling people try
-  RewriteRule ^our-work/?$ https://fabrioza.com/portfolio [R=301,L]
-  RewriteRule ^gallery/?$  https://fabrioza.com/portfolio [R=301,L]
+  # Portfolio withdrawn 13 Oct 2026 at a client's written request; the
+  # owner's standing rule is now that no customer work is published.
+  # 301 rather than 404 so the nav links that were live for 12 days,
+  # and any shared link, land somewhere useful.
+  RewriteRule ^portfolio/?$ https://fabrioza.com/what-we-make [R=301,L]
+  RewriteRule ^our-work/?$  https://fabrioza.com/what-we-make [R=301,L]
+  RewriteRule ^gallery/?$   https://fabrioza.com/what-we-make [R=301,L]
   RewriteRule ^services/?$ https://fabrioza.com/what-we-make                    [R=301,L]
   RewriteRule ^contact/?$  https://fabrioza.com/#contact    [R=301,NE,L]
   RewriteRule ^products/?$ https://fabrioza.com/#collections [R=301,NE,L]

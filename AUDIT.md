@@ -620,3 +620,49 @@ volume. Worth re-checking the terms once units are topped up.
 **Open:** the separate storefront being built on Cursor. If it replaces
 fabrioza.com it takes out 94 pages, the Tier 1-4 SEO, the CRM and the
 portfolio. Owner is checking with Nick before any DNS change.
+
+---
+
+## 13 Oct 2026 - /portfolio withdrawn; no customer work published
+
+**Why.** Kool World Global L.L.C. sent a written notice on 13 Oct 2026 stating
+they had not authorised public use of their name, logos, product photographs or
+website link, that KWG-001 remains in development with no authorised commercial
+release, and requesting immediate removal plus written confirmation.
+
+They were right to. The page carried the sentence "Brands are named and linked
+with permission", which was true for the owner's own brands and **not verified
+for the three third-party clients**. That gap was raised twice before the page
+was deployed on 1 Oct and the page went live before the permissions came back.
+
+**The owner's instruction is broader than the notice: no customer work is
+published at all.** So the whole page went, not just the KWG section.
+
+Removed:
+- `dist/portfolio/` and all 164 files in `dist/images/portfolio/` (17 MB)
+- nav link on 31 static pages; sitemap entry (90 urls)
+- homepage SPA nav item and the "See our work" link under the collection cards
+- the print-on-demand page's CTA, inline link, FAQ prose and OG/Twitter images,
+  which all pointed at portfolio photographs
+
+**Also removed, under the same instruction:** the homepage `#clients` section
+"Labels Built in Our Factory" ("Brands We Manufacture For"), which named
+**Southern Heritage Co.** and **APOLLO IX Official**. Same exposure the notice
+objected to, on the busiest page on the site. The component is no longer
+rendered and the names and their identifying blurbs were stripped from the
+bundle source as well, so nothing is readable in the served JavaScript.
+
+`/portfolio`, `/our-work` and `/gallery` now 301 to `/what-we-make` rather than
+404, because the nav links were live for 12 days and the URL may have been
+shared.
+
+Verified: zero references to "portfolio" anywhere in `dist/` except the
+`.htaccess` redirect and its comment; no client name anywhere in `dist/`;
+homepage renders 19 sections with **zero JS errors**; 15 collection cards
+intact; the print-on-demand calculator still works; schema_verify 93/93.
+Cache-bust `?v=20261013`.
+
+**Still outstanding and NOT solved by this commit:** the repository is public
+(`github.com/yaseenishfaqjan/fabriozaupdated-site-`) and the photographs remain
+in git history. Deleting them from the working tree does not remove them from
+earlier commits. Purging requires a history rewrite and a force push.
