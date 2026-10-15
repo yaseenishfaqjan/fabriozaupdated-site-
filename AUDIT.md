@@ -666,3 +666,74 @@ Cache-bust `?v=20261013`.
 (`github.com/yaseenishfaqjan/fabriozaupdated-site-`) and the photographs remain
 in git history. Deleting them from the working tree does not remove them from
 earlier commits. Purging requires a history rewrite and a force push.
+
+---
+
+## 16 Oct 2026 - form attachments: the file input was never wired
+
+**The fault.** The contact form has carried a file input accepting
+`.jpg,.jpeg,.png,.pdf,.ai,.eps` since launch. It had **no `name`, no
+`onChange`, no `ref` and no `value`** - React never read it - and the form
+posts `application/json`, which cannot carry a file. Customers attached tech
+packs and artwork, saw "Thank you", and the file was never read by JavaScript,
+let alone uploaded.
+
+Nothing was lost, because nothing was ever sent. There is no backlog to
+recover: no files exist on the server, in the database, or in any email.
+
+**The fix.** The submit handler already built a `FormData` from the form
+element, so the input only needed a `name` - no state plumbing. Files are then
+base64-encoded into the existing JSON envelope rather than switching the
+endpoint to multipart, which would have meant rewriting the CSRF and JSON
+parsing that currently work.
+
+- `dist/api/uploads.php` (new) - validation and storage
+- `lead_files` table in `db.php`
+- `send-email.php` stores attachments and names them in the notification
+- `dist/admin/file.php` (new) - authenticated download, streamed
+- `lead.php` - Attachments card, and files are erased on GDPR delete
+- Dockerfile - `post_max_size = 24M` (base64 is 4/3 of raw, so a 10 MB file is
+  ~13.4 MB on the wire; PHP's default 8M would have rejected it with an empty
+  `$_POST` and no useful error)
+
+**Decisions worth keeping:**
+
+- **Type is decided by MAGIC BYTES, never the filename.** A `.pdf` containing
+  HTML is rejected; a real PDF named `shell.php` is stored as `.pdf` and
+  downloads as `.pdf`.
+- **Files go to `/var/data/uploads`, never the web root.** The Dockerfile does
+  `COPY dist/ /var/www/html/`, so anything under the web root is destroyed on
+  the next rebuild. Nothing in `/var/data` is web-served, so `admin/file.php`
+  behind a login is the only route to a file.
+- **A rejected attachment never fails the lead.** The enquiry is worth more
+  than the file. Rejections are reported in the notification email.
+- **The attachment loop has its own try/catch.** It sits inside the lead
+  insert's try, whose catch calls `crm_failed_lead_dump()` - so without this, a
+  throw while storing a file would suppress the Telegram alert and record a
+  lead that IS saved as a failure.
+
+**Tested end to end against the real PHP** (built-in server, throwaway data
+dir), not just linted:
+
+| case | lead | file | correct |
+|---|---|---|---|
+| real PDF + PNG | saved | both stored, magic bytes intact | yes |
+| HTML renamed `.pdf` | saved | rejected | yes |
+| 11 MB | saved | rejected | yes |
+| `../../../../etc/passwd.pdf` | - | stored as `passwd.pdf`, 0 escaped the dir | yes |
+| `shell.php` (real PDF) | - | stored and served as `.pdf` | yes |
+| GDPR erase | - | 2 rows -> 0, files unlinked, dir removed | yes |
+| unauthenticated download | - | HTTP 401 | yes |
+
+Browser-verified: input carries `name="design" multiple`, both files reach the
+wire base64-encoded with magic bytes intact, text fields unaffected, an 11 MB
+file is blocked client-side with a readable message and no request sent, zero
+console errors, 19 sections and 15 cards intact. Cache-bust `?v=20261016`.
+
+**Separate and NOT fixed here: SMTP is failing again**, now with "Could not
+connect to SMTP host" (a connection failure, unlike September's authentication
+failure). Measured from this machine on 16 Oct: `s99.veladns.com` resolves to
+95.216.22.216, port 465 is OPEN and returns a valid Exim banner, MX and
+`mail.fabrioza.com` are correct. The mail host is healthy - the VPS cannot
+reach it. Most likely an outbound block on the Contabo host or the mail server
+rate-limiting that IP. Needs a test from the VPS itself.

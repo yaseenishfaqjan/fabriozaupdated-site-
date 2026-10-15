@@ -17,6 +17,7 @@ use PHPMailer\PHPMailer\Exception;
 
 require __DIR__. '/mailer.php';   // shared mailer: smtpSend, logEmail, buildNotificationEmail
 require __DIR__. '/db.php';
+require __DIR__. '/uploads.php';  // lead attachments (base64 -> /var/data/uploads)
 
 header('Content-Type: application/json');
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -121,6 +122,8 @@ try {
 
 /* ---- 6. INSERT THE LEAD FIRST ---- */
 $leadId = null;
+$savedFiles = [];
+$rejectedFiles = [];
 if ($db) {
     try {
         $payload = [
@@ -138,6 +141,37 @@ if ($db) {
         $stmt->execute([$clientName, $clientEmail, $company, $country, $productType, $quantity,
             $message, $formType, $sourcePage, $utmSource, $utmMedium, $utmCampaign, $score, $ipHash]);
         $leadId = (int)$db->lastInsertId();
+
+        /* ---- attachments -------------------------------------------------
+           The form posts JSON, so files arrive base64-encoded in `files`.
+           A rejected file must never fail the lead: the enquiry is worth far
+           more than the attachment, so failures are recorded and reported
+           back, and the submission still succeeds. */
+        /* Its own try/catch on purpose. This block sits inside the lead
+           insert's try, whose catch calls crm_failed_lead_dump() - so an
+           exception thrown while storing a file (a full disk, a locked DB)
+           would suppress the Telegram alert and record a lead that IS saved
+           as a failure. The attachment must never be able to do that. */
+        try {
+            $incoming = $data['files'] ?? [];
+            if (is_array($incoming)) {
+                foreach (array_slice($incoming, 0, CRM_UPLOAD_MAX_FILES) as $f) {
+                    if (!is_array($f)) { continue; }
+                    $r = crm_store_upload($db, $leadId, $f);
+                    if ($r['ok']) {
+                        $savedFiles[] = $r['name'] . ' (' . crm_format_bytes($r['size']) . ')';
+                    } else {
+                        $rejectedFiles[] = (string)($f['name'] ?? 'file') . ' - ' . $r['error'];
+                        crm_file_log("LEAD $leadId attachment rejected: "
+                            . (string)($f['name'] ?? '?') . ' - ' . $r['error']);
+                    }
+                }
+            }
+        } catch (Throwable $e) {
+            $rejectedFiles[] = 'attachment could not be stored';
+            crm_file_log("LEAD $leadId attachment EXCEPTION: " . $e->getMessage());
+            error_log('FABRIOZA attachment store failed: ' . $e->getMessage());
+        }
         crm_notify("🟢 NEW LEAD #$leadId ($formType)
 $clientName". ($company !== '' ? " - $company" : '')
          . "
@@ -167,6 +201,22 @@ $FROM_EMAIL = $SMTP_USER;
 
 $notifSubject = "New Lead". ($leadId ? " #$leadId" : ""). ": $formType - $clientName";
 $notifBody = buildNotificationEmail($leadId, $formType, $clientName, $clientEmail, $company, $country, $productType, $quantity, $message, $source, $sourcePage);
+
+/* Attachments are NOT attached to this email on purpose: the files are already
+   stored on the VPS, and a 10 MB MIME part is a reliable way to make an SMTP
+   send time out. The notification names them and links to the admin instead. */
+if ($savedFiles || $rejectedFiles) {
+    $att = '<p style="margin:16px 0 4px"><strong>Attachments</strong></p><ul>';
+    foreach ($savedFiles as $f) {
+        $att .= '<li>' . h($f) . '</li>';
+    }
+    foreach ($rejectedFiles as $f) {
+        $att .= '<li style="color:#b00">rejected - ' . h($f) . '</li>';
+    }
+    $att .= '</ul><p style="font-size:12px;color:#666">Download them from the lead page: '
+          . 'https://fabrioza.com/admin/lead.php?id=' . (int)$leadId . '</p>';
+    $notifBody .= $att;
+}
 
 $notifSent = false;
 if ($SMTP_PASS !== '') {

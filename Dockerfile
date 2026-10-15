@@ -19,6 +19,12 @@ RUN a2enmod rewrite headers expires deflate \
 # CRM data dir (named volume mounts here; ownership seeded from the image)
 RUN mkdir -p /var/data && chown www-data:www-data /var/data
 
+# Lead attachments arrive base64-encoded inside the JSON body, so the binding
+# limit is post_max_size, not upload_max_filesize. Base64 is ~4/3 of the raw
+# bytes: a 10 MB file is ~13.4 MB on the wire, and PHP's default post_max_size
+# of 8M would reject it with an empty $_POST and no useful error.
+RUN {       echo 'post_max_size = 24M';       echo 'upload_max_filesize = 12M';       echo 'memory_limit = 128M';       echo 'max_input_time = 120';     } > /usr/local/etc/php/conf.d/fabrioza-uploads.ini
+
 COPY dist/ /var/www/html/
 
 EXPOSE 80

@@ -1,5 +1,6 @@
 <?php
 require __DIR__ . '/_lib.php';
+require __DIR__ . '/../api/uploads.php';   // lead attachments
 adm_require_login();
 $db = crm_db();
 $id = (int)($_GET['id'] ?? $_POST['lead_id'] ?? 0);
@@ -9,6 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     adm_check_csrf();
     $act = $_POST['action'] ?? '';
     if ($act === 'delete') {                       // GDPR right to erasure: hard delete
+        // Files live on disk outside the DB; erasure has to reach them too.
+        crm_delete_lead_files($db, $id);
         $db->prepare('DELETE FROM leads WHERE id = ?')->execute([$id]);
         adm_audit($db, 'lead_deleted', $id);       // no PII in the audit log
         header('Location: /admin/leads.php'); exit;
@@ -77,6 +80,7 @@ $L = $st->fetch();
 if (!$L) { http_response_code(404); adm_head('Not found'); echo '<p>Lead not found. <a class="text-emerald-700" href="/admin/leads.php">Back</a></p>'; adm_foot(); exit; }
 $notes = $db->prepare('SELECT * FROM notes WHERE lead_id = ? ORDER BY created_at DESC'); $notes->execute([$id]); $notes = $notes->fetchAll();
 $emails = $db->prepare('SELECT * FROM email_log WHERE lead_id = ? ORDER BY sent_at DESC'); $emails->execute([$id]); $emails = $emails->fetchAll();
+$files = $db->prepare('SELECT * FROM lead_files WHERE lead_id = ? ORDER BY uploaded_at'); $files->execute([$id]); $files = $files->fetchAll();
 
 $PIPE = ['new' => 'New', 'quoted' => 'Quoted', 'sample' => 'Sample', 'trial' => 'Trial', 'bulk_negotiation' => 'Bulk', 'won' => 'Won'];
 $stageIdx = array_search($L['status'], array_keys($PIPE), true);
@@ -128,6 +132,26 @@ adm_head('Lead #' . $L['id']);
           <span class="text-xs bg-stone-200 text-stone-600 px-2 py-1 rounded-full font-semibold">auto follow-ups paused</span>
         <?php endif; ?>
       </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow p-6">
+      <h2 class="font-bold mb-4">Attachments</h2>
+      <?php foreach ($files as $f):
+            $missing = !is_file(crm_upload_path($f)); ?>
+        <div class="border-t py-2 text-sm flex justify-between items-center gap-3">
+          <span class="truncate">
+            <?= e($f['orig_name']) ?>
+            <span class="text-stone-400">&middot; <?= e(crm_format_bytes((int)$f['size_bytes'])) ?>
+            &middot; <?= e($f['uploaded_at']) ?></span>
+          </span>
+          <?php if ($missing): ?>
+            <span class="text-xs text-red-700 whitespace-nowrap">file missing on disk</span>
+          <?php else: ?>
+            <a href="file.php?id=<?= (int)$f['id'] ?>"
+               class="bg-stone-900 text-white px-3 py-1 rounded-lg text-xs whitespace-nowrap">Download</a>
+          <?php endif; ?>
+        </div>
+      <?php endforeach; if (!$files) { echo '<p class="text-sm text-stone-400">No files attached to this enquiry.</p>'; } ?>
     </div>
 
     <div class="bg-white rounded-2xl shadow p-6">

@@ -68,6 +68,15 @@ function crm_db(): PDO {
           status TEXT,
           error TEXT
         );
+        CREATE TABLE IF NOT EXISTS lead_files (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          lead_id INTEGER NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+          uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          orig_name TEXT NOT NULL,
+          stored_name TEXT NOT NULL,
+          mime TEXT,
+          size_bytes INTEGER
+        );
         CREATE TABLE IF NOT EXISTS audit_log (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           action TEXT NOT NULL,
