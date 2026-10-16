@@ -737,3 +737,39 @@ failure). Measured from this machine on 16 Oct: `s99.veladns.com` resolves to
 `mail.fabrioza.com` are correct. The mail host is healthy - the VPS cannot
 reach it. Most likely an outbound block on the Contabo host or the mail server
 rate-limiting that IP. Needs a test from the VPS itself.
+
+---
+
+## 17 Oct 2026 - lead_files never reached production (migration, not schema)
+
+Yesterday's attachment commit put `CREATE TABLE lead_files` inside the
+`if ($version < 1)` block in `db.php`. That block is the INITIAL schema: it
+runs once, when the database file is created. Production's database was
+already at `PRAGMA user_version = 3`, so the block was skipped and the table
+was never created. Every lead page fataled:
+
+    PDOException: no such table: lead_files in admin/lead.php:83
+
+**Why the tests passed anyway.** Every local test built a throwaway database
+from nothing, so `user_version` was 0 and the initial block always ran. The one
+state that mattered - an existing database being upgraded - was never
+exercised. A migration is only proved by running it against the OLD shape.
+
+Fixed by moving the table into a numbered step, `if ($version < 4)`, which runs
+on every database regardless of age, plus the missing `$version = 3;` so the
+chain falls through correctly.
+
+Verified in three separate processes (a new process each time, so the static
+`$pdo` cache cannot hide the result):
+
+| case | before | after |
+|---|---|---|
+| fresh database | - | user_version 4, table EXISTS |
+| database rewound to v3 with a lead in it (production's exact state) | v3, table MISSING | v4, table EXISTS, lead preserved |
+| opened a third time | v4 | v4, no error - migration is idempotent |
+
+The `lead.php` query that was fataling now runs.
+
+**Rule for this project: a new table or column goes in a NEW numbered
+migration, never into the v1 block.** Test it against a database at the old
+version, not a fresh one.

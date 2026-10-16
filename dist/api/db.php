@@ -68,15 +68,6 @@ function crm_db(): PDO {
           status TEXT,
           error TEXT
         );
-        CREATE TABLE IF NOT EXISTS lead_files (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          lead_id INTEGER NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
-          uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-          orig_name TEXT NOT NULL,
-          stored_name TEXT NOT NULL,
-          mime TEXT,
-          size_bytes INTEGER
-        );
         CREATE TABLE IF NOT EXISTS audit_log (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           action TEXT NOT NULL,
@@ -110,6 +101,23 @@ function crm_db(): PDO {
             message_id TEXT PRIMARY KEY,
             processed_at DATETIME DEFAULT CURRENT_TIMESTAMP)');
         $pdo->exec('PRAGMA user_version = 3');
+        $version = 3;
+    }
+    if ($version < 4) {
+        // Lead file attachments. This MUST be a numbered migration, not a line
+        // in the v1 block: that block only runs when the database is created,
+        // so an existing production DB (already at user_version 3) would never
+        // get the table and every lead page would fatal with "no such table".
+        $pdo->exec('CREATE TABLE IF NOT EXISTS lead_files (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            lead_id INTEGER NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+            uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            orig_name TEXT NOT NULL,
+            stored_name TEXT NOT NULL,
+            mime TEXT,
+            size_bytes INTEGER)');
+        $pdo->exec('CREATE INDEX IF NOT EXISTS idx_files_lead ON lead_files(lead_id)');
+        $pdo->exec('PRAGMA user_version = 4');
     }
     return $pdo;
 }
