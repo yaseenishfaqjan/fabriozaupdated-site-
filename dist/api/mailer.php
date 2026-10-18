@@ -51,6 +51,117 @@ function logEmail(?PDO $db, ?int $leadId, string $recipient, string $subject, bo
     }
 }
 
+/* ===================================================================
+ * Resend transport (HTTPS API, port 443)
+ *
+ * Why this exists: on 18 Oct 2026 the cPanel mail host (95.216.22.216)
+ * stopped answering this VPS on EVERY port - 25, 465, 587, 443 and even
+ * ICMP - while Gmail, Office365 and Resend all connected instantly from the
+ * same box. That is a firewall ban on 209.145.55.76, almost certainly an
+ * LFD/cPHulk block triggered by weeks of failed SMTP auth retries. Outbound
+ * SMTP itself was never blocked.
+ *
+ * Resend goes over HTTPS on 443, so it cannot be killed by an SMTP port
+ * policy, and a bad API key returns a clean 401 instead of hammering a login
+ * until the IP is banned again.
+ *
+ * The From address does NOT change: mail still goes out as info@fabrioza.com.
+ * Resend is the pipe, not the identity. That requires fabrioza.com to be
+ * verified in Resend - see RESEND-SETUP.md, and note the strict DMARC
+ * alignment constraint documented there.
+ * =================================================================== */
+
+function fab_resend_config(): array {
+    return [
+        'key'  => getenv('RESEND_API_KEY') ?: '',
+        'from' => getenv('RESEND_FROM') ?: (getenv('SMTP_USER') ?: 'info@fabrioza.com'),
+        'name' => getenv('RESEND_FROM_NAME') ?: 'FABRIOZA',
+    ];
+}
+
+function fab_resend_enabled(): bool {
+    return fab_resend_config()['key'] !== '';
+}
+
+/**
+ * Send one message through the Resend API.
+ * @return array{0:bool,1:string} [ok, note-or-error]
+ */
+function resendSend($to, $toName, $subject, $htmlBody, $replyTo = '', $replyToName = ''): array {
+    $c = fab_resend_config();
+    if ($c['key'] === '') { return [false, 'resend: RESEND_API_KEY not set']; }
+
+    $payload = [
+        'from'    => sprintf('%s <%s>', $c['name'], $c['from']),
+        'to'      => [$to],
+        'subject' => $subject,
+        'html'    => $htmlBody,
+    ];
+    if ($replyTo !== '') {
+        $payload['reply_to'] = $replyToName !== ''
+            ? sprintf('%s <%s>', $replyToName, $replyTo)
+            : $replyTo;
+    }
+
+    $ch = curl_init('https://api.resend.com/emails');
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_CONNECTTIMEOUT => 8,
+        CURLOPT_HTTPHEADER     => [
+            'Authorization: Bearer ' . $c['key'],
+            'Content-Type: application/json',
+        ],
+        CURLOPT_POSTFIELDS     => json_encode($payload, JSON_UNESCAPED_SLASHES),
+    ]);
+    $body = curl_exec($ch);
+    $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $cerr = curl_error($ch);
+    // No curl_close(): a no-op since PHP 8.0 and deprecated in 8.5.
+
+    if ($body === false) { return [false, 'resend: ' . ($cerr ?: 'request failed')]; }
+    $j = json_decode($body, true);
+
+    if ($code >= 200 && $code < 300 && !empty($j['id'])) {
+        return [true, 'via resend id=' . $j['id']];
+    }
+    // Resend returns a readable message; keep it, it is far more useful than
+    // PHPMailer's generic SMTP text.
+    $msg = $j['message'] ?? $j['error'] ?? mb_substr((string)$body, 0, 200);
+    return [false, "resend HTTP $code: $msg"];
+}
+
+/**
+ * The single entry point every caller should use.
+ *
+ * Resend first when configured, SMTP second. If Resend is not configured the
+ * behaviour is exactly what it was before, so this is safe to deploy before
+ * the API key exists.
+ *
+ * @param bool $retrySmtp false = one SMTP attempt (an admin is waiting)
+ */
+function fab_send($to, $toName, $subject, $htmlBody, $replyTo = '', $replyToName = '', bool $retrySmtp = true): array {
+    $notes = [];
+
+    if (fab_resend_enabled()) {
+        [$ok, $note] = resendSend($to, $toName, $subject, $htmlBody, $replyTo, $replyToName);
+        if ($ok) { return [true, $note]; }
+        $notes[] = $note;
+    }
+
+    $c = fab_smtp_config();
+    $fn = $retrySmtp ? 'smtpSend' : 'smtpSendOnce';
+    [$ok, $err] = $fn($c['host'], $c['port'], $c['user'], $c['pass'], $c['user'],
+                      $to, $toName, $subject, $htmlBody, $replyTo, $replyToName);
+    if ($ok) {
+        $notes[] = 'via smtp' . ($err !== '' ? " ($err)" : '');
+        return [true, implode(' | ', $notes)];
+    }
+    $notes[] = 'smtp: ' . $err;
+    return [false, implode(' | ', $notes)];
+}
+
 function smtpSend($host, $port, $user, $pass, $from, $to, $toName, $subject, $htmlBody, $replyTo = '', $replyToName = ''): array {
     // Retry up to 3 attempts. Delay is 3s (not 5s) and SMTP timeout 8s so the
     // absolute worst case (3x8s + 2x3s = 30s) stays inside PHP's request

@@ -773,3 +773,56 @@ The `lead.php` query that was fataling now runs.
 **Rule for this project: a new table or column goes in a NEW numbered
 migration, never into the v1 block.** Test it against a database at the old
 version, not a fresh one.
+
+---
+
+## 18 Oct 2026 - Resend transport added; the mail host banned the VPS
+
+**Diagnosis, measured not guessed.** From `209.145.55.76`:
+
+| target | result |
+|---|---|
+| `95.216.22.216` ports 25 / 465 / 587 | all time out (errno 110) |
+| `95.216.22.216` port **443** | times out |
+| ping `95.216.22.216` | 100% packet loss |
+| smtp.gmail.com:465 | OPEN, 0.1s |
+| smtp.office365.com:587 | OPEN, 0.0s |
+| smtp.resend.com:465 | OPEN, 0.1s |
+
+The same IP answers fine from a laptop. **Outbound SMTP was never blocked** -
+the cPanel mail host has firewall-banned the server's IP on every port
+including HTTPS and ICMP. That is an LFD/cPHulk pattern, and the mailer had
+been retrying 3x per email with a dead password for weeks, which is exactly
+what trips it. September's failure was "Could not authenticate"; this one is
+"Could not connect" - a different fault with the same root cause.
+
+**What was added.** `resendSend()` (HTTPS POST to api.resend.com, port 443,
+cURL confirmed present in the image) and `fab_send()`, one entry point that
+tries Resend when `RESEND_API_KEY` is set and falls back to SMTP otherwise.
+All three call sites switched: the lead notification, the auto-reply, and the
+admin Resend button (which passes `retrySmtp=false` so an admin is not left
+watching a 30-second hang).
+
+The gate on the notification block changed from `if ($SMTP_PASS !== '')` to
+`if (fab_resend_enabled() || $SMTP_PASS !== '')` - otherwise a box configured
+with only Resend would silently skip mail entirely.
+
+**The From address does not change.** Mail still goes out as
+`info@fabrioza.com`; Resend is the pipe, not the identity.
+
+**The constraint that will bite if ignored:** DMARC here is
+`adkim=s; aspf=s` - strict. Resend must verify the **ROOT** domain
+`fabrioza.com`, never a `send.` subdomain, or DKIM signs as
+`d=send.fabrioza.com`, fails alignment against an `@fabrioza.com` From, and
+every message quietly lands in spam. `p=none` means nothing bounces, so there
+would be no error to notice. Written up in `RESEND-SETUP.md`.
+
+Verified locally against the real API: no key -> `fab_resend_enabled()` false
+and behaviour identical to before (safe to deploy before an account exists);
+bogus key -> `resend HTTP 401: API key is invalid`; on failure `fab_send()`
+falls through to SMTP and logs both errors in one line. `curl_close()` removed
+(no-op since PHP 8.0, deprecated in 8.5).
+
+**Still outstanding:** the ban itself. While it stands the server cannot reach
+cPanel, webmail or IMAP on that host, so `import-inbox.php` cannot read the
+mailbox either. Worth asking the host to lift it regardless of Resend.

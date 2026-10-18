@@ -51,12 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $okAny = false; $errs = [];
                 foreach (fab_mail_to() as $to) {
-                    // One attempt, not smtpSend()'s three: an admin is watching the
-                    // browser, and 3 x 8s timeouts + 2 x 3s delays = a 30-second hang.
-                    // A persistent fault (bad password) will not fix itself on retry,
-                    // and a transient one is one more click away.
-                    [$sent, $err] = smtpSendOnce($cfg['host'], $cfg['port'], $cfg['user'], $cfg['pass'],
-                        $cfg['user'], $to, 'FABRIOZA Leads', $subject, $body, $LD['email'], $LD['name']);
+                    // retrySmtp=false: an admin is watching the browser, and the
+                    // SMTP fallback's 3 x 8s timeouts + 2 x 3s delays = a 30-second
+                    // hang. A persistent fault will not fix itself on retry, and a
+                    // transient one is one more click away. Resend, when configured,
+                    // answers in well under a second either way.
+                    [$sent, $err] = fab_send($to, 'FABRIOZA Leads', $subject, $body,
+                                             $LD['email'], $LD['name'], false);
                     logEmail($db, $id, $to, $subject . ' (resent)', $sent, $err);
                     if ($sent) { $okAny = true; } else { $errs[] = $to . ': ' . $err; }
                 }

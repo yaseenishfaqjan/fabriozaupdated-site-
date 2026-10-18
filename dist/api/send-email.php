@@ -219,20 +219,22 @@ if ($savedFiles || $rejectedFiles) {
 }
 
 $notifSent = false;
-if ($SMTP_PASS !== '') {
+// Either transport is enough to try a send. Gating on SMTP_PASS alone would
+// silently skip mail entirely on a box where only Resend is configured.
+if (fab_resend_enabled() || $SMTP_PASS !== '') {
     foreach ($TO_EMAILS as $to) {
-        [$sent, $err] = smtpSend($SMTP_HOST, $SMTP_PORT, $SMTP_USER, $SMTP_PASS, $FROM_EMAIL,
-            $to, 'FABRIOZA Leads', $notifSubject, $notifBody, $clientEmail, $clientName);
+        [$sent, $err] = fab_send($to, 'FABRIOZA Leads', $notifSubject, $notifBody,
+                                 $clientEmail, $clientName);
         logEmail($db, $leadId, $to, $notifSubject, $sent, $err);
         $notifSent = $notifSent || $sent;
     }
     $autoSubject = 'Thank you for contacting FABRIOZA - We will respond within 24 hours';
-    [$autoSent, $autoErr] = smtpSend($SMTP_HOST, $SMTP_PORT, $SMTP_USER, $SMTP_PASS, $FROM_EMAIL,
-        $clientEmail, $clientName ?: 'there', $autoSubject,
+    [$autoSent, $autoErr] = fab_send($clientEmail, $clientName ?: 'there', $autoSubject,
         getAutoReplyTemplate($clientName, $formType), $TO_EMAIL, 'FABRIOZA');
     logEmail($db, $leadId, $clientEmail, $autoSubject, $autoSent, $autoErr);
 } else {
-    logEmail($db, $leadId, implode(',', $TO_EMAILS), $notifSubject, false, 'SMTP_PASS not configured');
+    logEmail($db, $leadId, implode(',', $TO_EMAILS), $notifSubject, false,
+             'no mail transport configured (set RESEND_API_KEY or SMTP_PASS)');
 }
 
 /* ---- 8. Respond. The lead is stored; email failure is an internal problem. ---- */
