@@ -826,3 +826,73 @@ falls through to SMTP and logs both errors in one line. `curl_close()` removed
 **Still outstanding:** the ban itself. While it stands the server cannot reach
 cPanel, webmail or IMAP on that host, so `import-inbox.php` cannot read the
 mailbox either. Worth asking the host to lift it regardless of Resend.
+
+---
+
+## 22 Oct 2026 - /design: product configurator with a live preview
+
+**What the reference site actually was.** The owner asked to reverse-engineer
+divestimpex.com for a "choose a product, apply embroidery, see how it looks"
+tool. It does not have one. Read from the live product page: WordPress +
+WooCommerce + **YITH Advanced Product Options** - 40 colour swatches, a
+free-text size box and a file upload. **No `<canvas>`, no preview, zero hits
+for designer / design tool / personalise.** "Customize" appears 43 times as
+marketing copy. Copying it would have produced an options plugin.
+
+**We already owned the real thing.** The UK build's `client/mockup.ts` renders
+a per-technique SVG treatment. Ported here rather than written a third time.
+Also found: `AIDesignTool.tsx` already exists in the fabrioza.com bundle with
+the strings "Preview Your Design on Real Products" and "Upload Your Logo", and
+is **never rendered** - zero references, absent from the live HTML. The third
+dead shell on this project.
+
+**Built as a standalone static page, not a bundle patch.** Every change to
+`index-C6-wz3bb.js` is a hand-checked minified swap and one of them blanked
+the homepage. `/design` is plain HTML + vanilla JS in the same design system
+as `/pricing`, so it can be edited without touching the bundle.
+
+14 garments (the UK winter range plus t-shirt, oversized tee, long-sleeve and
+polo), 8 fabrics, 9 techniques, 6 placements, 10 colours. Two garment shapes
+are NEW: `tee` (short sleeve) and `polo` (collar wings, placket, two buttons).
+
+Each technique gets its own SVG treatment, which is what makes this worth
+having: thread displacement for embroidery, bevel + specular for 3D puff,
+clipped tile for sublimation, dot-mask and twinkle for rhinestone,
+posterisation for screen print, gloss mask for DTF and vinyl.
+
+**Decisions worth keeping:**
+
+- **Fabrics are mapped PER GARMENT.** The first port offered every fabric to
+  every product and produced "Classic t-shirt - Heavyweight cotton fleece".
+  Jersey, ring-spun, pique and performance polyester were added and
+  `FABRIC_BY_SHAPE` now gates the list, as the UK build does via
+  `product_fabrics`.
+- **Sublimation warns on cotton.** It bonds into polyester fibres, so picking
+  it on a cotton fabric shows a warning instead of a confident wrong preview.
+- **Labelled "Illustrative preview" in the SVG itself, the alt text and the
+  body copy**, with an explicit "this is an illustration, not a photograph"
+  note. Two weeks after the KWG letter, a render that could be mistaken for a
+  product photograph is the last thing this site needs.
+- **The config rides the existing enquiry pipeline.** No new endpoint: the
+  selection is appended to `message` and the logo goes through the attachment
+  system added on 16 Oct.
+- **The config is ONE line on purpose.** `sanitize()` collapses newlines to
+  spaces on every field as a header-injection guard. Rather than weaken a
+  security control for formatting, the summary uses middot separators.
+
+Verified end to end against real PHP (built-in server, throwaway data dir): a
+configured enquiry stored as lead #2, `form_type=Design Configurator`,
+`product_type="Oversized boxy t-shirt / Screen printing"`, the full spec
+readable in the message, and `acme-logo.png` stored on disk and linked to the
+lead. Browser-verified: zero console errors, all 9 techniques render
+distinctly, sublimation warns on cotton and clears on polyester, fabric and
+placement lists change per garment (hoodie gets Hood, joggers only Back and
+Left leg), uploaded logo appears in the preview, 1 column with no overflow at
+375px.
+
+**Mobile bug caught by measuring, not assuming:** the enquiry inputs stayed at
+14px because `.dz-form input[type=text]` (0,2,1) outranks `.dz-f input`
+(0,1,1) even inside the media query, so iOS Safari would have zoomed on every
+tap. The mobile rule now matches that specificity. All fields measure 16px.
+
+Wired into nav on 31 pages and the sitemap (91 urls). schema_verify 94/94.
