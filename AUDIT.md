@@ -1047,3 +1047,48 @@ is 20 sets. A blanket replace would have made the site wrong in a new way.
 - "**free samples** with DHL" and variants across the site. Third time this
   has surfaced. The owner has called it "the free sample issue you keep
   facing with leads" but has never said to remove it.
+
+---
+
+## 23 Oct 2026 - "free sample" removed sitewide
+
+Owner instruction. This had been raised three times since September, where
+it was described as "the free sample issue you keep facing with leads" -
+leads arriving expecting a free sample, being told samples are quoted, and
+the relationship starting with an argument.
+
+**26 claims across 16 files**, in 14 distinct phrasings. Replaced
+context-aware, one rule per phrasing, never a blanket find-and-replace - the
+last blanket claim removal on this site is what left "& amfori BSCI audited"
+in the customer auto-reply for seven weeks.
+
+The benefit is kept and only the word "free" goes, because "a sample before
+you commit to bulk" is still a real advantage over factories that make you
+order blind:
+
+| was | now |
+|---|---|
+| "Design mockup. Free sample. Quote in 24 hours." (8 pages) | "Design mockup. Pre-production sample. Quote in 24 hours." |
+| "Samples are free (DHL included)" | "Samples are quoted per design, DHL included" |
+| "free samples with DHL" | "samples quoted per design" |
+| "Design mockup in 48h, free sample, MOQ from 15-20 sets" | "...sample before bulk..." |
+| "Free DHL shipping on samples" | "DHL shipping on samples" |
+| "Start With a Free Sample" / "Request a Free Sample" | "Start With a Sample" / "Request a Sample" |
+| "published per-unit prices and free samples in 5-7 days" | "...and samples in 5-7 days" |
+| "Free sample with DHL shipping." | "Samples shipped by DHL." |
+| "Free sample with your design." | "Sample your design before bulk." |
+| "Low MOQ 50 pcs, free samples, 24h quotes" | "...samples before bulk..." |
+
+Two matches needed a second pass: one was split by a `</strong>` tag so the
+literal never matched, and one phrasing was not in the first catalogue. A
+regex sweep after the replacements is what found both - do not trust a
+replacement count alone, re-scan for the pattern afterwards.
+
+**Deliberately left, and flagged to the owner:** index.html still says "If
+you are not satisfied, we will remake the sample free of charge." That is a
+quality guarantee on a PAID sample, not an offer of a free one, and deleting
+it would remove a reasonable promise the owner may well honour. It is a
+separate decision.
+
+Every rewritten sentence was read back in rendered form before shipping.
+schema_verify 99/99.
