@@ -372,7 +372,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
   if(!f.checkValidity()){f.reportValidity();return}
   var d=new FormData(f);
   var body={form_type:'Blog enquiry',name:d.get('name')||'',email:d.get('email')||'',
-    company:d.get('company')||'',product_type:'Hoodies &amp; Sweatshirts',
+    company:d.get('company')||'',product_type:'Hoodies & Sweatshirts',
     quantity:d.get('quantity')||'',message:d.get('message')||'',
     source_page:'/blog/hoodie-manufacturing-cost-pakistan',gdpr_consent:d.get('privacy')?true:false};
   b.disabled=true; b.textContent='Sending\u2026';
