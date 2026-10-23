@@ -27,6 +27,13 @@ Resend is now live and fixes that going forward. It does nothing about the
 ## 1. Email marketing
 
 ### Decide first
+
+- [ ] **Move `info@fabrioza.com` to Google Workspace?** Owner's stated plan,
+      23 Oct. Recommended **yes** — full runbook, risks and ordering in
+      `WORKSPACE-MIGRATION.md`. It replaces the cPanel mailbox rather than
+      sitting beside it, so it supersedes the "keep both" brief. Resend is
+      unaffected (verified). One step is irreversible; one must precede it.
+
 - [ ] **Subdomain or new domain?** `news.fabrioza.com` is free, inherits your
       sending reputation and isolates campaigns from your quote address. A new
       domain costs ~£10/yr and **starts at zero reputation** — weeks of warm-up

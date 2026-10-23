@@ -2,6 +2,14 @@
 
 Written 23 Oct 2026, after Resend went live for the website's own mail.
 
+> **Superseded in part, 23 Oct 2026.** The owner now plans to move
+> `info@fabrioza.com` itself into Google Workspace, which changes the root MX
+> and retires the cPanel mailbox. That is a different shape from this
+> document, which was written to keep cPanel receiving untouched. Read
+> `WORKSPACE-MIGRATION.md` first and decide between the two.
+> The `news.fabrioza.com` plan below remains valid and needs no MX change;
+> it is the option to use if you want both systems.
+
 ## What is already working — do not disturb any of it
 
 | What | Where | Status |
