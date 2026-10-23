@@ -1003,3 +1003,47 @@ and attachment - which the 16 Oct upload work made useful - and links to
 "Design mockups within" ever reappear in that function.
 
 Rendered and read before shipping, not just linted.
+
+---
+
+## 23 Oct 2026 (later) - Resend key reached the container; MOQ is two tiers
+
+**The key was in .env for a day and never reached PHP.** `docker-compose.yml`
+lists env vars explicitly in its `environment:` block, and `RESEND_API_KEY`
+was not among them - so compose read `.env` for variable substitution and
+dropped it. `docker compose up -d --build` rebuilt happily and the container
+reported `RESEND_API_KEY: NOT SET`. My omission from 18 Oct: the setup notes
+documented the `.env` lines and never added the compose mapping.
+`RESEND_API_KEY`, `RESEND_FROM` and `RESEND_FROM_NAME` are now passed through.
+
+**A variable in .env is not a variable in the container.** Check from inside:
+`docker exec fabrioza-web php -r 'echo getenv("RESEND_API_KEY") ? "set" : "NOT SET";'`
+
+**`tools/resend_check.sh` failed on the VPS** in two ways, both mine. It
+shelled out to `python`, which the VPS does not have (only `python3`), so
+every DNS lookup returned empty and it reported live records as GONE - the
+same false-failure class as the Windows parsing bug the day before. And
+`--send` ssh'd to the VPS, which fails when you are already ON the VPS. It
+now parses with sed and grep only, prefers `dig` when present, and runs
+`docker exec` locally when docker is available.
+
+**MOQ: never a contradiction, two tiers nobody had written down.** Owner,
+23 Oct: 50 pieces per style standard; new brands can start from 20 **at a
+higher unit price**; sublimated team kits stay 15-20 sets. 24 pages showed
+both numbers with no explanation, which reads as the site contradicting
+itself - which is what clients were reacting to.
+
+Rolled out to the canonical FAQ answer (JSON-LD and visible), the comparison
+table, 7 product-schema descriptions and the small-batch page.
+
+**Deliberately NOT touched:** the 256 per-product spec chips (`MOQ: 50 pcs`,
+`MOQ: 20 sets`). Those are product-specific and correct - a soccer kit really
+is 20 sets. A blanket replace would have made the site wrong in a new way.
+
+**Two claims left standing that need an owner decision, not a guess:**
+- "20-piece trial order, cost **credited toward bulk**" on 5 pages. The owner
+  stated a higher unit price, not a credit. The two could coexist; I do not
+  know, so I have not rewritten them.
+- "**free samples** with DHL" and variants across the site. Third time this
+  has surfaced. The owner has called it "the free sample issue you keep
+  facing with leads" but has never said to remove it.
