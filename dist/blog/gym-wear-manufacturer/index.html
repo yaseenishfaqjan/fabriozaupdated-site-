@@ -177,6 +177,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
   .content h2{font-size:1.3rem}
   .cta-box{padding:24px}
 }
+
+/* --- inline enquiry form in the closing CTA (added 24 Oct 2026) ------
+   Light theme: these pages are #f8f9fa. The 16px input size inside the
+   mobile query stops iOS Safari auto-zooming and jumping the page. */
+.lq-form{background:#fff;border-radius:12px;padding:26px;margin-top:22px;text-align:left;box-shadow:0 2px 14px rgba(0,0,0,.10)}
+.lq-form .r{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.lq-form label{display:block;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:#5d6b62;margin-bottom:6px;font-weight:600}
+.lq-form input[type=text],.lq-form input[type=email],.lq-form textarea{width:100%;background:#fff;border:1px solid #cfd8d2;color:#1a1a1a;padding:11px 12px;border-radius:8px;font-size:15px;font-family:inherit;margin-bottom:14px;line-height:1.5}
+.lq-form input[type=text]:focus,.lq-form input[type=email]:focus,.lq-form textarea:focus{outline:none;border-color:#4A7C59;box-shadow:0 0 0 3px rgba(74,124,89,.16)}
+.lq-form textarea{min-height:88px;resize:vertical}
+.lq-form label.lq-consent{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:#55605a;line-height:1.6;margin-bottom:16px;text-transform:none;letter-spacing:normal;font-weight:400}
+.lq-form label.lq-consent span{text-transform:none;letter-spacing:normal}
+.lq-consent input{margin-top:3px;width:16px;height:16px;flex:0 0 auto;accent-color:#4A7C59}
+.lq-btn{display:inline-block;width:100%;background:#4A7C59;color:#fff;border:0;padding:14px 28px;border-radius:10px;font-weight:700;font-size:1rem;font-family:inherit;cursor:pointer;transition:background .2s}
+.lq-btn:hover:not(:disabled){background:#3d6749}
+.lq-btn:disabled{opacity:.65;cursor:default}
+.lq-msg{margin-top:13px;font-size:13.5px;line-height:1.6}
+.lq-msg.ok{color:#2d5a3d;font-weight:600}
+.lq-msg.err{color:#b4472e}
+.lq-alt{margin-top:14px;font-size:12.5px;color:rgba(255,255,255,.85);text-align:center}
+.cta-box .lq-alt a{background:none;background-color:transparent;padding:0;border-radius:0;display:inline;font-weight:600;color:#fff;text-decoration:underline}
+@media(max-width:768px){
+.lq-form{padding:18px}
+.lq-form .r{grid-template-columns:1fr}
+.lq-form input[type=text],.lq-form input[type=email],.lq-form textarea{font-size:16px}
+}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-714NBVRE2V"></script>
@@ -272,7 +298,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
     <div class="cta-box">
       <h3>Launch Your Gym Wear Brand With FABRIOZA</h3>
       <p>50 pieces minimum. Performance fabrics. Compression technology. Free quote in 24 hours.</p>
-      <a href="/?from=/blog/gym-wear-manufacturer#contact">Get Your Gym Wear Quote →</a>
+      <form class="lq-form" id="lqForm" novalidate><div class="r"><div><label for="lqName">Your name *</label><input id="lqName" name="name" type="text" required></div><div><label for="lqEmail">Email *</label><input id="lqEmail" name="email" type="email" required></div></div><div class="r"><div><label for="lqCo">Brand or company</label><input id="lqCo" name="company" type="text"></div><div><label for="lqQty">Quantity</label><input id="lqQty" name="quantity" type="text" placeholder="e.g. 100 pieces"></div></div><label for="lqMsgF">What are you making?</label><textarea id="lqMsgF" name="message" placeholder="Garment, fabric, decoration &mdash; or just the idea. A sentence is enough to start."></textarea><label class="lq-consent"><input type="checkbox" name="privacy" required><span>I understand FABRIOZA will use these details to reply to my enquiry and prepare a quote. *</span></label><button class="lq-btn" id="lqBtn" type="submit">Get a free quote in 24 hours</button><div class="lq-msg" id="lqMsg2" role="status" aria-live="polite"></div></form><p class="lq-alt">Prefer email? <a href="mailto:info@fabrioza.com">info@fabrioza.com</a> &mdash; we reply within one working day.</p>
     </div>
 
     
@@ -310,5 +336,38 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 
 <a href="#" class="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">↑</a>
 
+
+<script>
+/* Inline enquiry form. Same handler as /clothing-manufacturer-uk and
+   /brand-launch - deliberately not a third implementation. */
+(function(){
+ var f=document.getElementById('lqForm'); if(!f) return;
+ f.addEventListener('submit',function(ev){
+  ev.preventDefault();
+  var m=document.getElementById('lqMsg2'), b=document.getElementById('lqBtn');
+  var label=b.textContent;
+  m.className='lq-msg'; m.textContent='';
+  if(!f.checkValidity()){f.reportValidity();return}
+  var d=new FormData(f);
+  var body={form_type:'Blog enquiry',name:d.get('name')||'',email:d.get('email')||'',
+    company:d.get('company')||'',product_type:'Other',
+    quantity:d.get('quantity')||'',message:d.get('message')||'',
+    source_page:'/blog/gym-wear-manufacturer',gdpr_consent:d.get('privacy')?true:false};
+  b.disabled=true; b.textContent='Sending\u2026';
+  fetch('/api/csrf.php',{credentials:'same-origin'}).then(function(r){return r.json()})
+   .then(function(t){body.csrf=t.token;
+     return fetch('/api/send-email.php',{method:'POST',credentials:'same-origin',
+       headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})})
+   .then(function(r){return r.json()}).then(function(j){
+     b.disabled=false; b.textContent=label;
+     if(j&&j.success){m.className='lq-msg ok';
+       m.textContent='Thank you \u2014 we reply within one working day.'; f.reset();}
+     else {m.className='lq-msg err'; m.textContent=(j&&j.message)||'Something went wrong. Please email info@fabrioza.com.'}})
+   .catch(function(){b.disabled=false;b.textContent=label;
+     m.className='lq-msg err';
+     m.textContent='We could not send that. Please email info@fabrioza.com.'});
+ });
+})();
+</script>
 </body>
 </html>
