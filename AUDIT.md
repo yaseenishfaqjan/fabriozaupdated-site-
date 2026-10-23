@@ -1100,7 +1100,7 @@ schema_verify 99/99.
 Owner instruction. It was the last certification claim on the site and had
 been unevidenced for a month.
 
-**46 self-claims removed across 31 files**, in two passes.
+**55 self-claims removed across 33 files**, in THREE passes.
 
 **Kept, deliberately: 78 generic mentions.** Advice telling a buyer to look
 for a social audit at any factory is true and useful and is not a claim about
@@ -1140,6 +1140,15 @@ we cannot hand you with a number you can check. Tell us what your buyer
 requires and we will say plainly whether we hold it, can obtain it, or
 cannot." That reads stronger than the badge did.
 
-Verified: 0 surviving self-claims, 0 broken sentences, every rewritten answer
-read back rendered, schema_verify 99/99. The "doubled space" the checker
-flagged is a false positive - the HTML is `All Rights Reserved.<br>`.
+**Three passes, because each verifier had a blind spot.** Pass one covered
+strings from an opening grep and missed 27. Pass two used a regex requiring a
+pronoun near the mention, and missed label-style claims with no pronoun at
+all - `**Compliance:** amfori BSCI audited` in llms.txt, and `| Compliance |
+amfori BSCI audited |` in a comparison table. Pass three caught those plus
+"Verified standards: ... amfori BSCI social audit" on six country pages.
+
+Final state: 60 mentions remain, every one generic buyer advice, 0 flagged by
+a possession-marker scan (we are / our / FABRIOZA is / Verified standards /
+Compliance:). 0 broken sentences. Every rewritten answer read back rendered.
+schema_verify 99/99. The "doubled space" the checker flagged is a false
+positive - the HTML is `All Rights Reserved.<br>`.
