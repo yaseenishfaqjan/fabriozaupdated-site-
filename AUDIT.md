@@ -1092,3 +1092,54 @@ separate decision.
 
 Every rewritten sentence was read back in rendered form before shipping.
 schema_verify 99/99.
+
+---
+
+## 23 Oct 2026 - amfori BSCI removed; the September bug found a second time
+
+Owner instruction. It was the last certification claim on the site and had
+been unevidenced for a month.
+
+**46 self-claims removed across 31 files**, in two passes.
+
+**Kept, deliberately: 78 generic mentions.** Advice telling a buyer to look
+for a social audit at any factory is true and useful and is not a claim about
+us. `/blog/what-certifications-should-a-clothing-manufacturer-have` is
+literally about certifications; it now says where we stand honestly instead
+of claiming a badge.
+
+**The first pass missed 27 of them.** It only covered strings found in an
+opening grep. A verification step that re-read EVERY surviving mention -
+rather than trusting the replacement count - found the rest on pages the
+first audit never surfaced, including two on the homepage and one in
+`llms.txt`, the file AI assistants read.
+
+**The September bug had repeated itself, on the homepage.** The FAQ answer
+in the homepage JSON-LD read literally:
+
+    "We are  for quality management, amfori BSCI audited for social
+     standards, with 4-stage QC..."
+
+"We are  for quality management", double space and all, is what was left when
+"ISO 9001 certified" was stripped out in September. Seven weeks, on the
+homepage, in schema Google reads. That is the second instance of the same
+failure mode; the first was "& amfori BSCI audited" in the customer
+auto-reply, found yesterday.
+
+**The lesson, now twice-earned: after removing a claim, re-read the sentence
+it lived in.** A replacement count tells you how many strings changed, never
+whether what remains is English.
+
+Also caught: the sportswear listicle's own entry - the one that opens "Yes,
+this is us" - still said "ISO 9001 certified and amfori BSCI audited". The
+September ISO sweep had classified that whole file as generic advice.
+
+**Replacement wording** says what is true and refuses to imply more: "We hold
+no third-party certification we can evidence today, and we will not list one
+we cannot hand you with a number you can check. Tell us what your buyer
+requires and we will say plainly whether we hold it, can obtain it, or
+cannot." That reads stronger than the badge did.
+
+Verified: 0 surviving self-claims, 0 broken sentences, every rewritten answer
+read back rendered, schema_verify 99/99. The "doubled space" the checker
+flagged is a false positive - the HTML is `All Rights Reserved.<br>`.
