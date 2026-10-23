@@ -159,6 +159,10 @@ ErrorDocument 404 /404.html
   ExpiresByType image/png "access plus 1 year"
   ExpiresByType image/webp "access plus 1 year"
   ExpiresByType image/svg+xml "access plus 1 year"
+  # 40.7 MB of video shipped with no Cache-Control because video/* was never
+  # listed here, so every repeat visitor re-downloaded all of it.
+  ExpiresByType video/mp4 "access plus 1 year"
+  ExpiresByType video/webm "access plus 1 year"
   ExpiresByType text/css "access plus 1 month"
   ExpiresByType application/javascript "access plus 1 month"
   ExpiresByType application/json "access plus 1 day"
