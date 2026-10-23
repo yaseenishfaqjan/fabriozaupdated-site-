@@ -117,15 +117,11 @@ processed: **last read 24/10/2026, 102 URLs**.
 
 ## 5. Proof and pricing
 
-- [ ] **Confirm whether the factory photos and videos are real.** This file has
-      said "all 300 images are AI-generated". If the six factory videos are also
-      generated, then the site has **no** genuine visual proof, and the
-      competitor review's advice to lean on them is wrong. Settle this before
-      building anything on top of it — it changes the whole proof strategy.
-- [ ] **One real photograph beats everything generated.** The highest-converting
-      single asset missing is a digitizing **before/after**: a customer's rough
-      logo beside the stitched result. A phone photo of a real stitch-out is
-      enough.
+- [ ] **A digitizing before/after is the one asset worth photographing.** A rough
+      customer logo beside the stitched result. Imagery is AI across the site by
+      design and that is settled — but a real stitch-out is the one thing a
+      buyer uses to judge embroidery quality, and it cannot be generated
+      convincingly.
 - [ ] **Standalone prices for vector art, patches and sublimation.** Only
       digitizing is priced ($18 / $28 / $45 / from $60). You approved the model,
       not the figures.
