@@ -44,11 +44,9 @@ ErrorDocument 404 /404.html
   RewriteRule ^home/?$ https://fabrioza.com/ [R=301,L]
 
   # --- 3. Homepage anchor sections wrongly exposed as top-level paths ---
-  # The live nav already links to /#how-it-works, /#factory, /#faq; these
-  # catch previously indexed URLs and old bookmarks. NE keeps the "#" literal.
-  RewriteRule ^process/?$ https://fabrioza.com/#how-it-works [R=301,NE,L]
+  # /process and /faq are REAL PAGES as of 24 Oct 2026 and their 301s were
+  # removed; only /factory is still an anchor. NE keeps the "#" literal.
   RewriteRule ^factory/?$ https://fabrioza.com/#factory      [R=301,NE,L]
-  RewriteRule ^faq/?$     https://fabrioza.com/#faq          [R=301,NE,L]
 
   # --- 4. Old thin "meta refresh" stub pages -> single-hop server 301s ---
   # /about, /contact, /products, /moq exist on disk only as client-side
