@@ -258,44 +258,55 @@ function sanitize($str) {
 function getAutoReplyTemplate($name, $formType) {
     $firstName = explode(' ', $name)[0] ?: 'there';
     return "<!DOCTYPE html>
-<html><head><style>
-body{font-family:Arial,sans-serif;line-height:1.6;color:#333}
-.container{max-width:600px;margin:0 auto;padding:20px}
-.header{background:#4A7C59;color:white;padding:30px 20px;text-align:center}
-.header h1{margin:0;font-size:24px}
-.content{background:#fff;padding:30px 20px;border:1px solid #ddd}
-.cta{background:#4A7C59;color:white;padding:15px;text-align:center;margin:20px 0;border-radius:5px}
-.cta a{color:white;text-decoration:none;font-weight:bold}
-.features{background:#f5f5f5;padding:20px;margin:20px 0;border-radius:5px}
-.feature{margin-bottom:10px;padding-left:25px;position:relative}
-.feature::before{content:'\\2713';position:absolute;left:0;color:#4A7C59;font-weight:bold}
-.footer{text-align:center;padding:20px;color:#999;font-size:12px;border-top:1px solid #eee}
+<html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><style>
+body{margin:0;padding:0;background:#f4f4f2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#23262b;line-height:1.65}
+.wrap{max-width:600px;margin:0 auto;background:#ffffff}
+.header{background:#1d2b22;padding:30px 28px}
+.header h1{margin:0;font-size:21px;letter-spacing:3px;color:#ffffff;font-weight:700}
+.header p{margin:6px 0 0;font-size:13px;color:#9db9a8}
+.content{padding:30px 28px}
+.content p{margin:0 0 16px;font-size:15px}
+.facts{background:#f6f7f6;border-left:3px solid #4A7C59;padding:18px 20px;margin:22px 0}
+.facts div{font-size:14px;color:#3d4248;padding:5px 0}
+.facts b{color:#1d2b22}
+.links{margin:24px 0}
+.links a{display:block;padding:13px 18px;background:#4A7C59;color:#ffffff !important;text-decoration:none;font-weight:600;font-size:14px;border-radius:5px;margin-bottom:9px;text-align:center}
+.links a.alt{background:#ffffff;color:#1d2b22 !important;border:1px solid #d6d9d7}
+.sig{margin-top:26px;padding-top:20px;border-top:1px solid #e7e9e8;font-size:13px;color:#5b6168}
+.sig b{color:#1d2b22;font-size:14px}
+.footer{padding:20px 28px;background:#f6f7f6;font-size:11.5px;color:#8b9097;line-height:1.6}
+@media(max-width:620px){.content,.header,.footer{padding-left:20px;padding-right:20px}}
 </style></head><body>
-<div class='container'>
+<div class='wrap'>
 <div class='header'>
 <h1>FABRIOZA</h1>
-<p>Premium Private Label Clothing Manufacturer</p>
+<p>Custom clothing manufacturer &middot; Sialkot, Pakistan</p>
 </div>
 <div class='content'>
 <p>Hi ". h($firstName). ",</p>
-<p>Thank you for reaching out to FABRIOZA! We've received your inquiry and a member of our team will personally respond within <strong>24 hours</strong>.</p>
-<div class='features'>
-<div class='feature'>MOQ starts at just <strong>50 pieces</strong> (20-piece trial orders available)</div>
-<div class='feature'>Design mockups within 24-48 hours</div>
-<div class='feature'>Sample production in 5-7 business days</div>
-<div class='feature'>Factory-direct pricing (save 30-50%)</div>
-<div class='feature'> &amp; amfori BSCI audited</div>
+<p>Thanks for getting in touch. Your enquiry has reached us and a real person will reply within <strong>one working day</strong> &mdash; not an auto-quote, an actual answer to what you asked.</p>
+<div class='facts'>
+<div><b>Minimum order:</b> from 20 pieces</div>
+<div><b>Made by us:</b> cut and sewn in our own factory, not brokered out</div>
+<div><b>Delivery:</b> DDP, so the price we quote is the price landed</div>
 </div>
-<div class='cta'>
-<a href='https://calendly.com/fabrioza/30min'>Book a Free 30-Minute Consultation</a>
+<p>While you wait, two things that might save us both a round of emails:</p>
+<div class='links'>
+<a href='https://fabrioza.com/design'>Design it and see a preview</a>
+<a class='alt' href='https://fabrioza.com/brand-launch'>Starting a brand from scratch?</a>
 </div>
-<p>In the meantime, feel free to explore our website or book a meeting directly using the link above.</p>
-<p>Best regards,<br><strong>The FABRIOZA Team</strong></p>
-<p style='font-size:12px;color:#666'>USA Office: McDonough, Georgia (by appointment)<br>Factory / Head Office: Saro Street, near Fateh Garh Road, Sialkot 51310, Pakistan<br>Email: info@fabrioza.com</p>
+<p>If you already have artwork, reply to this email and attach it &mdash; a logo, a sketch or a photo of something similar all work.</p>
+<div class='sig'>
+<b>The FABRIOZA team</b><br>
+info@fabrioza.com &middot; +92 312 4815601<br>
+Saro Street, near Fateh Garh Road, Sialkot 51310, Pakistan<br>
+USA office: McDonough, Georgia (by appointment)
+</div>
 </div>
 <div class='footer'>
-<p>This is an automated response. Please do not reply to this email.</p>
-<p>&copy; 2026 FABRIOZA. All rights reserved.</p>
+You are receiving this because you sent an enquiry through fabrioza.com.
+<strong>You can reply to this email</strong> &mdash; it reaches the same inbox our team works from.
 </div>
-</div></body></html>";
+</div>
+</body></html>";
 }

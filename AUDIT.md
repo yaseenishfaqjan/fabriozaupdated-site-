@@ -962,3 +962,44 @@ overflow, all form fields 16px so iOS does not zoom.
 **Not done:** standalone prices, real photographs of patches and stitch-outs
 (the AI images are section art only), and the "free with production order"
 wording needs the owner's exact condition before it can say a quantity.
+
+---
+
+## 23 Oct 2026 - Resend domain verified; auto-reply rewritten
+
+**Resend DNS is done and correct.** `tools/resend_check.sh` reports 6 pass,
+0 fail: `resend._domainkey` present on the ROOT domain so DMARC strict
+alignment (`adkim=s`) passes, and critically the root MX, the cPanel
+`default._domainkey` and the SPF with `ip4:95.216.22.216` are all intact -
+the inbox and webmail still work. `send.fabrioza.com` carries an MX to
+`feedback.forge.rmta.net` for bounces, which does not touch the root MX.
+
+Still outstanding: the API key. The container reports `RESEND_API_KEY: no`,
+so `fab_send()` continues to fall through to SMTP, which is still blocked -
+the cPanel host has not lifted the ban on 209.145.55.76 (465 and 587 both
+still time out at 8s).
+
+**The auto-reply every lead receives was broken.** Found while checking what
+"our sending email looks like". The feature list ended with a bullet reading
+literally **"& amfori BSCI audited"** - the dangling ampersand left behind
+when "ISO 9001 certified" was stripped out of "ISO 9001 certified & amfori
+BSCI audited" during the September claim scrub. Broken English and an
+unevidenced certification, sent to every single enquiry for seven weeks.
+
+Four more, all customer-facing:
+
+| was | problem |
+|---|---|
+| "MOQ starts at just 50 pieces" | homepage title says "MOQ from 20 Pieces" - fourth place this contradiction has surfaced |
+| "Factory-direct pricing (save 30-50%)" | unverified; the UK page carried a different unverified figure, 45-60% |
+| "Design mockups within 24-48 hours" | owner has twice said free mockups are not offered, and in an auto-reply this reads as included |
+| "This is an automated response. Please do not reply" | sent FROM a monitored mailbox to a B2B buyer who just asked for a quote |
+
+Rewritten. Everything kept is either owner-stated (MOQ 20, one-working-day
+reply) or plainly true (own factory in Sialkot, DDP). It now invites a reply
+and attachment - which the 16 Oct upload work made useful - and links to
+/design and /brand-launch. Assertions in the rewrite script fail the build if
+"amfori", "BSCI", "ISO 9001", "save 30-50", "50 pieces", "do not reply" or
+"Design mockups within" ever reappear in that function.
+
+Rendered and read before shipping, not just linted.
