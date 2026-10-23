@@ -212,7 +212,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 .lq-form input[type=text],.lq-form input[type=email],.lq-form textarea{width:100%;background:#fff;border:1px solid #cfd8d2;color:#1a1a1a;padding:11px 12px;border-radius:8px;font-size:15px;font-family:inherit;margin-bottom:14px;line-height:1.5}
 .lq-form input[type=text]:focus,.lq-form input[type=email]:focus,.lq-form textarea:focus{outline:none;border-color:#4A7C59;box-shadow:0 0 0 3px rgba(74,124,89,.16)}
 .lq-form textarea{min-height:92px;resize:vertical}
-.lq-consent{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:#55605a;line-height:1.6;margin-bottom:16px}
+.lq-form label.lq-consent{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:#55605a;line-height:1.6;margin-bottom:16px;text-transform:none;letter-spacing:normal;font-weight:400}
+.lq-form label.lq-consent span{text-transform:none;letter-spacing:normal}
 .lq-consent input{margin-top:3px;width:16px;height:16px;flex:0 0 auto;accent-color:#4A7C59}
 .lq-btn{display:inline-block;width:100%;background:#4A7C59;color:#fff;border:0;padding:14px 28px;border-radius:10px;font-weight:700;font-size:1rem;font-family:inherit;cursor:pointer;transition:background .2s}
 .lq-btn:hover:not(:disabled){background:#3d6749}
@@ -221,7 +222,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 .lq-msg.ok{color:#2d5a3d;font-weight:600}
 .lq-msg.err{color:#b4472e}
 .lq-alt{margin-top:14px;font-size:12.5px;color:rgba(255,255,255,.85);text-align:center}
-.lq-alt a{color:#fff;text-decoration:underline}
+.lq-alt a{background:none;background-color:transparent;padding:0;border-radius:0;display:inline;font-weight:600;color:#fff;text-decoration:underline}
 @media(max-width:768px){
 .lq-form{padding:18px}
 .lq-form .r{grid-template-columns:1fr}
