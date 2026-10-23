@@ -730,7 +730,12 @@
 .wa-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(0,0,0,.28)}
 .wa-fab:focus-visible{outline:3px solid #0b5c2e;outline-offset:3px}
 .wa-fab svg{width:27px;height:27px;fill:#fff;display:block}
-@media(max-width:768px){.wa-fab{bottom:74px;right:16px;width:50px;height:50px}}
+/* 57 of 99 pages have no a.scroll-top, so the 80px clearance would leave
+   the button hovering with nothing beneath it. :has() drops it back down
+   on those pages; browsers without :has() keep 80px, which is harmless. */
+body:not(:has(.scroll-top)) .wa-fab{bottom:24px}
+@media(max-width:768px){.wa-fab{bottom:74px;right:16px;width:50px;height:50px}
+body:not(:has(.scroll-top)) .wa-fab{bottom:16px}}
 @media print{.wa-fab{display:none}}
 </style>
 <style>
