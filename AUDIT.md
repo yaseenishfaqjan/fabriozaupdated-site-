@@ -896,3 +896,69 @@ Left leg), uploaded logo appears in the preview, 1 column with no overflow at
 tap. The mobile rule now matches that specificity. All fields measure 16px.
 
 Wired into nav on 31 pages and the sitemap (91 urls). schema_verify 94/94.
+
+---
+
+## 23 Oct 2026 - /brand-launch + four service pages
+
+**The research that set the strategy.** The owner asked to match
+blackboldgraphics.com. Two findings changed the plan:
+
+1. **Standalone digitizing is a bad market to enter.** Measured from vendor
+   pricing pages: $8-15 flat rate is common, $10-25 for a left chest, with
+   2-12 hour turnaround advertised. Black Bold's "24-48 hours" is slow by that
+   standard. Competing there means fighting $1-per-file shops for pennies.
+2. **Nobody bundles the whole thing.** A search for a provider covering logo
+   design + digitizing + patches + manufacturing returned none. Printful is
+   closest and has no manufacturing and no logo design; patch shops give free
+   digitizing only with patch orders. A founder with a name currently hires
+   four suppliers.
+
+So digitizing is positioned as the **on-ramp to manufacturing**, not a product
+to win on price. The defensible claim: every other digitizer emails a file and
+never learns what happened to it; we sew the garment, so density is set for
+the actual fabric.
+
+**Owner decisions, 23 Oct 2026** (recorded because the pages depend on them):
+- Original logo design from just a brand name: **yes, in-house**
+- Pricing: **included with a production order, quoted standalone**
+- Patch types: **embroidered, woven, chenille, PVC/rubber and leather** - all four
+
+**Built:** `/brand-launch` (hub, 6-step HowTo) plus `/embroidery-digitizing`,
+`/vector-art-conversion`, `/custom-patches`, `/sublimation-printing`. Static
+pages in the existing design system - no bundle patching. Each carries one
+JSON-LD @graph (Breadcrumb + WebPage + Service + FAQPage; the hub uses HowTo)
+and an inline enquiry form posting to the existing endpoint.
+
+**No price is printed anywhere.** The owner approved the pricing MODEL, not
+figures. Pages state "included with a production order, quoted separately if
+you want the files alone" and nothing more.
+
+**Imagery: Vertex AI, and only abstract macros.** Google Cloud access was
+already present (account powerwealthenterprise@gmail.com, project
+storehouse360, billing + aiplatform enabled - no auth command needed).
+`gemini-3.1-flash-image` returns ~1408x768 PNG. Five images generated into
+`dist/images/services/`, 0.8 MB total: thread, fabric, dye, film and a
+workbench flat lay. **Nothing resembling a finished garment, a mockup or a
+client product** - after the KWG notice, a generated image that reads as real
+work is the one thing this site must not publish.
+
+Gotcha: `gcloud` on Windows is a `.cmd` shim, so Python's `subprocess` cannot
+resolve it (`WinError 2`). Pass the token in from the shell:
+`export GCP_TOKEN=$(gcloud auth print-access-token)`.
+
+Honesty content worth keeping: the sublimation page states plainly that it
+cannot work on cotton and cannot print white, and the digitizing page lists
+what fails in thread (text under ~5 mm, gradients, thin strokes). Telling a
+buyer what will not work is the cheapest trust you can buy, and it matches the
+warning already built into the /design configurator.
+
+Verified: zero console errors, hero images decode at 1408x768, no broken
+images, all 5 FAQ questions per page present in visible text (schema must
+match the page or Google ignores it), nav on 32 pages, sitemap 96 urls,
+schema_verify **99/99**. Mobile at 375px: single column, no horizontal
+overflow, all form fields 16px so iOS does not zoom.
+
+**Not done:** standalone prices, real photographs of patches and stitch-outs
+(the AI images are section art only), and the "free with production order"
+wording needs the owner's exact condition before it can say a quantity.
