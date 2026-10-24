@@ -460,12 +460,22 @@ function defs(id,logo,b){
   '</defs>';
 }
 
+var PHOTO_BOX={"tee":{"left-chest":{"x":224.8,"y":115.7,"w":44.0,"h":44.0},"full-front":{"x":136.9,"y":116.5,"w":129.0,"h":129.0},"back":{"x":125.1,"y":89.0,"w":152.5,"h":152.5},"sleeve":{"x":64.4,"y":170.6,"w":36.6,"h":36.6},"hood":{"x":170.6,"y":58.4,"w":61.6,"h":61.6},"left-leg":{"x":238.0,"y":211.5,"w":44.0,"h":44.0}},"hoodie":{"left-chest":{"x":225.4,"y":95.3,"w":46.2,"h":46.2},"full-front":{"x":133.1,"y":104.8,"w":135.5,"h":135.5},"back":{"x":120.7,"y":72.8,"w":160.2,"h":160.2},"sleeve":{"x":56.8,"y":163.1,"w":38.5,"h":38.5},"hood":{"x":168.5,"y":25.4,"w":64.7,"h":64.7},"left-leg":{"x":239.3,"y":215.1,"w":46.2,"h":46.2}},"zip-hoodie":{"left-chest":{"x":221.6,"y":89.0,"w":40.4,"h":40.4},"full-front":{"x":140.7,"y":101.6,"w":118.6,"h":118.6},"back":{"x":129.9,"y":72.0,"w":140.2,"h":140.2},"sleeve":{"x":74.0,"y":153.5,"w":33.7,"h":33.7},"hood":{"x":171.7,"y":22.9,"w":56.6,"h":56.6},"left-leg":{"x":233.7,"y":203.4,"w":40.4,"h":40.4}},"sweatshirt":{"left-chest":{"x":228.4,"y":109.1,"w":48.0,"h":48.0},"full-front":{"x":132.4,"y":110.1,"w":140.8,"h":140.8},"back":{"x":119.6,"y":80.0,"w":166.4,"h":166.4},"sleeve":{"x":53.2,"y":169.1,"w":40.0,"h":40.0},"hood":{"x":169.2,"y":46.5,"w":67.2,"h":67.2},"left-leg":{"x":242.8,"y":213.8,"w":48.0,"h":48.0}},"polo":{"left-chest":{"x":228.1,"y":99.2,"w":49.0,"h":49.0},"full-front":{"x":130.2,"y":104.2,"w":143.6,"h":143.6},"back":{"x":117.2,"y":72.1,"w":169.7,"h":169.7},"sleeve":{"x":49.4,"y":165.1,"w":40.8,"h":40.8},"hood":{"x":167.8,"y":30.8,"w":68.5,"h":68.5},"left-leg":{"x":242.8,"y":215.0,"w":49.0,"h":49.0}},"jacket":{"left-chest":{"x":224.1,"y":119.6,"w":40.4,"h":40.4},"full-front":{"x":143.4,"y":121.2,"w":118.4,"h":118.4},"back":{"x":132.6,"y":95.6,"w":140.0,"h":140.0},"sleeve":{"x":76.8,"y":170.9,"w":33.6,"h":33.6},"hood":{"x":174.3,"y":66.1,"w":56.5,"h":56.5},"left-leg":{"x":236.2,"y":209.3,"w":40.4,"h":40.4}},"tracksuit":{"left-chest":{"x":215.1,"y":66.6,"w":26.8,"h":26.8},"full-front":{"x":164.3,"y":78.6,"w":71.4,"h":71.4},"back":{"x":158.9,"y":64.7,"w":82.1,"h":82.1},"sleeve":{"x":114.4,"y":110.4,"w":21.4,"h":21.4},"left-leg":{"x":215.1,"y":279.1,"w":26.8,"h":26.8}},"joggers":{"left-chest":{"x":216.4,"y":100.8,"w":28.0,"h":28.0},"full-front":{"x":160.3,"y":132.4,"w":82.2,"h":82.2},"back":{"x":152.9,"y":103.6,"w":97.1,"h":97.1},"sleeve":{"x":114.0,"y":172.5,"w":23.4,"h":23.4},"hood":{"x":181.8,"y":29.3,"w":39.2,"h":39.2},"left-leg":{"x":224.8,"y":230.7,"w":28.0,"h":28.0}}};
+/* Placement boxes measured from each shape's own product photo. The old
+   FRONT/BACK/JOG maps were tuned to the SVG silhouettes and do not
+   transfer. Kept below only because defs() still references the shape. */
+/* One photo per product per colour, plus a back view. Falls back to the
+   front if a back is ever missing, which is wrong but not broken. */
+function photoSrc(back){
+  return '/images/design/'+state.product.slug+'--'+state.colour.slug+(back?'--back':'')+'.webp';
+}
 function render(){
   var id='m'+Math.random().toString(36).slice(2,7);
   var shape=state.product.shape;
   var pl=state.placement?state.placement.slug:'full-front';
   var back=(pl==='back'||pl==='hood');
-  var b=(shape==='joggers'?JOG[pl]:back?BACK[pl]:FRONT[pl])||FRONT['full-front'];
+  var pm=PHOTO_BOX[shape]||PHOTO_BOX.hoodie;
+  var b=pm[pl]||pm['full-front']||pm['back'];
   var logo=state.logo||LOGO;
   var img=function(ex){return '<image href="'+logo+'" x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" preserveAspectRatio="xMidYMid meet" '+(ex||'')+'/>'};
   var rect=function(f,ex){return '<rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" fill="'+f+'" '+(ex||'')+'/>'};
@@ -506,7 +516,7 @@ function render(){
            ' on the '+(state.placement?state.placement.name.toLowerCase():'front')).replace(/"/g,'');
   $('#dzStage').innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 440" role="img" aria-label="'+alt+'">'+
     defs(id,logo,b)+'<rect width="400" height="440" fill="#f6f5f2"/>'+
-    garment(shape,state.colour.hex,back)+'<g'+tr+'>'+deco+'</g>'+
+    '<image href="'+photoSrc(back)+'" x="0" y="0" width="400" height="400" preserveAspectRatio="xMidYMid meet" onerror="this.setAttribute(&quot;href&quot;,&quot;'+photoSrc(false)+'&quot;)"/>'+'<g'+tr+'>'+deco+'</g>'+
     '<text x="12" y="428" font-family="system-ui,sans-serif" font-size="13" fill="#555">'+view+' · Illustrative preview</text></svg>';
 
   var cards=document.querySelectorAll('.dz-tech');
@@ -523,8 +533,8 @@ function render(){
   } else { warn.style.display='none'; }
 
   $('#dzSum').innerHTML='<b>'+state.product.name+'</b> · '+(state.fabric?state.fabric.name:'')+
-    (state.gsm?' · '+state.gsm+' gsm':'')+'<br><b>'+state.colour.name+'</b> · '+
-    state.technique.name+' on the '+(state.placement?state.placement.name.toLowerCase():'')+'<br>'+
+    (state.gsmCustom?' · '+state.gsmCustom+' gsm':(state.gsm?' · '+state.gsm+' gsm':''))+'<br><b>'+state.colour.name+'</b> · '+
+    (state.techniqueCustom||state.technique.name)+' on the '+(state.placement?state.placement.name.toLowerCase():'')+'<br>'+
     (state.logoName?'Artwork: <b>'+state.logoName+'</b>':'<span style="color:rgba(255,255,255,.4)">No artwork uploaded yet</span>');
 }
 
