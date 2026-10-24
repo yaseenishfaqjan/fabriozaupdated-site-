@@ -174,6 +174,10 @@ if ($db) {
         }
         $fileLine = $savedFiles ? "\n📎 " . count($savedFiles) . " file(s): "
             . implode(', ', $savedFiles) : '';
+        // WhatsApp gets no name, company or email: see crm_notify().
+        // Attachment COUNT only - a filename can carry a customer's name.
+        $waFiles = $savedFiles ? "
+📎 " . count($savedFiles) . " file(s) attached" : '';
         crm_notify("🟢 NEW LEAD #$leadId ($formType)
 $clientName". ($company !== '' ? " - $company" : '')
          . "
@@ -181,6 +185,9 @@ $clientEmail". ($quantity !== '' ? "
 Qty: $quantity" : ''). "
 Score: $score"
          . $fileLine . "
+https://fabrioza.com/admin/lead.php?id=$leadId",
+            "🟢 New lead #$leadId ($formType)
+Score: $score" . $waFiles . "
 https://fabrioza.com/admin/lead.php?id=$leadId");
     } catch (Throwable $e) {
         error_log('FABRIOZA CRM lead insert failed: '. $e->getMessage());

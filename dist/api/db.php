@@ -383,10 +383,16 @@ function crm_notify_whatsapp(string $text): bool {
 }
 
 /** Push a new-lead alert to every configured channel.
- *  Each leg is independent - one failing never stops the other. */
-function crm_notify(string $text): void {
+ *  Each leg is independent - one failing never stops the other.
+ *
+ *  $waText, when given, is what the WhatsApp leg sends instead of $text.
+ *  It exists because CallMeBot is a third-party relay that takes the
+ *  message in a URL QUERY STRING: anything passed there lands in another
+ *  company's request logs. Callers put the customer's name, company and
+ *  email in $text for Telegram, and keep them out of $waText. */
+function crm_notify(string $text, ?string $waText = null): void {
     $tg = crm_notify_telegram($text);
-    $wa = crm_notify_whatsapp($text);
+    $wa = crm_notify_whatsapp($waText ?? $text);
     if (!$tg && !$wa) {
         error_log('crm_notify: NO CHANNEL DELIVERED this lead alert');
     }
