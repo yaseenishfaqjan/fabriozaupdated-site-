@@ -129,6 +129,11 @@ has  /sportswear-catalog 'Sportswear Catalogue'                        "catalogu
 lacks /sportswear-catalog '<title>Custom Sportswear Manufacturer'      "title no longer clashes with /custom-sportswear-manufacturer"
 has  /custom-sportswear-manufacturer '<title>Custom Sportswear Manufacturer' "/custom-sportswear-manufacturer still owns its phrase"
 
+# the UK landing page and its blog post both led with the same phrase
+has  /clothing-manufacturer-uk '<title>Clothing Manufacturer for UK Brands' "UK landing page keeps the commercial phrase"
+has  /blog/clothing-manufacturer-uk-brands 'Importing Clothes from Pakistan to the UK' "UK blog post retargeted"
+lacks /blog/clothing-manufacturer-uk-brands 'Clothing Manufacturer for UK Brands' "UK blog post no longer competes"
+
 hdr "Lead alerts (server side)"
 ssh -o ConnectTimeout=15 "$VPS" \
   "docker exec fabrioza-web grep -c crm_notify_whatsapp /var/www/html/api/db.php" >/dev/null 2>&1 \
