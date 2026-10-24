@@ -1,3 +1,7 @@
 .vscode/
 Thumbs.db
 .env
+
+# customer PII pulled from the CRM - never commit
+LEADS-TO-CONTACT.md
+LEADS-REPLY-EMAILS.md
