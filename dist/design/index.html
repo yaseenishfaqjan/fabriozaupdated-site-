@@ -249,6 +249,9 @@ body:not(:has(.scroll-top)) .wa-fab{bottom:16px}}
 .dz-wrap{display:grid;grid-template-columns:minmax(0,370px) minmax(0,1fr);gap:26px;align-items:start}
 .dz-panel{background:#111;border:1px solid #242424;border-radius:14px;padding:22px}
 .dz-f{margin-bottom:16px}
+.dz-other{width:100%;margin-top:8px;background:#0A0A0A;border:1px solid #2d2d2d;color:#fff;padding:11px 12px;border-radius:7px;font-size:14px;font-family:inherit}
+.dz-other:focus{outline:none;border-color:#4A7C59;box-shadow:0 0 0 3px rgba(74,124,89,.18)}
+@media(max-width:768px){.dz-other{font-size:16px}}
 .dz-f label{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:7px}
 .dz-f select,.dz-f input[type=file]{width:100%;background:#0A0A0A;border:1px solid #2d2d2d;color:#fff;padding:11px 12px;border-radius:7px;font-size:14px;font-family:inherit}
 .dz-f select:focus,.dz-f input:focus{outline:none;border-color:#4A7C59}
@@ -320,16 +323,16 @@ body:not(:has(.scroll-top)) .wa-fab{bottom:16px}}
         <div class="dz-f"><label for="dzProduct">Garment</label><select id="dzProduct"></select></div>
         <div class="dz-row">
           <div class="dz-f"><label for="dzFabric">Fabric</label><select id="dzFabric"></select></div>
-          <div class="dz-f"><label for="dzGsm">Weight</label><select id="dzGsm"></select></div>
+          <div class="dz-f"><label for="dzGsm">Weight</label><select id="dzGsm"></select><input id="dzGsmOther" class="dz-other" type="text" inputmode="numeric" placeholder="e.g. 450" aria-label="Enter your GSM" hidden></div>
         </div>
         <div class="dz-f"><label id="dzColourLbl">Colour</label>
           <div class="dz-sw" id="dzColour" role="group" aria-labelledby="dzColourLbl"></div></div>
         <div class="dz-row">
-          <div class="dz-f"><label for="dzTechnique">Decoration</label><select id="dzTechnique"></select></div>
+          <div class="dz-f"><label for="dzTechnique">Decoration</label><select id="dzTechnique"></select><input id="dzTechOther" class="dz-other" type="text" placeholder="Describe the technique" aria-label="Describe your decoration technique" hidden></div>
           <div class="dz-f"><label for="dzPlacement">Placement</label><select id="dzPlacement"></select></div>
         </div>
         <div class="dz-f"><label for="dzLogo">Your logo (optional)</label>
-          <input id="dzLogo" type="file" accept=".png,.jpg,.jpeg,.svg"></div>
+          <input id="dzLogo" type="file" accept=".png,.jpg,.jpeg,.svg,.pdf"></div>
         <p class="dz-note">PNG or SVG with a transparent background previews best. Up to 10 MB. Your file is attached to the enquiry and is never published.</p>
       </div>
 
@@ -534,8 +537,10 @@ function fillPlacements(){
 }
 function fillGsm(){
   var g=D.gsm[state.product.shape]||D.gsm.hoodie;
-  $('#dzGsm').innerHTML=g.map(function(n){return '<option value="'+n+'">'+n+' gsm</option>'}).join('');
-  state.gsm=g[0];
+  $('#dzGsm').innerHTML=g.map(function(n){return '<option value="'+n+'">'+n+' gsm</option>'}).join('')
+    +'<option value="custom">Other \u2014 enter GSM</option>';
+  state.gsm=g[0]; state.gsmCustom='';
+  var go=$('#dzGsmOther'); if(go){go.hidden=true; go.value='';}
 }
 /* Fabrics are per garment: a t-shirt must not be offered in heavyweight
    fleece. Keeps the current fabric selected when the new garment allows it. */
@@ -552,7 +557,8 @@ function build(){
   state.product=D.products[0]; state.fabric=D.fabrics[0];
   state.colour=D.colours[0]; state.technique=D.techniques[0];
   $('#dzProduct').innerHTML=D.products.map(function(p,i){return '<option value="'+i+'">'+p.name+'</option>'}).join('');
-  $('#dzTechnique').innerHTML=D.techniques.map(function(t,i){return '<option value="'+i+'">'+t.name+'</option>'}).join('');
+  $('#dzTechnique').innerHTML=D.techniques.map(function(t,i){return '<option value="'+i+'">'+t.name+'</option>'}).join('')
+    +'<option value="custom">Other \u2014 describe it</option>';
   $('#dzColour').innerHTML=D.colours.map(function(c,i){
     return '<button type="button" data-i="'+i+'" aria-pressed="'+(i===0?'true':'false')+'" title="'+c.name+'" aria-label="'+c.name+'" style="background:'+c.hex+'"></button>';
   }).join('');
@@ -565,8 +571,26 @@ function init(){
   $('#dzFabric').addEventListener('change',function(e){
     var m=D.fabrics.filter(function(f){return f.slug===e.target.value});
     if(m.length){state.fabric=m[0];render()}});
-  $('#dzGsm').addEventListener('change',function(e){state.gsm=+e.target.value;render()});
-  $('#dzTechnique').addEventListener('change',function(e){state.technique=D.techniques[+e.target.value];render()});
+  $('#dzGsm').addEventListener('change',function(e){
+    var o=$('#dzGsmOther');
+    if(e.target.value==='custom'){ o.hidden=false; o.focus(); state.gsmCustom=o.value.trim(); }
+    else { o.hidden=true; state.gsmCustom=''; state.gsm=+e.target.value; }
+    render();
+  });
+  $('#dzGsmOther').addEventListener('input',function(e){state.gsmCustom=e.target.value.trim();render()});
+  $('#dzTechnique').addEventListener('change',function(e){
+    var o=$('#dzTechOther');
+    if(e.target.value==='custom'){
+      /* keep the last real technique for DRAWING: the preview must not
+         invent a treatment it cannot show. The summary marks it as
+         customer-specified. */
+      o.hidden=false; o.focus(); state.techniqueCustom=o.value.trim();
+    } else {
+      o.hidden=true; state.techniqueCustom=''; state.technique=D.techniques[+e.target.value];
+    }
+    render();
+  });
+  $('#dzTechOther').addEventListener('input',function(e){state.techniqueCustom=e.target.value.trim();render()});
   $('#dzPlacement').addEventListener('change',function(e){
     var m=D.placements.filter(function(p){return p.slug===e.target.value});
     if(m.length){state.placement=m[0];render()}});
@@ -594,15 +618,15 @@ function init(){
     if(!form.checkValidity()){form.reportValidity();return}
     var cfg=['Product: '+state.product.name,
              'Fabric: '+(state.fabric?state.fabric.name:'-'),
-             'Weight: '+state.gsm+' gsm',
+             'Weight: '+(state.gsmCustom?state.gsmCustom+' gsm (customer specified)':state.gsm+' gsm'),
              'Colour: '+state.colour.name,
-             'Technique: '+state.technique.name,
+             'Technique: '+(state.techniqueCustom?state.techniqueCustom+' (customer specified)':state.technique.name),
              'Placement: '+(state.placement?state.placement.name:'-'),
              'Artwork: '+(state.logoName||'not supplied')].join('\n');
     var fd=new FormData(form);
     var body={form_type:'Design Configurator',
       name:fd.get('name')||'', email:fd.get('email')||'', company:fd.get('company')||'',
-      product_type:state.product.name+' / '+state.technique.name,
+      product_type:state.product.name+' / '+(state.techniqueCustom||state.technique.name),
       quantity:fd.get('quantity')||'',
       message:(fd.get('message')||'')+'  [DESIGN] '+cfg,
       source:'design-configurator', source_page:'/design',
