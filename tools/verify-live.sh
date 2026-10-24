@@ -167,6 +167,13 @@ for p in /blog/hoodie-brand-guide /blog/what-is-moq-clothing /blog/tech-pack-clo
   lacks "$p" '<a href="/">Blog</a>' "breadcrumb Blog link points at /blog on $p"
 done
 
+hdr "Attribution"
+for p in / /blog/tech-pack-clothing-guide /clothing-manufacturer-uk /pricing; do
+  has "$p" 'fabAttribution=function' "first-touch capture on $p"
+done
+has /clothing-manufacturer-uk 'fabAttribution(body)' "inline form attaches attribution"
+sshq "docker exec fabrioza-web php -r 'echo (new PDO(\"sqlite:/var/data/fabrioza_crm.db\"))->query(\"PRAGMA user_version\")->fetchColumn();'"   | grep -q '^5$' && g "CRM schema is at migration 5 (attribution columns)"   || b "CRM schema is not at migration 5"
+
 hdr "Lead alerts (server side)"
 sshq "docker exec fabrioza-web grep -c crm_notify_whatsapp /var/www/html/api/db.php" >/dev/null 2>&1 && g "WhatsApp fan-out is in the deployed db.php" || b "WhatsApp fan-out missing from the deployed db.php"
 
