@@ -152,6 +152,12 @@ has  /clothing-manufacturer-australia '<title>Clothing Manufacturer for Australi
 has  /blog/clothing-manufacturer-australia-brands 'Importing Clothing to Australia' "AU blog post retargeted"
 lacks /blog/clothing-manufacturer-australia-brands 'Clothing Manufacturer for Australian Brands' "AU blog post no longer competes"
 
+hdr "Breadcrumbs"
+# 16 posts linked "Blog" to the homepage while their own JSON-LD said /blog
+for p in /blog/hoodie-brand-guide /blog/what-is-moq-clothing /blog/tech-pack-clothing-guide /blog/pakistan-vs-china-clothing; do
+  lacks "$p" '<a href="/">Blog</a>' "breadcrumb Blog link points at /blog on $p"
+done
+
 hdr "Lead alerts (server side)"
 sshq "docker exec fabrioza-web grep -c crm_notify_whatsapp /var/www/html/api/db.php" >/dev/null 2>&1 && g "WhatsApp fan-out is in the deployed db.php" || b "WhatsApp fan-out missing from the deployed db.php"
 
