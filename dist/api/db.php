@@ -273,13 +273,16 @@ function crm_recaptcha_ok(?string $token, float $threshold = 0.5): bool {
     }
 }
 
-/** Instant push notification for new leads via Telegram (free).
- *  Configure in VPS .env: TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID
- *  (setup steps in CRM-HANDOFF.md). Silent no-op when unset. */
-function crm_notify(string $text): void {
+/** Telegram leg of crm_notify(). Silent no-op when unset, but says so in
+ *  the log - a channel that was never configured and a channel that failed
+ *  look identical from the outside otherwise. */
+function crm_notify_telegram(string $text): bool {
     $token = getenv('TELEGRAM_BOT_TOKEN') ?: '';
     $chat  = getenv('TELEGRAM_CHAT_ID') ?: '';
-    if ($token === '' || $chat === '') { return; }
+    if ($token === '' || $chat === '') {
+        error_log('crm_notify telegram: not_configured');
+        return false;
+    }
     try {
         $ch = curl_init('https://api.telegram.org/bot' . $token . '/sendMessage');
         curl_setopt_array($ch, [
@@ -287,7 +290,104 @@ function crm_notify(string $text): void {
             CURLOPT_POSTFIELDS => http_build_query(['chat_id' => $chat, 'text' => $text]),
             CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 6,
         ]);
-        curl_exec($ch);
+        $res  = curl_exec($ch);
+        $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err  = curl_error($ch);
         curl_close($ch);
-    } catch (Throwable $e) { error_log('crm_notify: ' . $e->getMessage()); }
+        if ($code >= 200 && $code < 300) {
+            error_log('crm_notify telegram: sent');
+            return true;
+        }
+        error_log('crm_notify telegram: FAILED http=' . $code . ' ' . $err
+            . ' ' . substr((string)$res, 0, 200));
+        return false;
+    } catch (Throwable $e) {
+        error_log('crm_notify telegram: EXCEPTION ' . $e->getMessage());
+        return false;
+    }
+}
+
+/** WhatsApp leg of crm_notify().
+ *  Meta Cloud API wins when configured; CallMeBot is the simple fallback.
+ *  Setup for both is in CRM-HANDOFF.md. Silent no-op when neither is set. */
+function crm_notify_whatsapp(string $text): bool {
+    $cloudTok = getenv('WHATSAPP_CLOUD_TOKEN') ?: '';
+    $cloudId  = getenv('WHATSAPP_CLOUD_PHONE_ID') ?: '';
+    $cloudTo  = getenv('WHATSAPP_TO') ?: '';
+    $cbPhone  = getenv('WHATSAPP_CALLMEBOT_PHONE') ?: '';
+    $cbKey    = getenv('WHATSAPP_CALLMEBOT_APIKEY') ?: '';
+
+    if ($cloudTok !== '' && $cloudId !== '' && $cloudTo !== '') {
+        try {
+            $ch = curl_init('https://graph.facebook.com/v21.0/' . $cloudId . '/messages');
+            curl_setopt_array($ch, [
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => [
+                    'Authorization: Bearer ' . $cloudTok,
+                    'Content-Type: application/json',
+                ],
+                CURLOPT_POSTFIELDS => json_encode([
+                    'messaging_product' => 'whatsapp',
+                    'to'   => $cloudTo,
+                    'type' => 'text',
+                    'text' => ['preview_url' => false, 'body' => $text],
+                ]),
+                CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 8,
+            ]);
+            $res  = curl_exec($ch);
+            $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $err  = curl_error($ch);
+            curl_close($ch);
+            if ($code >= 200 && $code < 300) {
+                error_log('crm_notify whatsapp(cloud): sent');
+                return true;
+            }
+            error_log('crm_notify whatsapp(cloud): FAILED http=' . $code . ' ' . $err
+                . ' ' . substr((string)$res, 0, 200));
+            // fall through to CallMeBot if it is configured
+        } catch (Throwable $e) {
+            error_log('crm_notify whatsapp(cloud): EXCEPTION ' . $e->getMessage());
+        }
+    }
+
+    if ($cbPhone !== '' && $cbKey !== '') {
+        try {
+            $url = 'https://api.callmebot.com/whatsapp.php?' . http_build_query([
+                'phone'  => $cbPhone,
+                'text'   => $text,
+                'apikey' => $cbKey,
+            ]);
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 12,
+            ]);
+            $res  = curl_exec($ch);
+            $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $err  = curl_error($ch);
+            curl_close($ch);
+            if ($code >= 200 && $code < 300) {
+                error_log('crm_notify whatsapp(callmebot): sent');
+                return true;
+            }
+            error_log('crm_notify whatsapp(callmebot): FAILED http=' . $code . ' ' . $err
+                . ' ' . substr((string)$res, 0, 200));
+            return false;
+        } catch (Throwable $e) {
+            error_log('crm_notify whatsapp(callmebot): EXCEPTION ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    error_log('crm_notify whatsapp: not_configured');
+    return false;
+}
+
+/** Push a new-lead alert to every configured channel.
+ *  Each leg is independent - one failing never stops the other. */
+function crm_notify(string $text): void {
+    $tg = crm_notify_telegram($text);
+    $wa = crm_notify_whatsapp($text);
+    if (!$tg && !$wa) {
+        error_log('crm_notify: NO CHANNEL DELIVERED this lead alert');
+    }
 }

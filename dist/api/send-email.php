@@ -172,13 +172,15 @@ if ($db) {
             crm_file_log("LEAD $leadId attachment EXCEPTION: " . $e->getMessage());
             error_log('FABRIOZA attachment store failed: ' . $e->getMessage());
         }
+        $fileLine = $savedFiles ? "\n📎 " . count($savedFiles) . " file(s): "
+            . implode(', ', $savedFiles) : '';
         crm_notify("🟢 NEW LEAD #$leadId ($formType)
 $clientName". ($company !== '' ? " - $company" : '')
          . "
 $clientEmail". ($quantity !== '' ? "
 Qty: $quantity" : ''). "
 Score: $score"
-         . "
+         . $fileLine . "
 https://fabrioza.com/admin/lead.php?id=$leadId");
     } catch (Throwable $e) {
         error_log('FABRIOZA CRM lead insert failed: '. $e->getMessage());

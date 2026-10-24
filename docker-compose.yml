@@ -26,6 +26,14 @@ services:
       ADMIN_PASS_HASH: ${ADMIN_PASS_HASH:-}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      # WhatsApp lead alerts. Cloud API wins when set; CallMeBot is the
+      # simple fallback. Same trap as RESEND_API_KEY: a variable only reaches
+      # the container if it is listed HERE.
+      WHATSAPP_CLOUD_TOKEN: ${WHATSAPP_CLOUD_TOKEN:-}
+      WHATSAPP_CLOUD_PHONE_ID: ${WHATSAPP_CLOUD_PHONE_ID:-}
+      WHATSAPP_TO: ${WHATSAPP_TO:-}
+      WHATSAPP_CALLMEBOT_PHONE: ${WHATSAPP_CALLMEBOT_PHONE:-}
+      WHATSAPP_CALLMEBOT_APIKEY: ${WHATSAPP_CALLMEBOT_APIKEY:-}
       CRM_INBOX_SKIP: ${CRM_INBOX_SKIP:-}
     volumes:
       # CRM SQLite database - OUTSIDE the web root, survives rebuilds
