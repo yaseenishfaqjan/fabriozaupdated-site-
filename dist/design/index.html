@@ -256,6 +256,11 @@ body:not(:has(.scroll-top)) .wa-fab{bottom:16px}}
 .dz-seg button.on{background:#4A7C59;border-color:#4A7C59;color:#fff}
 .dz-seg button:focus-visible{outline:2px solid #9BB8E2;outline-offset:2px}
 #dzSize{width:100%;margin-top:10px;accent-color:#4A7C59}
+#dzRot{width:100%;margin-top:10px;accent-color:#4A7C59}
+#dzRotVal{color:#8a8a8a;font-weight:400}
+.dz-reset{width:100%;margin-top:8px;background:#0A0A0A;border:1px solid #2d2d2d;color:#bbb;padding:11px 12px;border-radius:7px;font:inherit;font-size:13px;cursor:pointer}
+.dz-reset:hover{border-color:#4A7C59;color:#fff}
+.dz-reset:focus-visible{outline:2px solid #9BB8E2;outline-offset:2px}
 #dzStage svg{touch-action:none}
 .dz-hint{margin:8px 0 0;font-size:12px;color:#8a8a8a}
 @media(max-width:768px){.dz-other{font-size:16px}}
@@ -341,6 +346,10 @@ body:not(:has(.scroll-top)) .wa-fab{bottom:16px}}
         <div class="dz-row">
           <div class="dz-f"><label id="dzViewLbl">Showing</label><div class="dz-seg" role="group" aria-labelledby="dzViewLbl"><button type="button" data-v="front" class="on">Front</button><button type="button" data-v="back">Back</button></div></div>
           <div class="dz-f"><label for="dzSize">Logo size</label><input id="dzSize" type="range" min="40" max="190" value="100" aria-label="Logo size"></div>
+        </div>
+        <div class="dz-row">
+          <div class="dz-f"><label for="dzRot">Rotation <span id="dzRotVal">0°</span></label><input id="dzRot" type="range" min="-180" max="180" step="5" value="0" aria-label="Logo rotation in degrees"></div>
+          <div class="dz-f"><label id="dzResetLbl">Artwork</label><button type="button" id="dzReset" class="dz-reset">Reset position</button></div>
         </div>
         <div class="dz-f"><label for="dzLogo">Your logo (optional)</label>
           <input id="dzLogo" type="file" accept=".png,.jpg,.jpeg,.svg,.pdf"></div>
@@ -508,19 +517,33 @@ function presetBox(){
   var pm=PHOTO_BOX[view][state.product.slug]||PHOTO_BOX.front['pullover-hoodie'];
   var pl=state.placement?state.placement.slug:'full-front';
   var b=pm[pl]||pm['full-front']||pm['back']||{x:150,y:150,w:100,h:100};
-  return {x:b.x,y:b.y,w:b.w,h:b.h};
+  return {x:b.x,y:b.y,w:b.w,h:b.h,rot:0};
 }
 function resetBox(){ state.box=presetBox(); state.moved=false;
-  var sz=$('#dzSize'); if(sz) sz.value=100; }
+  var sz=$('#dzSize'); if(sz) sz.value=100;
+  var rt=$('#dzRot'); if(rt) rt.value=0;
+  var rv=$('#dzRotVal'); if(rv) rv.textContent='0\u00b0'; }
 
-/* keep the whole logo on the garment, not merely on the canvas */
+/* Keep the whole logo on the garment, not merely on the canvas - and
+   allow for rotation, because a square turned by t occupies a slot
+   w*(|cos t|+|sin t|), which at 45 degrees is 1.41x its upright width.
+   Clamping the upright box would let the corners hang off the edge. */
 function clampBox(b){
   var g=(GARMENT_BOX[state.view||'front']||{})[state.product.slug];
   if(!g) return b;
-  var minW=14, maxW=Math.min(g[2]-g[0], g[3]-g[1]);
-  b.w=Math.max(minW,Math.min(b.w,maxW)); b.h=b.w;
-  b.x=Math.max(g[0],Math.min(b.x,g[2]-b.w));
-  b.y=Math.max(g[1],Math.min(b.y,g[3]-b.h));
+  var gw=g[2]-g[0], gh=g[3]-g[1], minW=14;
+  b.w=Math.max(minW,Math.min(b.w,Math.min(gw,gh))); b.h=b.w;
+  var t=(b.rot||0)*Math.PI/180;
+  var spread=Math.abs(Math.cos(t))+Math.abs(Math.sin(t));
+  var ext=b.w/2*spread;
+  if(ext*2>Math.min(gw,gh)){           /* turned form will not fit: shrink it */
+    b.w=Math.max(minW,Math.min(gw,gh)/spread); b.h=b.w;
+    ext=b.w/2*spread;
+  }
+  var cx=b.x+b.w/2, cy=b.y+b.h/2;
+  cx=Math.max(g[0]+ext,Math.min(cx,g[2]-ext));
+  cy=Math.max(g[1]+ext,Math.min(cy,g[3]-ext));
+  b.x=cx-b.w/2; b.y=cy-b.h/2;
   return b;
 }
 function setView(v){
@@ -537,7 +560,8 @@ function boxPercent(){
   var gw=g[2]-g[0], gh=g[3]-g[1];
   return {cx:Math.round(((state.box.x+state.box.w/2)-g[0])/gw*100),
           cy:Math.round(((state.box.y+state.box.h/2)-g[1])/gh*100),
-          w:Math.round(state.box.w/gw*100)};
+          w:Math.round(state.box.w/gw*100),
+          rot:Math.round(state.box.rot||0)};
 }
 function render(){
   var id='m'+Math.random().toString(36).slice(2,7);
@@ -714,9 +738,21 @@ function init(){
     if(!state.box) state.box=presetBox();
     var base=presetBox(), cx=state.box.x+state.box.w/2, cy=state.box.y+state.box.h/2;
     state.box.w=base.w*(+e.target.value/100); state.box.h=state.box.w;
+    /* resizing must not quietly straighten a turned logo */
     state.box.x=cx-state.box.w/2; state.box.y=cy-state.box.h/2;
     clampBox(state.box); state.moved=true; render();
   });
+
+  var rot=$('#dzRot');
+  if(rot) rot.addEventListener('input',function(e){
+    if(!state.box) state.box=presetBox();
+    state.box.rot=+e.target.value;
+    var rv=$('#dzRotVal'); if(rv) rv.textContent=state.box.rot+'\u00b0';
+    clampBox(state.box); state.moved=true; render();
+  });
+
+  var rst=$('#dzReset');
+  if(rst) rst.addEventListener('click',function(){ resetBox(); render(); });
 
   var seg=document.querySelector('.dz-seg');
   if(seg) seg.addEventListener('click',function(e){
@@ -754,7 +790,7 @@ function init(){
              'Weight: '+(state.gsmCustom?state.gsmCustom+' gsm (customer specified)':state.gsm+' gsm'),
              'Colour: '+state.colour.name,
              'Technique: '+(state.techniqueCustom?state.techniqueCustom+' (customer specified)':state.technique.name),
-      (function(){var q=state.moved?boxPercent():null; return q?'Logo position: '+q.cx+'% across, '+q.cy+'% down the garment, '+q.w+'% of its width (set by the customer)':null;})(),
+      (function(){var q=state.moved?boxPercent():null; return q?'Logo position: '+q.cx+'% across, '+q.cy+'% down the garment, '+q.w+'% of its width'+(q.rot?', rotated '+q.rot+'\u00b0':'')+' (set by the customer)':null;})(),
              'Placement: '+(state.placement?state.placement.name:'-'),
              'Artwork: '+(state.logoName||'not supplied')].join('\n');
     var fd=new FormData(form);
