@@ -103,6 +103,12 @@ has  /design 'dzTechOther'                 "custom technique input field"
 has  /design 'This is a preview, not a photograph of your order' "preview disclaimer is the corrected one"
 lacks /design 'This is an illustration, not a photograph'        "old disclaimer gone"
 
+has  /design 'GARMENT_BOX'                 "drag is clamped to measured garment outlines"
+has  /design 'dz-seg'                      "Front/Back toggle present"
+has  /design 'dzSize'                      "logo size control present"
+has  /design 'Drag the logo on the preview' "drag hint present"
+has  /design 'pointermove'                 "drag handler shipped"
+
 hdr "Import duty figures"
 has  /clothing-manufacturer-usa       '26.5% on cotton knits'  "USA: 26.5% incl. Section 301"
 lacks /clothing-manufacturer-usa      '~16.5% on cotton knits' "USA: pre-July-2026 rate gone"
