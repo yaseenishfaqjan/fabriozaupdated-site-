@@ -20,6 +20,20 @@ g() { printf '  \033[32mPASS\033[0m  %s\n' "$1"; PASS=$((PASS+1)); }
 b() { printf '  \033[31mFAIL\033[0m  %s\n' "$1"; FAIL=$((FAIL+1)); }
 hdr() { printf '\n\033[1m%s\033[0m\n' "$1"; }
 
+# ssh here is occasionally flaky, and one dropped connection reported "VPS
+# is NOT on this commit" against a VPS that was perfectly in sync. A false
+# red trains you to ignore the script, which costs more than the check is
+# worth, so every remote call gets three attempts before it counts.
+sshq() {
+  local i out
+  for i in 1 2 3; do
+out=$(ssh -o ConnectTimeout=15 -o BatchMode=yes "$VPS" "$1")
+    [ -n "$out" ] && { printf '%s' "$out"; return 0; }
+    sleep 2
+  done
+  return 1
+}
+
 # page cache: fetch each page once, reuse
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 # NOTE: the two assignments below must be separate statements. "local a=$1
@@ -58,7 +72,7 @@ fi
 
 hdr "Commit in sync"
 LOCAL=$(git rev-parse HEAD)
-REMOTE=$(ssh -o ConnectTimeout=15 "$VPS" 'cd /opt/fabrioza && git rev-parse HEAD' 2>/dev/null | tr -d '\r')
+REMOTE=$(sshq 'cd /opt/fabrioza && git rev-parse HEAD' || echo '')
 printf '  local  %s\n  vps    %s\n' "${LOCAL:0:12}" "${REMOTE:0:12}"
 [ -n "$REMOTE" ] && [ "$LOCAL" = "$REMOTE" ] && g "VPS is on this commit" \
   || b "VPS is NOT on this commit (unpushed work, or the pull did not run)"
@@ -66,15 +80,12 @@ printf '  local  %s\n  vps    %s\n' "${LOCAL:0:12}" "${REMOTE:0:12}"
   || b "working tree has uncommitted changes - they are not live"
 
 hdr "Container"
-ssh -o ConnectTimeout=15 "$VPS" \
-  "docker ps --filter name=fabrioza-web --format '{{.Status}} | image {{.Image}}'" 2>/dev/null \
-  | sed 's/^/  /'
-UP=$(ssh -o ConnectTimeout=15 "$VPS" "docker ps -q --filter name=fabrioza-web" 2>/dev/null | tr -d '\r')
+sshq "docker ps --filter name=fabrioza-web --format '{{.Status}} | image {{.Image}}'" | sed 's/^/  /'
+UP=$(sshq "docker ps -q --filter name=fabrioza-web" || echo '')
 [ -n "$UP" ] && g "fabrioza-web is running" || b "fabrioza-web is NOT running"
 
 hdr "Configurator photos"
-N=$(ssh -o ConnectTimeout=15 "$VPS" \
-  "docker exec fabrioza-web sh -c 'ls /var/www/html/images/design/*.webp 2>/dev/null | wc -l'" 2>/dev/null | tr -d '\r ')
+N=$(sshq "docker exec fabrioza-web sh -c 'ls /var/www/html/images/design/*.webp | wc -l'" | tr -d ' ')
 [ "$N" = "280" ] && g "280 product photos in the container" || b "expected 280 photos, found '${N:-none}'"
 code /images/design/pullover-hoodie--black--back.webp 200 "a back view serves"
 code /images/design/club-tracksuit--royal-blue.webp   200 "a front view serves"
@@ -142,10 +153,7 @@ has  /blog/clothing-manufacturer-australia-brands 'Importing Clothing to Austral
 lacks /blog/clothing-manufacturer-australia-brands 'Clothing Manufacturer for Australian Brands' "AU blog post no longer competes"
 
 hdr "Lead alerts (server side)"
-ssh -o ConnectTimeout=15 "$VPS" \
-  "docker exec fabrioza-web grep -c crm_notify_whatsapp /var/www/html/api/db.php" >/dev/null 2>&1 \
-  && g "WhatsApp fan-out is in the deployed db.php" \
-  || b "WhatsApp fan-out missing from the deployed db.php"
+sshq "docker exec fabrioza-web grep -c crm_notify_whatsapp /var/www/html/api/db.php" >/dev/null 2>&1 && g "WhatsApp fan-out is in the deployed db.php" || b "WhatsApp fan-out missing from the deployed db.php"
 
 hdr "Result"
 printf '  %d passed, %d failed\n\n' "$PASS" "$FAIL"
