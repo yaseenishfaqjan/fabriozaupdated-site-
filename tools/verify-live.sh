@@ -120,6 +120,15 @@ for p in /blog/tech-pack-clothing-guide /process /streetwear-manufacturer /custo
   has "$p" '"FAQPage"' "FAQPage schema on $p"
 done
 
+hdr "Page targeting"
+# these three led with phrases Google does not recognise as queries
+has  /team-uniform-manufacturer 'Sports, School & Staff Uniform Manufacturer' "team page retargeted"
+lacks /team-uniform-manufacturer '<title>Team Uniform Manufacturer'   "old team title gone"
+has  /sampling-and-moq 'How Much Does a Clothing Sample Cost'          "sampling page retargeted"
+has  /sportswear-catalog 'Sportswear Catalogue'                        "catalogue page retargeted"
+lacks /sportswear-catalog '<title>Custom Sportswear Manufacturer'      "title no longer clashes with /custom-sportswear-manufacturer"
+has  /custom-sportswear-manufacturer '<title>Custom Sportswear Manufacturer' "/custom-sportswear-manufacturer still owns its phrase"
+
 hdr "Lead alerts (server side)"
 ssh -o ConnectTimeout=15 "$VPS" \
   "docker exec fabrioza-web grep -c crm_notify_whatsapp /var/www/html/api/db.php" >/dev/null 2>&1 \
