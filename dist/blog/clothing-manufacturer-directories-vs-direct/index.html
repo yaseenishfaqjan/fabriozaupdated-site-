@@ -270,6 +270,41 @@ body:not(:has(.scroll-top)) .wa-fab{bottom:16px}}
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-714NBVRE2V"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-714NBVRE2V');</script>
+<script>
+/* First-touch attribution. Captured on whatever page the visitor lands on
+   and never overwritten, so an ad click that converts three pages later is
+   still credited to the ad. Uses the same fab_* keys as the homepage form
+   guard, so the two cannot disagree about a value they both hold. */
+(function(){
+  try{
+    var q=new URLSearchParams(location.search), keys=['utm_source','utm_medium',
+      'utm_campaign','utm_term','utm_content','gclid','fbclid'];
+    for(var i=0;i<keys.length;i++){
+      var v=q.get(keys[i]);
+      if(v && !sessionStorage.getItem('fab_'+keys[i]))
+        sessionStorage.setItem('fab_'+keys[i], String(v).slice(0,200));
+    }
+    if(!sessionStorage.getItem('fab_landing_page'))
+      sessionStorage.setItem('fab_landing_page',
+        (location.pathname+location.search).slice(0,200));
+    /* our own pages are not a referrer */
+    if(!sessionStorage.getItem('fab_referrer') && document.referrer &&
+       document.referrer.indexOf(location.host)===-1)
+      sessionStorage.setItem('fab_referrer', document.referrer.slice(0,400));
+  }catch(e){}
+  window.fabAttribution=function(body){
+    try{
+      var k=['utm_source','utm_medium','utm_campaign','gclid','fbclid',
+             'referrer','landing_page'];
+      for(var i=0;i<k.length;i++){
+        var v=sessionStorage.getItem('fab_'+k[i]);
+        if(v && !body[k[i]]) body[k[i]]=v;
+      }
+    }catch(e){}
+    return body;
+  };
+})();
+</script>
 </head>
 <body>
 
@@ -406,6 +441,7 @@ body:not(:has(.scroll-top)) .wa-fab{bottom:16px}}
     company:d.get('company')||'',product_type:'Other',
     quantity:d.get('quantity')||'',message:d.get('message')||'',
     source_page:'/blog/clothing-manufacturer-directories-vs-direct',gdpr_consent:d.get('privacy')?true:false};
+  if(window.fabAttribution) window.fabAttribution(body);
   b.disabled=true; b.textContent='Sending\u2026';
   fetch('/api/csrf.php',{credentials:'same-origin'}).then(function(r){return r.json()})
    .then(function(t){body.csrf=t.token;

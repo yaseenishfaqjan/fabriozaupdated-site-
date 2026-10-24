@@ -57,6 +57,10 @@ $source      = mb_substr(sanitize($data['source'] ?? ''), 0, 120);
 $utmSource   = mb_substr(sanitize($data['utm_source'] ?? ''), 0, 120);
 $utmMedium   = mb_substr(sanitize($data['utm_medium'] ?? ''), 0, 120);
 $utmCampaign = mb_substr(sanitize($data['utm_campaign'] ?? ''), 0, 120);
+$gclid       = mb_substr(sanitize($data['gclid'] ?? ''), 0, 200);
+$fbclid      = mb_substr(sanitize($data['fbclid'] ?? ''), 0, 200);
+$referrer    = mb_substr(sanitize($data['referrer'] ?? ''), 0, 400);
+$landingPage = mb_substr(sanitize($data['landing_page'] ?? ''), 0, 200);
 $sourcePage  = mb_substr(sanitize($data['source_page'] ?? ($_SERVER['HTTP_REFERER'] ?? '')), 0, 300);
 
 if ($clientName === '') { http_response_code(400); echo json_encode(['success' => false, 'message' => 'Your name is required']); exit; }
@@ -131,15 +135,19 @@ if ($db) {
             'country' => $country, 'product_type' => $productType, 'quantity' => $quantity,
             'message' => $message, 'form_type' => $formType, 'source_page' => $sourcePage,
             'utm_source' => $utmSource, 'utm_medium' => $utmMedium, 'utm_campaign' => $utmCampaign,
+            'gclid' => $gclid, 'fbclid' => $fbclid,
+            'referrer' => $referrer, 'landing_page' => $landingPage,
         ];
         $score = crm_lead_score($payload);
         $stmt = $db->prepare('INSERT INTO leads
             (name, email, company, country, product_type, quantity, message, form_type,
-             source_page, utm_source, utm_medium, utm_campaign, lead_score,
+             source_page, utm_source, utm_medium, utm_campaign,
+             gclid, fbclid, referrer, landing_page, lead_score,
              gdpr_consent, gdpr_consent_ts, ip_hash)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,1,CURRENT_TIMESTAMP,?)');
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,CURRENT_TIMESTAMP,?)');
         $stmt->execute([$clientName, $clientEmail, $company, $country, $productType, $quantity,
-            $message, $formType, $sourcePage, $utmSource, $utmMedium, $utmCampaign, $score, $ipHash]);
+            $message, $formType, $sourcePage, $utmSource, $utmMedium, $utmCampaign,
+            $gclid, $fbclid, $referrer, $landingPage, $score, $ipHash]);
         $leadId = (int)$db->lastInsertId();
 
         /* ---- attachments -------------------------------------------------

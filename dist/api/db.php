@@ -119,6 +119,18 @@ function crm_db(): PDO {
         $pdo->exec('CREATE INDEX IF NOT EXISTS idx_files_lead ON lead_files(lead_id)');
         $pdo->exec('PRAGMA user_version = 4');
     }
+    if ($version < 5) {
+        // Attribution. utm_* existed already; a click id and a referrer did
+        // not, so any visit the source did not tag itself was untraceable.
+        // landing_page is the FIRST page of the session, which is not
+        // source_page - that is the page they finally converted on.
+        foreach (['gclid', 'fbclid', 'referrer', 'landing_page'] as $col) {
+            try { $pdo->exec("ALTER TABLE leads ADD COLUMN $col TEXT"); }
+            catch (Throwable $e) { /* already present */ }
+        }
+        $pdo->exec('PRAGMA user_version = 5');
+        $version = 5;
+    }
     return $pdo;
 }
 
