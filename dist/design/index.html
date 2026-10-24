@@ -251,6 +251,13 @@ body:not(:has(.scroll-top)) .wa-fab{bottom:16px}}
 .dz-f{margin-bottom:16px}
 .dz-other{width:100%;margin-top:8px;background:#0A0A0A;border:1px solid #2d2d2d;color:#fff;padding:11px 12px;border-radius:7px;font-size:14px;font-family:inherit}
 .dz-other:focus{outline:none;border-color:#4A7C59;box-shadow:0 0 0 3px rgba(74,124,89,.18)}
+.dz-seg{display:flex;gap:6px}
+.dz-seg button{flex:1;background:#0A0A0A;border:1px solid #2d2d2d;color:#bbb;padding:10px 8px;border-radius:7px;font:inherit;font-size:13px;cursor:pointer}
+.dz-seg button.on{background:#4A7C59;border-color:#4A7C59;color:#fff}
+.dz-seg button:focus-visible{outline:2px solid #9BB8E2;outline-offset:2px}
+#dzSize{width:100%;margin-top:10px;accent-color:#4A7C59}
+#dzStage svg{touch-action:none}
+.dz-hint{margin:8px 0 0;font-size:12px;color:#8a8a8a}
 @media(max-width:768px){.dz-other{font-size:16px}}
 .dz-f label{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:7px}
 .dz-f select,.dz-f input[type=file]{width:100%;background:#0A0A0A;border:1px solid #2d2d2d;color:#fff;padding:11px 12px;border-radius:7px;font-size:14px;font-family:inherit}
@@ -331,6 +338,10 @@ body:not(:has(.scroll-top)) .wa-fab{bottom:16px}}
           <div class="dz-f"><label for="dzTechnique">Decoration</label><select id="dzTechnique"></select><input id="dzTechOther" class="dz-other" type="text" placeholder="Describe the technique" aria-label="Describe your decoration technique" hidden></div>
           <div class="dz-f"><label for="dzPlacement">Placement</label><select id="dzPlacement"></select></div>
         </div>
+        <div class="dz-row">
+          <div class="dz-f"><label id="dzViewLbl">Showing</label><div class="dz-seg" role="group" aria-labelledby="dzViewLbl"><button type="button" data-v="front" class="on">Front</button><button type="button" data-v="back">Back</button></div></div>
+          <div class="dz-f"><label for="dzSize">Logo size</label><input id="dzSize" type="range" min="40" max="190" value="100" aria-label="Logo size"></div>
+        </div>
         <div class="dz-f"><label for="dzLogo">Your logo (optional)</label>
           <input id="dzLogo" type="file" accept=".png,.jpg,.jpeg,.svg,.pdf"></div>
         <p class="dz-note">PNG or SVG with a transparent background previews best. Up to 10 MB. Your file is attached to the enquiry and is never published.</p>
@@ -338,6 +349,7 @@ body:not(:has(.scroll-top)) .wa-fab{bottom:16px}}
 
       <div>
         <div class="dz-stage" id="dzStage"></div>
+        <p class="dz-hint" id="dzHint">Drag the logo on the preview to move it, or use Logo size to scale it.</p>
         <div class="dz-warn" id="dzWarn"></div>
         <div class="dz-sum" id="dzSum"></div>
         <p class="dz-note"><strong style="color:rgba(255,255,255,.7)">This is a preview, not a photograph of your order.</strong>
@@ -392,7 +404,13 @@ body:not(:has(.scroll-top)) .wa-fab{bottom:16px}}
 <script>(function(){
 var D={"products":[{"slug":"classic-tee","name":"Classic t-shirt","shape":"tee"},{"slug":"oversized-tee","name":"Oversized boxy t-shirt","shape":"tee"},{"slug":"pullover-hoodie","name":"Pullover hoodie","shape":"hoodie"},{"slug":"zip-hoodie","name":"Zip hoodie","shape":"zip-hoodie"},{"slug":"crew-sweatshirt","name":"Crew sweatshirt","shape":"sweatshirt"},{"slug":"polo-shirt","name":"Polo shirt","shape":"polo"},{"slug":"leavers-hoodie","name":"Leavers hoodie","shape":"hoodie"},{"slug":"quarter-zip-sweatshirt","name":"Quarter-zip sweatshirt","shape":"sweatshirt"},{"slug":"varsity-jacket","name":"Varsity jacket","shape":"jacket"},{"slug":"fleece-lined-jacket","name":"Fleece-lined jacket","shape":"jacket"},{"slug":"club-tracksuit","name":"Tracksuit","shape":"tracksuit"},{"slug":"tapered-joggers","name":"Tapered joggers","shape":"joggers"},{"slug":"open-hem-joggers","name":"Open-hem joggers","shape":"joggers"},{"slug":"long-sleeve-tee","name":"Long-sleeve t-shirt","shape":"tee"}],"techniques":[{"slug":"embroidery","name":"Embroidery","what":"Your logo is stitched into the garment with thread on a computerised embroidery machine. The design is first converted into a stitch file (called digitising).","best":"Logos, crests and small text on hoodies, sweatshirts and jackets. It looks premium and lasts as long as the garment.","limits":"Very fine detail and tiny text (roughly under 5 mm tall) can blur. Gradients and photographs cannot be stitched. Large areas get heavy and stiff.","visual":"stitch","poly":0},{"slug":"3d-puff-embroidery","name":"3D puff embroidery","what":"Embroidery stitched over a foam layer, so the design stands up from the fabric with a raised, rounded edge.","best":"Bold logos, initials and simple shapes on the front of hoodies, sweatshirts and jackets.","limits":"Needs bold, simple shapes with thick strokes. Thin lines and small text do not puff well. Not suited to large back designs.","visual":"puff","poly":0},{"slug":"sublimation","name":"Sublimation","what":"Ink is turned into a gas with heat and bonds into polyester fibres, so the print becomes part of the fabric and can run edge to edge.","best":"All-over patterns, full-colour designs and teamwear where the whole garment is the design.","limits":"Only works on light-coloured, polyester-rich fabric. It does not work on cotton fleece or dark garments.","visual":"allover","poly":1},{"slug":"dtf","name":"DTF (direct-to-film) print","what":"Your design is printed onto a film with a white base layer, then heat-pressed onto the garment.","best":"Full-colour logos on most fabrics and colours, including dark cotton fleece, at small and medium quantities.","limits":"Leaves a thin, slightly smooth layer on the fabric. Large solid areas feel less breathable than screen print.","visual":"film","poly":0},{"slug":"dtg","name":"DTG (direct-to-garment) print","what":"An inkjet printer prints the design straight into the fabric, a bit like a paper printer.","best":"Detailed, full-colour artwork and photographic designs on cotton-rich garments.","limits":"Best on high-cotton fabric. Colours can look softer on dark garments, and it is slower for large runs.","visual":"soft","poly":0},{"slug":"screen-printing","name":"Screen printing","what":"Ink is pushed through a fine mesh screen, one screen per colour, onto the garment.","best":"Larger runs of the same design with a few solid colours. Durable and good value at volume.","limits":"Each colour needs its own screen, so set-up makes small runs and many-colour designs less economical. Photographic gradients are limited.","visual":"flat","poly":0},{"slug":"high-density-print","name":"High-density print","what":"A thick screen-printing ink built up in layers to create a raised, sharp-edged print you can feel.","best":"Bold logos and lettering where you want texture without stitching.","limits":"Works best with simple shapes and few colours. Fine detail is lost as the ink builds up.","visual":"raised","poly":0},{"slug":"heat-transfer-vinyl","name":"HD / heat-transfer vinyl","what":"Coloured vinyl is cut to the shape of your design and heat-pressed onto the garment. HD vinyl is a thicker version with a raised finish.","best":"Names, numbers and simple one or two-colour logos, especially for teamwear and leavers hoodies.","limits":"Best for solid shapes and text. Very detailed or multi-colour artwork is not practical, and it can crack with heavy wear.","visual":"vinyl","poly":0},{"slug":"rhinestone","name":"Rhinestone","what":"Small glass or resin stones are laid out in the shape of your design and heat-fixed onto the garment.","best":"Eye-catching logos, dance and cheer teams, and leavers designs that need sparkle.","limits":"Designs are made of dots, so fine lines and small text are simplified. Needs gentle washing inside out.","visual":"sparkle","poly":0}],"placements":[{"slug":"left-chest","name":"Left chest","shapes":["hoodie","zip-hoodie","sweatshirt","jacket","tracksuit","tee","polo"]},{"slug":"full-front","name":"Full front","shapes":["hoodie","zip-hoodie","sweatshirt","jacket","tracksuit","tee","polo"]},{"slug":"back","name":"Back","shapes":["hoodie","zip-hoodie","sweatshirt","jacket","tracksuit","joggers","tee","polo"]},{"slug":"sleeve","name":"Sleeve","shapes":["hoodie","zip-hoodie","sweatshirt","jacket","tracksuit","tee","polo"]},{"slug":"hood","name":"Hood","shapes":["hoodie","zip-hoodie"]},{"slug":"left-leg","name":"Left leg","shapes":["joggers"]}],"colours":[{"slug":"black","name":"Black","hex":"#1b1b1d"},{"slug":"navy","name":"Navy","hex":"#1f2a44"},{"slug":"charcoal","name":"Charcoal","hex":"#3d3f44"},{"slug":"heather-grey","name":"Heather grey","hex":"#a7a9ac"},{"slug":"off-white","name":"Off-white","hex":"#efece4"},{"slug":"bottle-green","name":"Bottle green","hex":"#1f4d3a"},{"slug":"burgundy","name":"Burgundy","hex":"#6b1f2e"},{"slug":"royal-blue","name":"Royal blue","hex":"#2a52be"},{"slug":"red","name":"Red","hex":"#b3202a"},{"slug":"sand","name":"Sand","hex":"#cdb892"}],"fabrics":[{"slug":"heavyweight-cotton-fleece","name":"Heavyweight cotton fleece","poly":0},{"slug":"french-terry","name":"French terry","poly":0},{"slug":"brushed-back-fleece","name":"Brushed-back fleece","poly":0},{"slug":"poly-cotton","name":"Poly/cotton blend","poly":1},{"slug":"single-jersey","name":"Single jersey cotton","poly":0},{"slug":"combed-ring-spun","name":"Combed ring-spun cotton","poly":0},{"slug":"cotton-pique","name":"Cotton pique","poly":0},{"slug":"performance-poly","name":"Performance polyester","poly":1}],"gsm":{"tee":[180,210,240,280],"polo":[200,220,240],"hoodie":[280,320,380,450],"zip-hoodie":[280,320,380,450],"sweatshirt":[280,320,380],"jacket":[280,320,380],"tracksuit":[260,300,340],"joggers":[260,300,340]},"fabricByShape":{"tee":["single-jersey","combed-ring-spun","poly-cotton","performance-poly"],"polo":["cotton-pique","combed-ring-spun","poly-cotton","performance-poly"],"hoodie":["heavyweight-cotton-fleece","brushed-back-fleece","french-terry","poly-cotton"],"zip-hoodie":["heavyweight-cotton-fleece","brushed-back-fleece","french-terry","poly-cotton"],"sweatshirt":["brushed-back-fleece","french-terry","poly-cotton","heavyweight-cotton-fleece"],"jacket":["heavyweight-cotton-fleece","brushed-back-fleece","poly-cotton"],"tracksuit":["poly-cotton","brushed-back-fleece","french-terry","performance-poly"],"joggers":["brushed-back-fleece","french-terry","heavyweight-cotton-fleece","poly-cotton"]}};
 var $=function(s){return document.querySelector(s)};
-var state={product:null,fabric:null,gsm:null,colour:null,technique:null,placement:null,logo:null,logoName:''};
+var state={product:null,fabric:null,gsm:null,colour:null,technique:null,placement:null,logo:null,logoName:'',
+  /* view: which side is shown. Follows the placement until the
+     buyer presses Front/Back, then it is theirs.
+     box: where the decoration actually sits, in canvas units.
+     moved: true once they drag or resize, which changes what
+     the summary and the enquiry say. */
+  view:'front', box:null, moved:false};
 
 /* geometry ported from the UK build's client/mockup.ts */
 var FRONT={'left-chest':{x:222,y:150,w:52,h:52},'full-front':{x:140,y:160,w:120,h:115},sleeve:{x:58,y:185,w:36,h:44,rot:22}};
@@ -460,7 +478,11 @@ function defs(id,logo,b){
   '</defs>';
 }
 
-var PHOTO_BOX={"front":{"classic-tee":{"left-chest":{"x":224.8,"y":110.3,"w":44.7,"h":44.7},"full-front":{"x":135.4,"y":114.1,"w":131.1,"h":131.1},"back":{"x":123.5,"y":85.0,"w":155.0,"h":155.0},"sleeve":{"x":61.7,"y":169.6,"w":37.2,"h":37.2},"left-leg":{"x":238.3,"y":214.2,"w":44.7,"h":44.7}},"club-tracksuit":{"left-chest":{"x":214.8,"y":60.4,"w":27.2,"h":27.2},"full-front":{"x":163.2,"y":73.4,"w":72.5,"h":72.5},"back":{"x":157.7,"y":59.0,"w":83.4,"h":83.4},"sleeve":{"x":112.4,"y":105.9,"w":21.7,"h":21.7},"left-leg":{"x":214.8,"y":281.6,"w":27.2,"h":27.2}},"crew-sweatshirt":{"left-chest":{"x":227.2,"y":111.8,"w":43.4,"h":43.4},"full-front":{"x":140.3,"y":116.9,"w":127.4,"h":127.4},"back":{"x":128.7,"y":88.2,"w":150.6,"h":150.6},"sleeve":{"x":68.6,"y":171.0,"w":36.2,"h":36.2},"left-leg":{"x":240.2,"y":215.9,"w":43.4,"h":43.4}},"fleece-lined-jacket":{"left-chest":{"x":225.9,"y":108.3,"w":42.9,"h":42.9},"full-front":{"x":140.1,"y":117.7,"w":125.8,"h":125.8},"back":{"x":128.7,"y":87.7,"w":148.7,"h":148.7},"sleeve":{"x":69.3,"y":171.9,"w":35.8,"h":35.8},"left-leg":{"x":238.8,"y":220.7,"w":42.9,"h":42.9}},"leavers-hoodie":{"left-chest":{"x":226.2,"y":100.0,"w":43.2,"h":43.2},"full-front":{"x":139.9,"y":112.4,"w":126.7,"h":126.7},"back":{"x":131.2,"y":123.4,"w":144.0,"h":144.0},"sleeve":{"x":68.6,"y":167.6,"w":36.0,"h":36.0},"hood":{"x":175.9,"y":50.0,"w":54.7,"h":54.7},"left-leg":{"x":239.2,"y":219.8,"w":43.2,"h":43.2}},"long-sleeve-tee":{"left-chest":{"x":224.5,"y":113.9,"w":44.4,"h":44.4},"full-front":{"x":135.7,"y":115.1,"w":130.2,"h":130.2},"back":{"x":123.9,"y":87.2,"w":153.9,"h":153.9},"sleeve":{"x":62.4,"y":169.7,"w":37.0,"h":37.0},"left-leg":{"x":237.8,"y":211.5,"w":44.4,"h":44.4}},"open-hem-joggers":{"left-chest":{"x":215.7,"y":101.3,"w":28.4,"h":28.4},"full-front":{"x":159.0,"y":131.7,"w":83.2,"h":83.2},"back":{"x":151.4,"y":103.1,"w":98.4,"h":98.4},"sleeve":{"x":112.2,"y":172.1,"w":23.6,"h":23.6},"left-leg":{"x":224.2,"y":229.3,"w":28.4,"h":28.4}},"oversized-tee":{"left-chest":{"x":227.8,"y":116.7,"w":48.4,"h":48.4},"full-front":{"x":131.1,"y":111.4,"w":141.9,"h":141.9},"back":{"x":118.2,"y":83.4,"w":167.6,"h":167.6},"sleeve":{"x":51.3,"y":169.7,"w":40.3,"h":40.3},"left-leg":{"x":242.3,"y":208.3,"w":48.4,"h":48.4}},"polo-shirt":{"left-chest":{"x":229.0,"y":103.5,"w":46.8,"h":46.8},"full-front":{"x":135.3,"y":108.8,"w":137.3,"h":137.3},"back":{"x":122.9,"y":78.0,"w":162.2,"h":162.2},"sleeve":{"x":58.1,"y":167.2,"w":39.0,"h":39.0},"left-leg":{"x":243.0,"y":215.4,"w":46.8,"h":46.8}},"pullover-hoodie":{"left-chest":{"x":226.4,"y":96.6,"w":47.0,"h":47.0},"full-front":{"x":132.5,"y":106.1,"w":137.8,"h":137.8},"back":{"x":123.1,"y":116.6,"w":156.6,"h":156.6},"sleeve":{"x":55.0,"y":165.4,"w":39.1,"h":39.1},"hood":{"x":171.6,"y":45.4,"w":59.5,"h":59.5},"left-leg":{"x":240.5,"y":218.0,"w":47.0,"h":47.0}},"quarter-zip-sweatshirt":{"left-chest":{"x":227.2,"y":107.3,"w":43.4,"h":43.4},"full-front":{"x":140.3,"y":115.1,"w":127.4,"h":127.4},"back":{"x":128.7,"y":85.4,"w":150.6,"h":150.6},"sleeve":{"x":68.6,"y":169.8,"w":36.2,"h":36.2},"left-leg":{"x":240.2,"y":217.5,"w":43.4,"h":43.4}},"tapered-joggers":{"left-chest":{"x":215.6,"y":105.0,"w":26.6,"h":26.6},"full-front":{"x":162.4,"y":135.7,"w":78.0,"h":78.0},"back":{"x":155.3,"y":108.1,"w":92.1,"h":92.1},"sleeve":{"x":118.6,"y":173.9,"w":22.1,"h":22.1},"left-leg":{"x":223.5,"y":229.7,"w":26.6,"h":26.6}},"varsity-jacket":{"left-chest":{"x":225.4,"y":116.4,"w":43.8,"h":43.8},"full-front":{"x":137.8,"y":120.0,"w":128.5,"h":128.5},"back":{"x":126.1,"y":91.7,"w":151.8,"h":151.8},"sleeve":{"x":65.5,"y":174.4,"w":36.5,"h":36.5},"left-leg":{"x":238.5,"y":218.2,"w":43.8,"h":43.8}},"zip-hoodie":{"left-chest":{"x":224.9,"y":99.2,"w":41.8,"h":41.8},"full-front":{"x":141.3,"y":113.6,"w":122.7,"h":122.7},"back":{"x":132.9,"y":125.2,"w":139.4,"h":139.4},"sleeve":{"x":72.2,"y":167.5,"w":34.9,"h":34.9},"hood":{"x":176.1,"y":48.6,"w":53.0,"h":53.0},"left-leg":{"x":237.5,"y":220.6,"w":41.8,"h":41.8}}},"back":{"classic-tee":{"left-chest":{"x":225.6,"y":117.9,"w":42.0,"h":42.0},"full-front":{"x":141.6,"y":121.2,"w":123.2,"h":123.2},"back":{"x":130.4,"y":94.0,"w":145.6,"h":145.6},"sleeve":{"x":72.3,"y":173.2,"w":35.0,"h":35.0},"left-leg":{"x":238.2,"y":214.9,"w":42.0,"h":42.0}},"club-tracksuit":{"left-chest":{"x":215.5,"y":66.7,"w":27.4,"h":27.4},"full-front":{"x":163.5,"y":77.9,"w":73.0,"h":73.0},"back":{"x":158.1,"y":63.9,"w":83.9,"h":83.9},"sleeve":{"x":112.4,"y":110.2,"w":21.9,"h":21.9},"left-leg":{"x":215.5,"y":277.5,"w":27.4,"h":27.4}},"crew-sweatshirt":{"left-chest":{"x":225.2,"y":114.5,"w":44.6,"h":44.6},"full-front":{"x":136.0,"y":116.0,"w":130.8,"h":130.8},"back":{"x":124.2,"y":87.9,"w":154.5,"h":154.5},"sleeve":{"x":62.5,"y":170.9,"w":37.1,"h":37.1},"left-leg":{"x":238.5,"y":213.1,"w":44.6,"h":44.6}},"fleece-lined-jacket":{"left-chest":{"x":225.0,"y":113.4,"w":43.2,"h":43.2},"full-front":{"x":138.7,"y":118.1,"w":126.7,"h":126.7},"back":{"x":127.1,"y":89.7,"w":149.8,"h":149.8},"sleeve":{"x":67.4,"y":171.9,"w":36.0,"h":36.0},"left-leg":{"x":238.0,"y":216.2,"w":43.2,"h":43.2}},"leavers-hoodie":{"left-chest":{"x":224.4,"y":102.6,"w":41.0,"h":41.0},"full-front":{"x":142.5,"y":115.5,"w":120.2,"h":120.2},"back":{"x":134.3,"y":126.3,"w":136.6,"h":136.6},"sleeve":{"x":74.9,"y":168.0,"w":34.1,"h":34.1},"hood":{"x":176.7,"y":54.2,"w":51.9,"h":51.9},"left-leg":{"x":236.7,"y":218.7,"w":41.0,"h":41.0}},"long-sleeve-tee":{"left-chest":{"x":226.7,"y":120.3,"w":43.3,"h":43.3},"full-front":{"x":140.1,"y":121.5,"w":127.1,"h":127.1},"back":{"x":128.5,"y":94.3,"w":150.2,"h":150.2},"sleeve":{"x":68.6,"y":174.9,"w":36.1,"h":36.1},"left-leg":{"x":239.7,"y":215.7,"w":43.3,"h":43.3}},"open-hem-joggers":{"left-chest":{"x":214.3,"y":108.2,"w":24.9,"h":24.9},"full-front":{"x":164.5,"y":140.3,"w":73.0,"h":73.0},"back":{"x":157.8,"y":113.2,"w":86.3,"h":86.3},"sleeve":{"x":123.4,"y":176.6,"w":20.8,"h":20.8},"left-leg":{"x":221.8,"y":232.4,"w":24.9,"h":24.9}},"oversized-tee":{"left-chest":{"x":227.6,"y":117.4,"w":47.3,"h":47.3},"full-front":{"x":133.0,"y":113.8,"w":138.7,"h":138.7},"back":{"x":120.4,"y":85.9,"w":163.9,"h":163.9},"sleeve":{"x":55.0,"y":171.1,"w":39.4,"h":39.4},"left-leg":{"x":241.8,"y":210.6,"w":47.3,"h":47.3}},"polo-shirt":{"left-chest":{"x":227.2,"y":108.1,"w":44.3,"h":44.3},"full-front":{"x":138.6,"y":113.4,"w":129.9,"h":129.9},"back":{"x":126.8,"y":84.1,"w":153.5,"h":153.5},"sleeve":{"x":65.6,"y":168.6,"w":36.9,"h":36.9},"left-leg":{"x":240.5,"y":214.4,"w":44.3,"h":44.3}},"pullover-hoodie":{"left-chest":{"x":223.2,"y":101.4,"w":42.0,"h":42.0},"full-front":{"x":139.2,"y":114.1,"w":123.2,"h":123.2},"back":{"x":130.8,"y":125.1,"w":140.0,"h":140.0},"sleeve":{"x":69.9,"y":167.9,"w":35.0,"h":35.0},"hood":{"x":174.2,"y":52.2,"w":53.2,"h":53.2},"left-leg":{"x":235.8,"y":219.4,"w":42.0,"h":42.0}},"quarter-zip-sweatshirt":{"left-chest":{"x":227.4,"y":107.9,"w":44.5,"h":44.5},"full-front":{"x":138.3,"y":114.2,"w":130.6,"h":130.6},"back":{"x":126.5,"y":84.4,"w":154.3,"h":154.3},"sleeve":{"x":64.8,"y":169.9,"w":37.1,"h":37.1},"left-leg":{"x":240.7,"y":217.0,"w":44.5,"h":44.5}},"tapered-joggers":{"left-chest":{"x":213.6,"y":114.0,"w":23.0,"h":23.0},"full-front":{"x":167.7,"y":145.1,"w":67.4,"h":67.4},"back":{"x":161.5,"y":119.6,"w":79.7,"h":79.7},"sleeve":{"x":129.8,"y":178.9,"w":19.1,"h":19.1},"left-leg":{"x":220.5,"y":231.8,"w":23.0,"h":23.0}},"varsity-jacket":{"left-chest":{"x":228.9,"y":120.8,"w":41.8,"h":41.8},"full-front":{"x":145.3,"y":121.7,"w":122.7,"h":122.7},"back":{"x":134.1,"y":95.5,"w":145.0,"h":145.0},"sleeve":{"x":76.2,"y":173.1,"w":34.9,"h":34.9},"left-leg":{"x":241.5,"y":212.1,"w":41.8,"h":41.8}},"zip-hoodie":{"left-chest":{"x":222.6,"y":107.8,"w":37.9,"h":37.9},"full-front":{"x":146.8,"y":122.6,"w":111.2,"h":111.2},"back":{"x":139.2,"y":133.8,"w":126.4,"h":126.4},"sleeve":{"x":84.2,"y":171.8,"w":31.6,"h":31.6},"hood":{"x":178.4,"y":60.6,"w":48.0,"h":48.0},"left-leg":{"x":234.0,"y":221.7,"w":37.9,"h":37.9}}}};
+/* The garment outline in canvas units, per product and per view -
+   the same measurements PHOTO_BOX is built from. Dragging is clamped
+   to this, so a logo cannot be parked on the background. */
+var GARMENT_BOX={"front":{"classic-tee":[52.0,60.0,350.0,344.8],"club-tracksuit":[108.8,24.0,290.0,380.8],"crew-sweatshirt":[59.2,60.8,348.8,346.0],"fleece-lined-jacket":[60.0,51.2,346.0,359.2],"leavers-hoodie":[59.2,38.0,347.2,366.0],"long-sleeve-tee":[52.8,68.0,348.8,335.2],"open-hem-joggers":[106.0,26.0,295.2,376.8],"oversized-tee":[40.8,76.8,363.2,328.0],"polo-shirt":[48.0,48.8,360.0,355.2],"pullover-hoodie":[44.8,35.2,358.0,368.0],"quarter-zip-sweatshirt":[59.2,52.0,348.8,354.0],"tapered-joggers":[112.8,31.2,290.0,372.8],"varsity-jacket":[56.0,67.2,348.0,346.0],"zip-hoodie":[63.2,35.2,342.0,368.0]},"back":{"classic-tee":[63.2,71.2,343.2,336.8],"club-tracksuit":[108.8,32.8,291.2,372.8],"crew-sweatshirt":[52.8,68.0,350.0,338.0],"fleece-lined-jacket":[58.0,63.2,346.0,344.8],"leavers-hoodie":[66.0,42.0,339.2,360.0],"long-sleeve-tee":[59.2,75.2,348.0,336.8],"open-hem-joggers":[118.0,34.0,284.0,374.0],"oversized-tee":[44.8,76.0,360.0,331.2],"polo-shirt":[56.0,56.0,351.2,347.2],"pullover-hoodie":[60.8,40.0,340.8,363.2],"quarter-zip-sweatshirt":[55.2,54.0,352.0,352.8],"tapered-joggers":[124.8,43.2,278.0,366.0],"varsity-jacket":[67.2,78.0,346.0,328.0],"zip-hoodie":[76.0,47.2,328.8,359.2]}};
+var PHOTO_BOX={"front":{"classic-tee":{"left-chest":{"x":224.8,"y":110.3,"w":44.7,"h":44.7},"full-front":{"x":135.4,"y":114.1,"w":131.1,"h":131.1},"back":{"x":123.5,"y":85.0,"w":155.0,"h":155.0},"sleeve":{"x":61.7,"y":169.6,"w":37.2,"h":37.2},"left-leg":{"x":238.3,"y":214.2,"w":44.7,"h":44.7}},"club-tracksuit":{"left-chest":{"x":214.8,"y":60.4,"w":27.2,"h":27.2},"full-front":{"x":163.2,"y":73.4,"w":72.5,"h":72.5},"back":{"x":157.7,"y":59.0,"w":83.4,"h":83.4},"sleeve":{"x":112.4,"y":105.9,"w":21.7,"h":21.7},"left-leg":{"x":214.8,"y":281.6,"w":27.2,"h":27.2}},"crew-sweatshirt":{"left-chest":{"x":227.2,"y":111.8,"w":43.4,"h":43.4},"full-front":{"x":140.3,"y":116.9,"w":127.4,"h":127.4},"back":{"x":128.7,"y":88.2,"w":150.6,"h":150.6},"sleeve":{"x":68.6,"y":171.0,"w":36.2,"h":36.2},"left-leg":{"x":240.2,"y":215.9,"w":43.4,"h":43.4}},"fleece-lined-jacket":{"left-chest":{"x":225.9,"y":108.3,"w":42.9,"h":42.9},"full-front":{"x":140.1,"y":117.7,"w":125.8,"h":125.8},"back":{"x":128.7,"y":87.7,"w":148.7,"h":148.7},"sleeve":{"x":69.3,"y":171.9,"w":35.8,"h":35.8},"left-leg":{"x":238.8,"y":220.7,"w":42.9,"h":42.9}},"leavers-hoodie":{"left-chest":{"x":226.2,"y":100.0,"w":43.2,"h":43.2},"full-front":{"x":139.9,"y":112.4,"w":126.7,"h":126.7},"back":{"x":131.2,"y":123.4,"w":144.0,"h":144.0},"sleeve":{"x":68.6,"y":167.6,"w":36.0,"h":36.0},"hood":{"x":175.9,"y":50.0,"w":54.7,"h":54.7},"left-leg":{"x":239.2,"y":219.8,"w":43.2,"h":43.2}},"long-sleeve-tee":{"left-chest":{"x":224.5,"y":113.9,"w":44.4,"h":44.4},"full-front":{"x":135.7,"y":115.1,"w":130.2,"h":130.2},"back":{"x":123.9,"y":87.2,"w":153.9,"h":153.9},"sleeve":{"x":62.4,"y":169.7,"w":37.0,"h":37.0},"left-leg":{"x":237.8,"y":211.5,"w":44.4,"h":44.4}},"open-hem-joggers":{"back":{"x":181.7,"y":66.7,"w":37.8,"h":37.8},"left-leg":{"x":223.3,"y":207.3,"w":30.3,"h":30.3}},"oversized-tee":{"left-chest":{"x":227.8,"y":116.7,"w":48.4,"h":48.4},"full-front":{"x":131.1,"y":111.4,"w":141.9,"h":141.9},"back":{"x":118.2,"y":83.4,"w":167.6,"h":167.6},"sleeve":{"x":51.3,"y":169.7,"w":40.3,"h":40.3},"left-leg":{"x":242.3,"y":208.3,"w":48.4,"h":48.4}},"polo-shirt":{"left-chest":{"x":229.0,"y":103.5,"w":46.8,"h":46.8},"full-front":{"x":135.3,"y":108.8,"w":137.3,"h":137.3},"back":{"x":122.9,"y":78.0,"w":162.2,"h":162.2},"sleeve":{"x":58.1,"y":167.2,"w":39.0,"h":39.0},"left-leg":{"x":243.0,"y":215.4,"w":46.8,"h":46.8}},"pullover-hoodie":{"left-chest":{"x":226.4,"y":96.6,"w":47.0,"h":47.0},"full-front":{"x":132.5,"y":106.1,"w":137.8,"h":137.8},"back":{"x":123.1,"y":116.6,"w":156.6,"h":156.6},"sleeve":{"x":55.0,"y":165.4,"w":39.1,"h":39.1},"hood":{"x":171.6,"y":45.4,"w":59.5,"h":59.5},"left-leg":{"x":240.5,"y":218.0,"w":47.0,"h":47.0}},"quarter-zip-sweatshirt":{"left-chest":{"x":227.2,"y":107.3,"w":43.4,"h":43.4},"full-front":{"x":140.3,"y":115.1,"w":127.4,"h":127.4},"back":{"x":128.7,"y":85.4,"w":150.6,"h":150.6},"sleeve":{"x":68.6,"y":169.8,"w":36.2,"h":36.2},"left-leg":{"x":240.2,"y":217.5,"w":43.4,"h":43.4}},"tapered-joggers":{"back":{"x":183.7,"y":71.6,"w":35.4,"h":35.4},"left-leg":{"x":222.6,"y":208.3,"w":28.4,"h":28.4}},"varsity-jacket":{"left-chest":{"x":225.4,"y":116.4,"w":43.8,"h":43.8},"full-front":{"x":137.8,"y":120.0,"w":128.5,"h":128.5},"back":{"x":126.1,"y":91.7,"w":151.8,"h":151.8},"sleeve":{"x":65.5,"y":174.4,"w":36.5,"h":36.5},"left-leg":{"x":238.5,"y":218.2,"w":43.8,"h":43.8}},"zip-hoodie":{"left-chest":{"x":224.9,"y":99.2,"w":41.8,"h":41.8},"full-front":{"x":141.3,"y":113.6,"w":122.7,"h":122.7},"back":{"x":132.9,"y":125.2,"w":139.4,"h":139.4},"sleeve":{"x":72.2,"y":167.5,"w":34.9,"h":34.9},"hood":{"x":176.1,"y":48.6,"w":53.0,"h":53.0},"left-leg":{"x":237.5,"y":220.6,"w":41.8,"h":41.8}}},"back":{"classic-tee":{"left-chest":{"x":225.6,"y":117.9,"w":42.0,"h":42.0},"full-front":{"x":141.6,"y":121.2,"w":123.2,"h":123.2},"back":{"x":130.4,"y":94.0,"w":145.6,"h":145.6},"sleeve":{"x":72.3,"y":173.2,"w":35.0,"h":35.0},"left-leg":{"x":238.2,"y":214.9,"w":42.0,"h":42.0}},"club-tracksuit":{"left-chest":{"x":215.5,"y":66.7,"w":27.4,"h":27.4},"full-front":{"x":163.5,"y":77.9,"w":73.0,"h":73.0},"back":{"x":158.1,"y":63.9,"w":83.9,"h":83.9},"sleeve":{"x":112.4,"y":110.2,"w":21.9,"h":21.9},"left-leg":{"x":215.5,"y":277.5,"w":27.4,"h":27.4}},"crew-sweatshirt":{"left-chest":{"x":225.2,"y":114.5,"w":44.6,"h":44.6},"full-front":{"x":136.0,"y":116.0,"w":130.8,"h":130.8},"back":{"x":124.2,"y":87.9,"w":154.5,"h":154.5},"sleeve":{"x":62.5,"y":170.9,"w":37.1,"h":37.1},"left-leg":{"x":238.5,"y":213.1,"w":44.6,"h":44.6}},"fleece-lined-jacket":{"left-chest":{"x":225.0,"y":113.4,"w":43.2,"h":43.2},"full-front":{"x":138.7,"y":118.1,"w":126.7,"h":126.7},"back":{"x":127.1,"y":89.7,"w":149.8,"h":149.8},"sleeve":{"x":67.4,"y":171.9,"w":36.0,"h":36.0},"left-leg":{"x":238.0,"y":216.2,"w":43.2,"h":43.2}},"leavers-hoodie":{"left-chest":{"x":224.4,"y":102.6,"w":41.0,"h":41.0},"full-front":{"x":142.5,"y":115.5,"w":120.2,"h":120.2},"back":{"x":134.3,"y":126.3,"w":136.6,"h":136.6},"sleeve":{"x":74.9,"y":168.0,"w":34.1,"h":34.1},"hood":{"x":176.7,"y":54.2,"w":51.9,"h":51.9},"left-leg":{"x":236.7,"y":218.7,"w":41.0,"h":41.0}},"long-sleeve-tee":{"left-chest":{"x":226.7,"y":120.3,"w":43.3,"h":43.3},"full-front":{"x":140.1,"y":121.5,"w":127.1,"h":127.1},"back":{"x":128.5,"y":94.3,"w":150.2,"h":150.2},"sleeve":{"x":68.6,"y":174.9,"w":36.1,"h":36.1},"left-leg":{"x":239.7,"y":215.7,"w":43.3,"h":43.3}},"open-hem-joggers":{"back":{"x":184.4,"y":75.2,"w":33.2,"h":33.2},"left-leg":{"x":220.9,"y":211.1,"w":26.6,"h":26.6}},"oversized-tee":{"left-chest":{"x":227.6,"y":117.4,"w":47.3,"h":47.3},"full-front":{"x":133.0,"y":113.8,"w":138.7,"h":138.7},"back":{"x":120.4,"y":85.9,"w":163.9,"h":163.9},"sleeve":{"x":55.0,"y":171.1,"w":39.4,"h":39.4},"left-leg":{"x":241.8,"y":210.6,"w":47.3,"h":47.3}},"polo-shirt":{"left-chest":{"x":227.2,"y":108.1,"w":44.3,"h":44.3},"full-front":{"x":138.6,"y":113.4,"w":129.9,"h":129.9},"back":{"x":126.8,"y":84.1,"w":153.5,"h":153.5},"sleeve":{"x":65.6,"y":168.6,"w":36.9,"h":36.9},"left-leg":{"x":240.5,"y":214.4,"w":44.3,"h":44.3}},"pullover-hoodie":{"left-chest":{"x":223.2,"y":101.4,"w":42.0,"h":42.0},"full-front":{"x":139.2,"y":114.1,"w":123.2,"h":123.2},"back":{"x":130.8,"y":125.1,"w":140.0,"h":140.0},"sleeve":{"x":69.9,"y":167.9,"w":35.0,"h":35.0},"hood":{"x":174.2,"y":52.2,"w":53.2,"h":53.2},"left-leg":{"x":235.8,"y":219.4,"w":42.0,"h":42.0}},"quarter-zip-sweatshirt":{"left-chest":{"x":227.4,"y":107.9,"w":44.5,"h":44.5},"full-front":{"x":138.3,"y":114.2,"w":130.6,"h":130.6},"back":{"x":126.5,"y":84.4,"w":154.3,"h":154.3},"sleeve":{"x":64.8,"y":169.9,"w":37.1,"h":37.1},"left-leg":{"x":240.7,"y":217.0,"w":44.5,"h":44.5}},"tapered-joggers":{"back":{"x":186.1,"y":82.8,"w":30.6,"h":30.6},"left-leg":{"x":219.8,"y":211.7,"w":24.5,"h":24.5}},"varsity-jacket":{"left-chest":{"x":228.9,"y":120.8,"w":41.8,"h":41.8},"full-front":{"x":145.3,"y":121.7,"w":122.7,"h":122.7},"back":{"x":134.1,"y":95.5,"w":145.0,"h":145.0},"sleeve":{"x":76.2,"y":173.1,"w":34.9,"h":34.9},"left-leg":{"x":241.5,"y":212.1,"w":41.8,"h":41.8}},"zip-hoodie":{"left-chest":{"x":222.6,"y":107.8,"w":37.9,"h":37.9},"full-front":{"x":146.8,"y":122.6,"w":111.2,"h":111.2},"back":{"x":139.2,"y":133.8,"w":126.4,"h":126.4},"sleeve":{"x":84.2,"y":171.8,"w":31.6,"h":31.6},"hood":{"x":178.4,"y":60.6,"w":48.0,"h":48.0},"left-leg":{"x":234.0,"y":221.7,"w":37.9,"h":37.9}}}};
 /* Placement boxes measured from each PRODUCT's own photo, separately for
    the front and the back: the back frames run a little tighter, so one
    map for both crept a logo off the garment edge. Keyed by product, not
@@ -472,13 +494,59 @@ var PHOTO_BOX={"front":{"classic-tee":{"left-chest":{"x":224.8,"y":110.3,"w":44.
 function photoSrc(back){
   return '/images/design/'+state.product.slug+'--'+state.colour.slug+(back?'--back':'')+'.webp';
 }
+/* The decoration rectangle. resetBox() puts it back on the chosen preset;
+   after that the buyer owns it until they change product or placement. */
+function setViewSilently(v){
+  state.view=v;
+  var btns=document.querySelectorAll('.dz-seg button');
+  for(var i=0;i<btns.length;i++) btns[i].classList.toggle('on', btns[i].getAttribute('data-v')===v);
+}
+function sideFor(pl){ return (pl==='back'||pl==='hood') ? 'back' : 'front'; }
+
+function presetBox(){
+  var view=state.view||'front';
+  var pm=PHOTO_BOX[view][state.product.slug]||PHOTO_BOX.front['pullover-hoodie'];
+  var pl=state.placement?state.placement.slug:'full-front';
+  var b=pm[pl]||pm['full-front']||pm['back']||{x:150,y:150,w:100,h:100};
+  return {x:b.x,y:b.y,w:b.w,h:b.h};
+}
+function resetBox(){ state.box=presetBox(); state.moved=false;
+  var sz=$('#dzSize'); if(sz) sz.value=100; }
+
+/* keep the whole logo on the garment, not merely on the canvas */
+function clampBox(b){
+  var g=(GARMENT_BOX[state.view||'front']||{})[state.product.slug];
+  if(!g) return b;
+  var minW=14, maxW=Math.min(g[2]-g[0], g[3]-g[1]);
+  b.w=Math.max(minW,Math.min(b.w,maxW)); b.h=b.w;
+  b.x=Math.max(g[0],Math.min(b.x,g[2]-b.w));
+  b.y=Math.max(g[1],Math.min(b.y,g[3]-b.h));
+  return b;
+}
+function setView(v){
+  if(state.view===v) return;
+  state.view=v; resetBox();
+  var btns=document.querySelectorAll('.dz-seg button');
+  for(var i=0;i<btns.length;i++) btns[i].classList.toggle('on', btns[i].getAttribute('data-v')===v);
+  render();
+}
+/* where the logo sits, as a percentage of the garment - what a cutter needs */
+function boxPercent(){
+  var g=(GARMENT_BOX[state.view||'front']||{})[state.product.slug];
+  if(!g||!state.box) return null;
+  var gw=g[2]-g[0], gh=g[3]-g[1];
+  return {cx:Math.round(((state.box.x+state.box.w/2)-g[0])/gw*100),
+          cy:Math.round(((state.box.y+state.box.h/2)-g[1])/gh*100),
+          w:Math.round(state.box.w/gw*100)};
+}
 function render(){
   var id='m'+Math.random().toString(36).slice(2,7);
   var shape=state.product.shape;
   var pl=state.placement?state.placement.slug:'full-front';
-  var back=(pl==='back'||pl==='hood');
-  var pm=PHOTO_BOX[back?'back':'front'][state.product.slug]||PHOTO_BOX.front['pullover-hoodie'];
-  var b=pm[pl]||pm['full-front']||pm['back'];
+  /* the view is the buyer's now, not a side effect of the placement */
+  var back=(state.view==='back');
+  if(!state.box) state.box=presetBox();
+  var b=state.box;
   var logo=state.logo||LOGO;
   var img=function(ex){return '<image href="'+logo+'" x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" preserveAspectRatio="xMidYMid meet" '+(ex||'')+'/>'};
   var rect=function(f,ex){return '<rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" fill="'+f+'" '+(ex||'')+'/>'};
@@ -538,7 +606,7 @@ function render(){
   $('#dzSum').innerHTML='<b>'+state.product.name+'</b> · '+(state.fabric?state.fabric.name:'')+
     (state.gsmCustom?' · '+state.gsmCustom+' gsm':(state.gsm?' · '+state.gsm+' gsm':''))+'<br><b>'+state.colour.name+'</b> · '+
     (state.techniqueCustom||state.technique.name)+' on the '+(state.placement?state.placement.name.toLowerCase():'')+'<br>'+
-    (state.logoName?'Artwork: <b>'+state.logoName+'</b>':'<span style="color:rgba(255,255,255,.4)">No artwork uploaded yet</span>');
+    (state.logoName?'Artwork: <b>'+state.logoName+'</b>':'<span style="color:rgba(255,255,255,.4)">No artwork uploaded yet</span>')+(state.moved?' <i>(position set by you)</i>':'');
 }
 
 function fillPlacements(){
@@ -547,6 +615,7 @@ function fillPlacements(){
   if(!ok.length) ok=[D.placements[0]];
   sel.innerHTML=ok.map(function(p){return '<option value="'+p.slug+'">'+p.name+'</option>'}).join('');
   state.placement=ok[0]; sel.value=ok[0].slug;
+  setViewSilently(sideFor(ok[0].slug)); resetBox();
 }
 function fillGsm(){
   var g=D.gsm[state.product.shape]||D.gsm.hoodie;
@@ -604,9 +673,60 @@ function init(){
     render();
   });
   $('#dzTechOther').addEventListener('input',function(e){state.techniqueCustom=e.target.value.trim();render()});
+
+/* Drag the logo. Pointer events so a finger works; rAF-coalesced because a
+   move re-renders the whole SVG. */
+(function(){
+  var stage=$('#dzStage'), drag=null, queued=false;
+  function pt(e){
+    var svg=stage.querySelector('svg'); if(!svg) return null;
+    var r=svg.getBoundingClientRect();
+    return {x:(e.clientX-r.left)/r.width*400, y:(e.clientY-r.top)/r.height*440};
+  }
+  function paint(){ queued=false; render(); }
+  stage.addEventListener('pointerdown',function(e){
+    if(!state.box) return;
+    var q=pt(e); if(!q) return;
+    var b=state.box, pad=8;
+    if(q.x<b.x-pad||q.x>b.x+b.w+pad||q.y<b.y-pad||q.y>b.y+b.h+pad) return;
+    drag={dx:q.x-b.x, dy:q.y-b.y};
+    stage.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  stage.addEventListener('pointermove',function(e){
+    if(!drag) return;
+    var q=pt(e); if(!q) return;
+    state.box.x=q.x-drag.dx; state.box.y=q.y-drag.dy;
+    clampBox(state.box); state.moved=true;
+    if(!queued){ queued=true; requestAnimationFrame(paint); }
+    e.preventDefault();
+  });
+  function stop(e){
+    if(!drag) return;
+    drag=null;
+    try{ stage.releasePointerCapture(e.pointerId); }catch(_){}
+    render();
+  }
+  stage.addEventListener('pointerup',stop);
+  stage.addEventListener('pointercancel',stop);
+
+  var sz=$('#dzSize');
+  if(sz) sz.addEventListener('input',function(e){
+    if(!state.box) state.box=presetBox();
+    var base=presetBox(), cx=state.box.x+state.box.w/2, cy=state.box.y+state.box.h/2;
+    state.box.w=base.w*(+e.target.value/100); state.box.h=state.box.w;
+    state.box.x=cx-state.box.w/2; state.box.y=cy-state.box.h/2;
+    clampBox(state.box); state.moved=true; render();
+  });
+
+  var seg=document.querySelector('.dz-seg');
+  if(seg) seg.addEventListener('click',function(e){
+    var btn=e.target.closest('button[data-v]'); if(btn) setView(btn.getAttribute('data-v'));
+  });
+})();
+
   $('#dzPlacement').addEventListener('change',function(e){
     var m=D.placements.filter(function(p){return p.slug===e.target.value});
-    if(m.length){state.placement=m[0];render()}});
+    if(m.length){ state.placement=m[0]; setViewSilently(sideFor(m[0].slug)); resetBox(); render(); }});
   $('#dzColour').addEventListener('click',function(e){
     var b=e.target.closest('button'); if(!b) return;
     var all=this.querySelectorAll('button');
@@ -634,6 +754,7 @@ function init(){
              'Weight: '+(state.gsmCustom?state.gsmCustom+' gsm (customer specified)':state.gsm+' gsm'),
              'Colour: '+state.colour.name,
              'Technique: '+(state.techniqueCustom?state.techniqueCustom+' (customer specified)':state.technique.name),
+      (function(){var q=state.moved?boxPercent():null; return q?'Logo position: '+q.cx+'% across, '+q.cy+'% down the garment, '+q.w+'% of its width (set by the customer)':null;})(),
              'Placement: '+(state.placement?state.placement.name:'-'),
              'Artwork: '+(state.logoName||'not supplied')].join('\n');
     var fd=new FormData(form);
