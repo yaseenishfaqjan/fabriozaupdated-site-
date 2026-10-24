@@ -134,6 +134,13 @@ has  /clothing-manufacturer-uk '<title>Clothing Manufacturer for UK Brands' "UK 
 has  /blog/clothing-manufacturer-uk-brands 'Importing Clothes from Pakistan to the UK' "UK blog post retargeted"
 lacks /blog/clothing-manufacturer-uk-brands 'Clothing Manufacturer for UK Brands' "UK blog post no longer competes"
 
+has  /clothing-manufacturer-usa '<title>Clothing Manufacturer for USA Brands' "USA landing page keeps the commercial phrase"
+has  /blog/clothing-manufacturer-usa-brands 'US Clothing Import Duty' "USA blog post retargeted"
+lacks /blog/clothing-manufacturer-usa-brands 'Clothing Manufacturer for USA Brands' "USA blog post no longer competes"
+has  /clothing-manufacturer-australia '<title>Clothing Manufacturer for Australian Brands' "AU landing page keeps the commercial phrase"
+has  /blog/clothing-manufacturer-australia-brands 'Importing Clothing to Australia' "AU blog post retargeted"
+lacks /blog/clothing-manufacturer-australia-brands 'Clothing Manufacturer for Australian Brands' "AU blog post no longer competes"
+
 hdr "Lead alerts (server side)"
 ssh -o ConnectTimeout=15 "$VPS" \
   "docker exec fabrioza-web grep -c crm_notify_whatsapp /var/www/html/api/db.php" >/dev/null 2>&1 \
