@@ -59,8 +59,13 @@ $utmMedium   = mb_substr(sanitize($data['utm_medium'] ?? ''), 0, 120);
 $utmCampaign = mb_substr(sanitize($data['utm_campaign'] ?? ''), 0, 120);
 $gclid       = mb_substr(sanitize($data['gclid'] ?? ''), 0, 200);
 $fbclid      = mb_substr(sanitize($data['fbclid'] ?? ''), 0, 200);
-$referrer    = mb_substr(sanitize($data['referrer'] ?? ''), 0, 400);
-$landingPage = mb_substr(sanitize($data['landing_page'] ?? ''), 0, 200);
+/* These two are URLs, and sanitize() escapes & as &amp; - correct for a
+   name or a message, wrong for a query string, which came back stored as
+   ...?utm_source=google&amp;utm_medium=cpc. Only the ampersand is undone:
+   it cannot open a tag, so the value stays safe to echo while being a
+   real URL again. < > " and ' remain escaped. */
+$referrer    = str_replace('&amp;', '&', mb_substr(sanitize($data['referrer'] ?? ''), 0, 400));
+$landingPage = str_replace('&amp;', '&', mb_substr(sanitize($data['landing_page'] ?? ''), 0, 200));
 $sourcePage  = mb_substr(sanitize($data['source_page'] ?? ($_SERVER['HTTP_REFERER'] ?? '')), 0, 300);
 
 if ($clientName === '') { http_response_code(400); echo json_encode(['success' => false, 'message' => 'Your name is required']); exit; }
