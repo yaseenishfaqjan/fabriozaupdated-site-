@@ -62,6 +62,15 @@ foreach ($SEQUENCES as $formType => $rules) {
              WHERE form_type = ? AND status = ? AND sequences_paused = 0
                AND created_at <= datetime('now', ?)
                AND created_at >  datetime('now', ?)      -- don't mail ancient leads on first rollout
+               -- NOTE: this deliberately matches the log row whatever its
+               -- status, so a FAILED attempt also blocks a retry. That looks
+               -- like a bug and is not one. The mail host banned this server
+               -- from 8 Sep to 22 Oct 2026; the sequence ran every morning
+               -- through it and logged ~70 failures. Tightening this to
+               -- status = 'sent' would unblock all of them at once and fire
+               -- a day-3 nudge at people
+               -- whose enquiry is a month old and who are getting a personal
+               -- reply instead. Leave it.
                AND id NOT IN (SELECT lead_id FROM email_log WHERE lead_id IS NOT NULL AND subject LIKE ?)");
         $st->execute([$formType, $onlyStatus, "-$days days", '-' . ($days + 14) . ' days', "$tag%"]);
         foreach ($st->fetchAll() as $lead) {
