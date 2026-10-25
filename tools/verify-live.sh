@@ -68,6 +68,12 @@ if [ "${1:-}" = "--deploy" ]; then
   git push origin HEAD || { echo "push failed"; exit 1; }
   ssh "$VPS" 'cd /opt/fabrioza && git pull --ff-only && docker compose up -d --build' \
     2>&1 | tail -4
+  # CLAUDE.md asks for this after any SEO-relevant deploy, and it was missed
+  # every time on 24 Oct, so it runs here rather than relying on memory. One
+  # POST tells Bing and Yandex to recrawl - and Bing is what ChatGPT
+  # searches, which is where 15 of the 16 attributed leads came from.
+  hdr "IndexNow"
+  curl -s --max-time 120 https://fabrioza.com/indexnow.php | sed 's/^/  /'
 fi
 
 hdr "Commit in sync"
