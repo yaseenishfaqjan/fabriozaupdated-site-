@@ -1247,6 +1247,43 @@ body:not(:has(.scroll-top)) .wa-fab{bottom:24px}
 @media(max-width:768px){.wa-fab{bottom:74px;right:16px;width:50px;height:50px}
 body:not(:has(.scroll-top)) .wa-fab{bottom:16px}}
 @media print{.wa-fab{display:none}}
+/* --- inline landed-cost quote form (added 24 Oct 2026) --------------
+   Light theme on purpose: these pages are #f8f9fa, unlike /brand-launch
+   which is dark. The 16px input size on mobile is NOT cosmetic - iOS
+   Safari auto-zooms any input under 16px and the page jumps. */
+.lq-form{background:#fff;border-radius:12px;padding:26px;margin-top:24px;text-align:left;box-shadow:0 2px 14px rgba(0,0,0,.10)}
+.lq-form .r{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.lq-form label{display:block;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:#5d6b62;margin-bottom:6px;font-weight:600}
+.lq-form input[type=text],.lq-form input[type=email],.lq-form textarea{width:100%;background:#fff;border:1px solid #cfd8d2;color:#1a1a1a;padding:11px 12px;border-radius:8px;font-size:15px;font-family:inherit;margin-bottom:14px;line-height:1.5}
+.lq-form input[type=text]:focus,.lq-form input[type=email]:focus,.lq-form textarea:focus{outline:none;border-color:#4A7C59;box-shadow:0 0 0 3px rgba(74,124,89,.16)}
+.lq-form textarea{min-height:92px;resize:vertical}
+.lq-form label.lq-consent{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:#55605a;line-height:1.6;margin-bottom:16px;text-transform:none;letter-spacing:normal;font-weight:400}
+.lq-form label.lq-consent span{text-transform:none;letter-spacing:normal}
+.lq-consent input{margin-top:3px;width:16px;height:16px;flex:0 0 auto;accent-color:#4A7C59}
+.lq-btn{display:inline-block;width:100%;background:#4A7C59;color:#fff;border:0;padding:14px 28px;border-radius:10px;font-weight:700;font-size:1rem;font-family:inherit;cursor:pointer;transition:background .2s}
+.lq-btn:hover:not(:disabled){background:#3d6749}
+.lq-btn:disabled{opacity:.65;cursor:default}
+.lq-msg{margin-top:13px;font-size:13.5px;line-height:1.6}
+.lq-msg.ok{color:#2d5a3d;font-weight:600}
+.lq-msg.err{color:#b4472e}
+.lq-alt{margin-top:14px;font-size:12.5px;color:rgba(255,255,255,.85);text-align:center}
+.lq-alt a{background:none;background-color:transparent;padding:0;border-radius:0;display:inline;font-weight:600;color:#fff;text-decoration:underline}
+@media(max-width:768px){
+.lq-form{padding:18px}
+.lq-form .r{grid-template-columns:1fr}
+.lq-form input[type=text],.lq-form input[type=email],.lq-form textarea{font-size:16px}
+}
+
+/* --- pre-footer enquiry section (added 25 Oct 2026) -------------------
+   Declares its own background instead of inheriting the page's. These 56
+   pages are not one theme - /brand-launch and others are dark - and the
+   donor form is light by design, so it is given a surface it can rely on
+   rather than whatever happens to be behind it. */
+.lq-section{background:#f8f9fa;padding:52px 0;margin-top:48px;border-top:1px solid #e8e8e8}
+.lq-section .container{max-width:760px}
+.lq-section h2{color:#1a1a1a;font-size:1.5rem;margin:0 0 8px;text-align:center}
+.lq-section .lq-lede{color:#555;margin:0;text-align:center;font-size:1rem}
+@media(max-width:768px){.lq-section{padding:36px 0;margin-top:32px}}
 </style>
 <meta name="keywords" content="basketball uniforms manufacturer, custom basketball jerseys, custom basketball kits wholesale, reversible basketball uniforms, youth basketball uniforms, sublimated basketball jerseys, basketball team kit low MOQ, custom basketball shorts">
 <meta property="og:type" content="website">
@@ -1423,6 +1460,18 @@ body:not(:has(.scroll-top)) .wa-fab{bottom:16px}}
   </div>
 </section>
 
+
+<section class="lq-section">
+  <div class="container">
+    <h2>Get a quote in 24 hours</h2>
+    <p class="lq-lede">Send your design and quantities and we reply within one working
+      day with unit price, lead time and landed cost. No account, no obligation.</p>
+    <form class="lq-form" id="lqForm" novalidate><div class="r"><div><label for="lqName">Your name *</label><input id="lqName" name="name" type="text" required></div><div><label for="lqEmail">Email *</label><input id="lqEmail" name="email" type="email" required></div></div><div class="r"><div><label for="lqCo">Brand or company</label><input id="lqCo" name="company" type="text"></div><div><label for="lqQty">Quantity</label><input id="lqQty" name="quantity" type="text" placeholder="e.g. 100 pieces"></div></div><label for="lqMsg">What are you making?</label><textarea id="lqMsg" name="message" placeholder="Garment type, fabric, decoration &mdash; or just your idea. Tell us your commodity code if you have it and we will confirm your duty rate."></textarea><label class="lq-consent"><input type="checkbox" name="privacy" required><span>I understand FABRIOZA will use these details to reply to my enquiry and prepare a quote. *</span></label><button class="lq-btn" id="lqBtn" type="submit">Get my UK landed-cost quote</button><div class="lq-msg" id="lqMsg2" role="status" aria-live="polite"></div></form>
+    <p class="lq-alt">Prefer email? <a href="mailto:info@fabrioza.com">info@fabrioza.com</a>
+      &mdash; we reply within one working day.</p>
+  </div>
+</section>
+
 <footer class="footer">
   <div class="container">
     <p>FABRIOZA - Premium Basketball Uniform Manufacturing | info@fabrioza.com</p>
@@ -1430,5 +1479,40 @@ body:not(:has(.scroll-top)) .wa-fab{bottom:16px}}
 </footer>
 
 <a class="wa-fab" href="https://wa.me/923124815601?text=Hi%20FABRIOZA%2C%20I%20would%20like%20a%20quote.%20%28via%20fabrioza.com%2Fbasketball-kits%29" target="_blank" rel="noopener noreferrer" aria-label="Message FABRIOZA on WhatsApp" title="Message us on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0 0 20.465 3.488"/></svg></a>
+<script>
+/* Inline quote form. Mirrors the working /brand-launch handler rather than
+   inventing a second one. country is stamped server-side-ready here because
+   this page IS the country - it was empty on 80 of 82 leads before. */
+(function(){
+ var f=document.getElementById('lqForm'); if(!f) return;
+ f.addEventListener('submit',function(ev){
+  ev.preventDefault();
+  var m=document.getElementById('lqMsg2'), b=document.getElementById('lqBtn');
+  var label=b.textContent;
+  m.className='lq-msg'; m.textContent='';
+  if(!f.checkValidity()){f.reportValidity();return}
+  var d=new FormData(f);
+  var body={form_type:'Quote',name:d.get('name')||'',email:d.get('email')||'',
+    company:d.get('company')||'',country:'United Kingdom',product_type:'Custom clothing (UK)',
+    quantity:d.get('quantity')||'',message:d.get('message')||'',
+    source_page:'/basketball-kits',gdpr_consent:d.get('privacy')?true:false};
+  if(window.fabAttribution) window.fabAttribution(body);
+  b.disabled=true; b.textContent='Sending…';
+  fetch('/api/csrf.php',{credentials:'same-origin'}).then(function(r){return r.json()})
+   .then(function(t){body.csrf=t.token;
+     return fetch('/api/send-email.php',{method:'POST',credentials:'same-origin',
+       headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})})
+   .then(function(r){return r.json()}).then(function(j){
+     b.disabled=false; b.textContent=label;
+     if(j&&j.success){m.className='lq-msg ok';
+       m.textContent='Thank you — we reply within one working day with your unit price, shipping and landed cost.';
+       f.reset();}
+     else {m.className='lq-msg err'; m.textContent=(j&&j.message)||'Something went wrong. Please email info@fabrioza.com.'}})
+   .catch(function(){b.disabled=false;b.textContent=label;
+     m.className='lq-msg err';
+     m.textContent='We could not send that. Please email info@fabrioza.com.'});
+ });
+})();
+</script>
 </body>
 </html>
