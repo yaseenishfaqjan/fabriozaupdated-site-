@@ -44,7 +44,15 @@ page() {  # page <path>  -> prints the local file holding that page body
   local p="$1"
   local f
   f="$TMP/$(printf '%s' "$p" | tr '/' '_')"
-  [ -s "$f" ] || curl -fsS --max-time 30 "$SITE$p" -o "$f" 2>/dev/null || : >"$f"
+# -L matters here. fabrioza.com canonicalises to the NO-SLASH form, so any
+# path written with a trailing slash 301s. Without -L curl saves the 366-byte
+# redirect stub, and because that stub is NOT empty, fetched() is satisfied -
+# so "lacks" greps the stub, finds nothing, and reports PASS. A check that
+# cannot fail. (Measured 28 Oct 2026 on /sustainable-fashion/ while verifying
+# a claim removal: all three greps returned 0 against the stub.) code() is
+# deliberately left WITHOUT -L, so it still asserts the status of the URL as
+# written rather than the status at the end of a chain.
+  [ -s "$f" ] || curl -fsSL --max-time 30 "$SITE$p" -o "$f" 2>/dev/null || : >"$f"
   printf '%s' "$f"
 }
 # An unfetchable page must FAIL both ways. The first version let "lacks"
