@@ -74,14 +74,48 @@ code() {
 if [ "${1:-}" = "--deploy" ]; then
   hdr "Deploying"
   git push origin HEAD || { echo "push failed"; exit 1; }
-  ssh "$VPS" 'cd /opt/fabrioza && git pull --ff-only && docker compose up -d --build' \
-    2>&1 | tail -4
+
+  # pipefail is set, but nothing examined this pipeline's status, so a failed
+  # pull or a broken image build used to scroll past inside tail's four lines
+  # and the script went on to "verify" a deploy that never happened - then
+  # reported PASS on 73 checks describing the OLD content. Capture, check,
+  # then print.
+  if ! deploy_out=$(ssh -o ConnectTimeout=20 -o BatchMode=yes "$VPS" \
+        'cd /opt/fabrioza && git pull --ff-only && docker compose up -d --build' 2>&1); then
+    printf '%s\n' "$deploy_out" | tail -15 | sed 's/^/  /'
+    printf '\n  \033[31mDEPLOY FAILED\033[0m  the VPS was not updated, so nothing below would mean anything.\n\n'
+    exit 1
+  fi
+  printf '%s\n' "$deploy_out" | tail -4 | sed 's/^/  /'
+
   # CLAUDE.md asks for this after any SEO-relevant deploy, and it was missed
   # every time on 24 Oct, so it runs here rather than relying on memory. One
   # POST tells Bing and Yandex to recrawl - and Bing is what ChatGPT
   # searches, which is where 15 of the 16 attributed leads came from.
+  #
+  # indexnow.php is a web PAGE, not a command: it exits 0 whatever happens
+  # and the outcome is only in its text. On 1 Nov 2026 it printed
+  # "HTTP status: 0" and this script still finished "73 passed, 0 failed" -
+  # Bing had been told nothing. Match the success string and route it
+  # through b() so it reaches the tally and the exit code.
+  #
+  # One retry, because that failure was transient and the immediate retry
+  # returned 200 - same reasoning as sshq() above. It still fails if both
+  # attempts fail; the retry removes false reds, it does not hide a real one.
   hdr "IndexNow"
-  curl -s --max-time 120 https://fabrioza.com/indexnow.php | sed 's/^/  /'
+  idx=""
+  for attempt in 1 2; do
+    idx=$(curl -s --max-time 120 "$SITE/indexnow.php" 2>&1)
+    case "$idx" in *"SUCCESS:"*) break ;; esac
+    [ "$attempt" = "1" ] && sleep 5
+  done
+  printf '%s\n' "$idx" | sed 's/^/  /'
+  case "$idx" in
+    *"SUCCESS:"*)
+      g "IndexNow accepted the submission" ;;
+    *)
+      b "IndexNow did NOT accept it - Bing will not recrawl until this is re-run" ;;
+  esac
 fi
 
 hdr "Commit in sync"
