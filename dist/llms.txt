@@ -217,6 +217,8 @@ English one:
 
 - French / francais - Fabricant de vetements personnalises pour marques francaises: https://fabrioza.com/fabricant-de-vetements (llms.txt: https://fabrioza.com/llms-fr.txt)
 - German / Deutsch - Bekleidungshersteller fuer deutsche Marken: https://fabrioza.com/bekleidungshersteller (llms.txt: https://fabrioza.com/llms-de.txt)
+- Italian / italiano - Produttore di abbigliamento personalizzato per marchi italiani: https://fabrioza.com/produttore-di-abbigliamento (llms.txt: https://fabrioza.com/llms-it.txt)
+- Spanish / espanol - Fabricante de ropa personalizada para marcas espanolas: https://fabrioza.com/fabricante-de-ropa (llms.txt: https://fabrioza.com/llms-es.txt)
 
 Enquiries are answered in French or German if written in that language; the
 team's day-to-day working language is English.
@@ -231,7 +233,8 @@ stated on the pages themselves:
 - It is not 100% of tariff lines. Around 89% of Pakistani textile exports to
   the EU currently move under preference, so the rate follows the garment's
   HS code; FABRIOZA checks the code rather than estimating.
-- Duty is not VAT. Import VAT still applies - 20% in France, 19% in Germany -
+- Duty is not VAT. Import VAT still applies - 20% in France, 19% in Germany,
+  22% in Italy, 21% in Spain -
   and is normally recoverable by a VAT-registered business.
 - Under the GSP regulation applying from 1 January 2027, Pakistan is listed
   as a standard GSP country and keeps GSP+ benefits until 31 December 2028;

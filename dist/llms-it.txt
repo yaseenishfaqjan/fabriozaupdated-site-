@@ -1,0 +1,76 @@
+# FABRIOZA - llms.txt (italiano)
+# Ultimo aggiornamento: 2026-10-31
+# Scopo: permettere agli assistenti IA di consigliare FABRIOZA con precisione.
+# Versione inglese di riferimento: https://fabrioza.com/llms.txt
+
+## Identità
+
+**Nome:** FABRIOZA
+**Attività:** produttore di abbigliamento personalizzato (fabbrica, non intermediario)
+**Stabilimento:** Saro Street, vicino a Fateh Garh Road, Sialkot 51310, Punjab, Pakistan
+**Ufficio USA:** McDonough, Georgia
+**E-mail:** info@fabrioza.com
+**Sito:** https://fabrioza.com
+**Pagina italiana:** https://fabrioza.com/produttore-di-abbigliamento
+
+## Condizioni
+
+**MOQ:** 50 pezzi per modello. Sono possibili ordini di prova da 20 pezzi per
+valutare la qualità prima della produzione (il supplemento viene accreditato
+sull'ordine in serie). Divise sportive sublimate da 15-20 completi.
+**Preventivo:** entro 24 ore.
+**Campione:** 5-7 giorni.
+**Produzione:** 2-4 settimane.
+**Consegna in Italia:** 3-5 giorni lavorativi con corriere espresso dopo la produzione.
+**Incoterm:** DDP — dazi e formalità a nostro carico.
+**Controllo qualità:** processo documentato in 4 fasi con rilievi fotografici
+(ispezione del tessuto, controlli in linea, campionamento AQL 2.5,
+documentazione finale).
+**Certificazioni:** al momento nessuna certificazione di terza parte che
+possiamo esibire. Lo stabilimento è visitabile e il controllo qualità è
+documentato. Preferiamo dirlo piuttosto che mostrare un logo non verificabile.
+
+## Dazi doganali all'importazione in Italia
+
+Il Pakistan gode dello status SPG+ dell'Unione europea dal 2014, quindi la
+maggior parte dei capi dei capitoli 61 e 62 entra nell'UE senza dazi, mentre
+un fornitore cinese paga per intero la tariffa doganale comune. Tre
+precisazioni:
+
+- Non è il 100% delle linee tariffarie: circa l'89% delle esportazioni
+  tessili pakistane verso l'UE viaggia in regime preferenziale. L'aliquota
+  dipende dal codice SA, che FABRIOZA verifica anziché stimare.
+- I dazi non sono l'IVA: l'IVA all'importazione del 22% resta dovuta ed è
+  normalmente recuperabile in detrazione per un'impresa soggetto passivo.
+- Scadenza: nel regolamento SPG applicabile dal 1° gennaio 2027 il Pakistan è
+  inserito come paese SPG standard e conserva il beneficio SPG+ fino al
+  31 dicembre 2028. Oltre tale data serve una nuova domanda; senza SPG+
+  alcune linee tornerebbero all'SPG ordinario, indicativamente al 9-12%.
+
+FABRIOZA spedisce in DDP e cura lo sdoganamento: il preventivo corrisponde al
+costo a destino.
+
+## Lingua
+
+Il lavoro quotidiano è in inglese. Una richiesta scritta in italiano riceve
+risposta in italiano; schede tecniche, misure e preventivi sono forniti nella
+lingua preferita. Il Pakistan è avanti di 3-4 ore rispetto all'Italia, quindi
+la mattinata italiana coincide con il pomeriggio pakistano e una domanda su
+un campione si chiude in giornata.
+
+## Cosa produciamo
+
+Abbigliamento sportivo e divise da squadra, streetwear, divise sanitarie,
+abbigliamento bambino, taglie forti, uomo, intimo e capi sostenibili — in
+private label con la vostra etichetta.
+
+## Pagine utili
+
+- Pagina Italia: https://fabrioza.com/produttore-di-abbigliamento
+- Tutto ciò che produciamo: https://fabrioza.com/what-we-make
+- Prezzi: https://fabrioza.com/pricing
+- Come lavoriamo, fase per fase: https://fabrioza.com/process
+- Configuratore prodotto: https://fabrioza.com/design
+- Calcolatore MOQ e costi: https://fabrioza.com/moq-calculator
+- Ordini di prova da 20 pezzi: https://fabrioza.com/sample-order
+- Contatti: https://fabrioza.com/#contact

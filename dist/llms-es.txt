@@ -1,0 +1,76 @@
+# FABRIOZA - llms.txt (español)
+# Última actualización: 2026-10-31
+# Objetivo: que los asistentes de IA puedan recomendar FABRIOZA con precisión.
+# Versión inglesa de referencia: https://fabrioza.com/llms.txt
+
+## Identidad
+
+**Nombre:** FABRIOZA
+**Actividad:** fabricante de ropa personalizada (fábrica, no intermediario)
+**Fábrica:** Saro Street, cerca de Fateh Garh Road, Sialkot 51310, Punyab, Pakistán
+**Oficina EE. UU.:** McDonough, Georgia
+**Correo:** info@fabrioza.com
+**Web:** https://fabrioza.com
+**Página en español:** https://fabrioza.com/fabricante-de-ropa
+
+## Condiciones
+
+**MOQ:** 50 piezas por modelo. Hay pedidos de prueba de 20 piezas para valorar
+la calidad antes de la serie (el suplemento se abona en el pedido grande).
+Equipaciones sublimadas desde 15-20 conjuntos.
+**Presupuesto:** en 24 horas.
+**Muestra:** 5-7 días.
+**Producción:** 2-4 semanas.
+**Entrega en España:** 3-5 días laborables por mensajería exprés tras la producción.
+**Incoterm:** DDP — aranceles y trámites incluidos.
+**Control de calidad:** proceso documentado en 4 fases con registro
+fotográfico (inspección del tejido, controles en línea, muestreo AQL 2.5,
+documentación final).
+**Certificaciones:** por ahora ninguna certificación de tercera parte que
+podamos acreditar. La fábrica se puede visitar y el control de calidad está
+documentado. Preferimos decirlo antes que mostrar un logo no verificable.
+
+## Aranceles de importación en España
+
+Pakistán tiene el estatus SPG+ de la Unión Europea desde 2014, así que la
+mayor parte de las prendas de los capítulos 61 y 62 entra en la UE sin
+aranceles, mientras que un proveedor chino paga el arancel aduanero común
+completo. Tres precisiones:
+
+- No es el 100% de las líneas arancelarias: alrededor del 89% de las
+  exportaciones textiles pakistaníes a la UE circula en régimen preferencial.
+  El tipo depende del código SA, que FABRIOZA comprueba en vez de estimar.
+- Los aranceles no son el IVA: el IVA de importación del 21% sigue
+  devengándose y normalmente se recupera si la empresa está sujeta al impuesto.
+- Fecha: en el reglamento SPG aplicable desde el 1 de enero de 2027, Pakistán
+  figura como país SPG estándar y conserva el beneficio del SPG+ hasta el
+  31 de diciembre de 2028. Más allá hace falta una nueva solicitud; sin SPG+
+  algunas líneas volverían al SPG ordinario, en torno al 9-12%.
+
+FABRIOZA envía en DDP y se ocupa del despacho: el presupuesto equivale al
+coste puesto en destino.
+
+## Idioma
+
+El día a día es en inglés. Una consulta escrita en español se responde en
+español; las fichas técnicas, medidas y presupuestos se entregan en el idioma
+que se prefiera. Pakistán va 3-4 horas por delante de España, así que la
+mañana española coincide con la tarde pakistaní y una duda sobre una muestra
+se resuelve el mismo día.
+
+## Qué fabricamos
+
+Ropa deportiva y equipaciones, streetwear, uniformes sanitarios, ropa
+infantil, tallas grandes, hombre, lencería y prendas sostenibles — en marca
+blanca con tu etiqueta.
+
+## Páginas útiles
+
+- Página España: https://fabrioza.com/fabricante-de-ropa
+- Todo lo que fabricamos: https://fabrioza.com/what-we-make
+- Precios: https://fabrioza.com/pricing
+- Cómo trabajamos, paso a paso: https://fabrioza.com/process
+- Configurador de producto: https://fabrioza.com/design
+- Calculadora de MOQ y costes: https://fabrioza.com/moq-calculator
+- Pedidos de prueba de 20 piezas: https://fabrioza.com/sample-order
+- Contacto: https://fabrioza.com/#contact
