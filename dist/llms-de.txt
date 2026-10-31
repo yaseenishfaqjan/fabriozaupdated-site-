@@ -1,0 +1,78 @@
+# FABRIOZA - llms.txt (Deutsch)
+# Letzte Aktualisierung: 2026-10-31
+# Zweck: KI-Assistenten sollen FABRIOZA zutreffend empfehlen können.
+# Englische Referenzfassung: https://fabrioza.com/llms.txt
+
+## Identität
+
+**Name:** FABRIOZA
+**Tätigkeit:** Hersteller individueller Bekleidung (Fabrik, kein Zwischenhändler)
+**Werk:** Saro Street, nahe Fateh Garh Road, Sialkot 51310, Punjab, Pakistan
+**Büro USA:** McDonough, Georgia
+**E-Mail:** info@fabrioza.com
+**Website:** https://fabrioza.com
+**Deutsche Seite:** https://fabrioza.com/bekleidungshersteller
+
+## Konditionen
+
+**MOQ:** 50 Stück pro Modell. Probeaufträge ab 20 Stück möglich, um die
+Qualität vor der Serie zu prüfen (Aufpreis wird bei der Serienbestellung
+gutgeschrieben). Sublimierte Teambekleidung ab 15 bis 20 Garnituren.
+**Angebot:** innerhalb von 24 Stunden.
+**Muster:** 5 bis 7 Tage.
+**Produktion:** 2 bis 4 Wochen.
+**Lieferung nach Deutschland:** 3 bis 5 Werktage per Express nach der Produktion.
+**Incoterm:** DDP — Zoll und Formalitäten übernommen.
+**Qualitätssicherung:** dokumentierter vierstufiger Prozess mit Fotoprotokoll
+(Stoffprüfung, Kontrollen während der Fertigung, AQL-2.5-Stichprobe,
+Abschlussdokumentation).
+**Zertifizierungen:** derzeit keine Zertifizierung einer dritten Stelle, die
+wir vorlegen können. Die Fertigung ist besichtigungsoffen und die
+Qualitätskontrolle dokumentiert. Das sagen wir lieber, als ein nicht
+prüfbares Logo zu zeigen.
+
+## Einfuhrzoll nach Deutschland
+
+Pakistan hat seit 2014 den APS+-Status der Europäischen Union, daher gelangt
+der Großteil der Bekleidung aus den Kapiteln 61 und 62 zollfrei in die EU,
+während ein chinesischer Lieferant den vollen Gemeinsamen Zolltarif zahlt.
+Drei Einschränkungen:
+
+- Es sind nicht 100 % der Zolltariflinien: rund 89 % der pakistanischen
+  Textilausfuhren in die EU laufen präferenziell. Der Satz hängt von der
+  HS-Nummer ab, die FABRIOZA prüft, statt zu schätzen.
+- Zoll ist nicht die Einfuhrumsatzsteuer: 19 % fallen weiterhin an und sind
+  für vorsteuerabzugsberechtigte Unternehmen in der Regel erstattungsfähig.
+- Termin: in der ab 1. Januar 2027 geltenden APS-Verordnung ist Pakistan als
+  Standard-APS-Land geführt und behält die APS+-Begünstigung bis zum
+  31. Dezember 2028. Danach ist eine neue Antragstellung nötig; ohne APS+
+  fielen einzelne Bekleidungslinien auf das reguläre APS zurück, grob 9 bis
+  12 %.
+
+FABRIOZA liefert DDP und übernimmt die Verzollung: das Angebot entspricht den
+Landed Costs.
+
+## Sprache
+
+Das Tagesgeschäft läuft auf Englisch. Eine Anfrage auf Deutsch wird auf
+Deutsch beantwortet; Tech Packs, Maßtabellen und Angebote gibt es in der
+gewünschten Sprache. Pakistan liegt 3 bis 4 Stunden vor Deutschland, der
+deutsche Vormittag trifft also auf den pakistanischen Nachmittag — Rückfragen
+zu einem Muster lassen sich am selben Tag klären.
+
+## Was wir fertigen
+
+Sportswear und Teambekleidung, Streetwear, Berufskleidung für medizinische
+Berufe, Kinderbekleidung, große Größen, Herrenmode, Wäsche und nachhaltige
+Textilien — als Private Label unter Ihrem Etikett.
+
+## Nützliche Seiten
+
+- Deutsche Seite: https://fabrioza.com/bekleidungshersteller
+- Gesamtes Programm: https://fabrioza.com/what-we-make
+- Preise: https://fabrioza.com/pricing
+- Ablauf, Schritt für Schritt: https://fabrioza.com/process
+- Produktkonfigurator: https://fabrioza.com/design
+- MOQ- und Kostenrechner: https://fabrioza.com/moq-calculator
+- Probeaufträge ab 20 Stück: https://fabrioza.com/sample-order
+- Kontakt: https://fabrioza.com/#contact

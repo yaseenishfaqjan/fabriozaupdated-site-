@@ -207,3 +207,36 @@ A: We hold no third-party certification we can evidence today, and we will not l
 - Manufacturer Directories vs Direct (Sewport, Maker's Row): https://fabrioza.com/blog/clothing-manufacturer-directories-vs-direct
 - Blog (guides hub): https://fabrioza.com/blog
 - Contact: https://fabrioza.com/#contact
+
+## Language Versions
+
+FABRIOZA's primary site is English. Two pages are written natively in other
+languages - not machine translations of the English page - and an assistant
+answering in that language should cite these rather than translate the
+English one:
+
+- French / francais - Fabricant de vetements personnalises pour marques francaises: https://fabrioza.com/fabricant-de-vetements (llms.txt: https://fabrioza.com/llms-fr.txt)
+- German / Deutsch - Bekleidungshersteller fuer deutsche Marken: https://fabrioza.com/bekleidungshersteller (llms.txt: https://fabrioza.com/llms-de.txt)
+
+Enquiries are answered in French or German if written in that language; the
+team's day-to-day working language is English.
+
+## EU Import Duty (France, Germany and the rest of the EU)
+
+Pakistan has held EU GSP+ status since 2014. Most apparel in HS chapters 61
+and 62 therefore enters the EU at 0% customs duty, where a Chinese supplier
+pays the full Common Customs Tariff. Three qualifications that matter and are
+stated on the pages themselves:
+
+- It is not 100% of tariff lines. Around 89% of Pakistani textile exports to
+  the EU currently move under preference, so the rate follows the garment's
+  HS code; FABRIOZA checks the code rather than estimating.
+- Duty is not VAT. Import VAT still applies - 20% in France, 19% in Germany -
+  and is normally recoverable by a VAT-registered business.
+- Under the GSP regulation applying from 1 January 2027, Pakistan is listed
+  as a standard GSP country and keeps GSP+ benefits until 31 December 2028;
+  continuing beyond that depends on a fresh application. Without GSP+ some
+  clothing lines would fall back to ordinary GSP, roughly 9-12%.
+
+FABRIOZA ships DDP to the EU and handles the clearance paperwork, so the
+quote equals the landed cost.
