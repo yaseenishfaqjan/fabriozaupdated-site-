@@ -14,6 +14,9 @@ require __DIR__ . '/lib/Exception.php';
 require __DIR__ . '/lib/PHPMailer.php';
 require __DIR__ . '/lib/SMTP.php';
 require __DIR__ . '/db.php';
+// After the lib requires, not before - see process-sequences.php.
+require_once __DIR__ . '/mailer.php';   // fab_send(): Resend first, SMTP fallback
+
 
 $db = crm_db();
 $new = $db->query("SELECT id,name,company,form_type,lead_score FROM leads
@@ -43,22 +46,24 @@ $port = (int)(getenv('SMTP_PORT') ?: 587);
 $user = getenv('SMTP_USER') ?: '';
 $pass = getenv('SMTP_PASS') ?: '';
 $tos = array_filter(array_map('trim', explode(',', getenv('MAIL_TO') ?: $user)));
-if ($pass === '') { fwrite(STDERR, "SMTP not configured\n"); exit(1); }
+// Was: exit if SMTP_PASS is empty. That is no longer the right test -
+// Resend alone is a perfectly good transport, and this guard would have
+// killed the digest on a box configured with Resend and no SMTP password.
+if ($pass === '' && !getenv('RESEND_API_KEY')) {
+    fwrite(STDERR, "no mail transport configured (set RESEND_API_KEY or SMTP_PASS)\n");
+    exit(1);
+}
 
 foreach ($tos as $to) {
     try {
-        $m = new PHPMailer(true);
-        $m->isSMTP(); $m->Host = $host; $m->SMTPAuth = true;
-        $m->Username = $user; $m->Password = $pass; $m->Port = $port;
-        $m->SMTPSecure = ($port === 587) ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
-        $m->CharSet = 'UTF-8'; $m->Timeout = 10;
-        $m->setFrom($user, 'FABRIOZA CRM');
-        $m->addAddress($to);
-        $m->isHTML(true);
-        $m->Subject = 'CRM digest: ' . count($new) . ' new, ' . count($overdue) . ' overdue - ' . gmdate('Y-m-d');
-        $m->Body = $body;
-        $m->send();
-        echo "digest sent to $to\n";
+        // Same migration as process-sequences.php: this was SMTP-only, so the
+        // owner's own daily digest stopped arriving whenever SMTP was down -
+        // including the whole 6-22 Oct blackout - with nothing to notice it by.
+        $subject = 'CRM digest: ' . count($new) . ' new, ' . count($overdue)
+                 . ' overdue - ' . gmdate('Y-m-d');
+        [$ok, $note] = fab_send($to, 'FABRIOZA', $subject, $body);
+        if (!$ok) { throw new Exception($note); }
+        echo "digest sent to $to" . ($note !== '' ? " ($note)" : '') . "\n";
     } catch (Exception $e) {
         fwrite(STDERR, "digest to $to failed: " . $e->getMessage() . "\n");
     }

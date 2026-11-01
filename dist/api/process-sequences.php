@@ -19,6 +19,11 @@ require __DIR__ . '/lib/Exception.php';
 require __DIR__ . '/lib/PHPMailer.php';
 require __DIR__ . '/lib/SMTP.php';
 require __DIR__ . '/db.php';
+// AFTER the lib requires above, never before: mailer.php pulls the same
+// PHPMailer files with require_once, and a plain require of them later
+// would fatal on "cannot redeclare".
+require_once __DIR__ . '/mailer.php';   // fab_send(): Resend first, SMTP fallback
+
 
 /* Sequence config: form_type => list of [day_offset, template, only_status] */
 $SEQUENCES = [
@@ -37,20 +42,16 @@ $user = getenv('SMTP_USER') ?: '';
 $pass = getenv('SMTP_PASS') ?: '';
 $dry  = in_array('--dry-run', $argv ?? [], true);
 
+// Was its own SMTP-only PHPMailer, which is why every sequence send failed
+// with "Could not connect to SMTP host" while the auto-reply went out fine
+// over Resend. Delegates to fab_send now - Resend first, SMTP fallback -
+// exactly like send-email.php. The signature is unchanged so the call site
+// below does not move; $host/$port/$user/$pass are ignored because fab_send
+// reads the same environment itself.
 function seqMail($host, $port, $user, $pass, $to, $toName, $subject, $body): array {
-    try {
-        $m = new PHPMailer(true);
-        $m->isSMTP(); $m->Host = $host; $m->SMTPAuth = true;
-        $m->Username = $user; $m->Password = $pass; $m->Port = $port;
-        $m->SMTPSecure = ($port === 587) ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
-        $m->CharSet = 'UTF-8'; $m->Timeout = 10;
-        $m->setFrom($user, 'FABRIOZA');
-        $m->addAddress($to, $toName);
-        $m->addReplyTo(getenv('MAIL_TO') ? explode(',', getenv('MAIL_TO'))[0] : $user, 'FABRIOZA');
-        $m->isHTML(true); $m->Subject = $subject; $m->Body = $body;
-        $m->AltBody = strip_tags($body);
-        return [$m->send(), ''];
-    } catch (Exception $e) { return [false, $e->getMessage()]; }
+    $replyTo = getenv('MAIL_TO') ? explode(',', getenv('MAIL_TO'))[0] : ($user ?: '');
+    [$ok, $note] = fab_send($to, $toName, $subject, $body, $replyTo, 'FABRIOZA');
+    return [$ok, $ok ? '' : $note];
 }
 
 $sent = $skipped = 0;
