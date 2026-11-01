@@ -225,6 +225,46 @@ sshq "docker exec fabrioza-web php -r 'echo (new PDO(\"sqlite:/var/data/fabrioza
 hdr "Lead alerts (server side)"
 sshq "docker exec fabrioza-web grep -c crm_notify_whatsapp /var/www/html/api/db.php" >/dev/null 2>&1 && g "WhatsApp fan-out is in the deployed db.php" || b "WhatsApp fan-out missing from the deployed db.php"
 
+hdr "Automated mail (cron)"
+# Nothing watched these until 1 Nov 2026. process-sequences.php and
+# daily-digest.php each opened their own PHPMailer straight to SMTP instead
+# of going through fab_send, so neither could ever reach Resend. Both failed
+# every morning for over a week - leads #93, #96 and #97 never got their
+# day-3 nudge and six consecutive digests never arrived - while this suite
+# reported 74 passed, 0 failed.
+
+# 1. Structural: no sender may bypass fab_send. mailer.php is the one
+#    legitimate exception, because smtpSend() lives there as the fallback.
+#    This is the check that stops a third sender repeating the mistake.
+bypass=$(sshq "docker exec fabrioza-web sh -c 'cd /var/www/html/api && grep -l -- \"->isSMTP()\" *.php 2>/dev/null | grep -v \"^mailer.php\$\" | tr \"\\n\" \" \"'" || true)
+# trim only the ends - tr -d ' ' would glue two filenames together and make
+# the failure message unreadable at exactly the moment it matters
+bypass=$(printf '%s' "$bypass" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+if [ -z "$bypass" ]; then
+  g "every api mailer goes through fab_send (Resend, SMTP fallback)"
+else
+  b "these bypass fab_send and can never reach Resend: $bypass"
+fi
+
+# 2. Behavioural: is mail working NOW. Deliberately "the newest row is not a
+#    failure" rather than "no failures in 48h" - the second stays red for a
+#    fault already fixed, and a check that cries wolf gets ignored. The 48h
+#    counts print either way so intermittent failures remain visible.
+#    The query is in dist/api/mail-health.php, not inlined, because nesting
+#    SQL through ssh -> docker -> php -r eats a level of quoting per layer.
+mailstat=$(sshq "docker exec fabrioza-web php /var/www/html/api/mail-health.php" || true)
+last_status=${mailstat%%|*}
+sent48=$(printf '%s' "$mailstat" | cut -d'|' -f2)
+failed48=$(printf '%s' "$mailstat" | cut -d'|' -f3)
+printf '        last 48h: %s sent, %s failed  |  newest entry: %s\n' \
+  "${sent48:-?}" "${failed48:-?}" "${last_status:-unreadable}"
+case "$last_status" in
+  sent)  g "mail transport is working (most recent send succeeded)" ;;
+  empty) g "mail transport untested (email_log is empty)" ;;
+  "")    b "could not read mail-health.php - cannot tell whether mail is working" ;;
+  *)     b "the most recent email FAILED ($last_status) - cron mail is down" ;;
+esac
+
 hdr "Result"
 printf '  %d passed, %d failed\n\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1
