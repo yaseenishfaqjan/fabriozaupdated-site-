@@ -13,6 +13,9 @@
 
 set -uo pipefail
 
+# Resolved from this script's own path so the checks that read repo files
+# work from any working directory, not just the repo root.
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SITE="https://fabrioza.com"
 VPS="root@209.145.55.76"
 PASS=0; FAIL=0
@@ -220,7 +223,18 @@ for p in / /blog/tech-pack-clothing-guide /clothing-manufacturer-uk /pricing; do
   has "$p" 'fabAttribution=function' "first-touch capture on $p"
 done
 has /clothing-manufacturer-uk 'fabAttribution(body)' "inline form attaches attribution"
-sshq "docker exec fabrioza-web php -r 'echo (new PDO(\"sqlite:/var/data/fabrioza_crm.db\"))->query(\"PRAGMA user_version\")->fetchColumn();'"   | grep -q '^5$' && g "CRM schema is at migration 5 (attribution columns)"   || b "CRM schema is not at migration 5"
+# Derived, never hard-coded. This read `grep -q '^5$'` and went red the
+# moment migration 6 landed, reporting a fault on a database that was
+# perfectly correct - the same stale-constant trap as the "want 9" and
+# "want 11" checks before it. db.php declares the latest migration, so
+# ask db.php.
+want_ver=$(grep -o 'PRAGMA user_version = [0-9]*' "$REPO/dist/api/db.php" | grep -o '[0-9]*$' | sort -n | tail -1)
+live_ver=$(sshq "docker exec fabrioza-web php -r 'echo (new PDO(\"sqlite:/var/data/fabrioza_crm.db\"))->query(\"PRAGMA user_version\")->fetchColumn();'" || echo '')
+if [ -n "$want_ver" ] && [ "$live_ver" = "$want_ver" ]; then
+  g "CRM schema is at migration $want_ver (matches db.php)"
+else
+  b "CRM schema is at '${live_ver:-unreadable}' but db.php declares '${want_ver:-?}'"
+fi
 
 hdr "Lead alerts (server side)"
 sshq "docker exec fabrioza-web grep -c crm_notify_whatsapp /var/www/html/api/db.php" >/dev/null 2>&1 && g "WhatsApp fan-out is in the deployed db.php" || b "WhatsApp fan-out missing from the deployed db.php"
