@@ -124,13 +124,31 @@ $db = crm_db();
    messages stay in mail_seen so they are never re-imported. */
 if (in_array('--prune', $argv, true)) {
     $pruned = 0;
-    foreach ($db->query("SELECT id, email, message FROM leads WHERE form_type = 'Inbox Email'")->fetchAll() as $r) {
+    foreach ($db->query("SELECT id, email, message, status FROM leads WHERE form_type = 'Inbox Email'")->fetchAll() as $r) {
         $addr = strtolower($r['email']);
         $bad = in_array($addr, $SKIP_SENDERS, true);
         foreach ($SKIP_PATTERNS as $p) { if (!$bad && strpos($addr, $p) !== false) { $bad = true; } }
         // the stored message begins with the subject in quotes
         if (!$bad && preg_match('/^"([^"]*)"/', (string)$r['message'], $sm)
             && subject_is_junk($sm[1], $SKIP_SUBJECTS)) { $bad = true; }
+        /* A lead ACCUMULATES, and the rules above only ever see its first
+           imported message. Lead #11 was flagged as a calendar acceptance -
+           which its first message genuinely is - while having since gathered
+           4 notes and reached 'quoted', one of only six deals that ever got
+           that far. Deleting it would have taken the conversation with it.
+           So: classify on the first message, but never delete a row that has
+           accumulated anything. */
+        if ($bad) {
+            $hn = $db->prepare('SELECT COUNT(*) FROM notes WHERE lead_id = ?');
+            $hn->execute([$r['id']]);
+            $notes = (int)$hn->fetchColumn();
+            if ($notes > 0 || ($r['status'] ?? 'new') !== 'new') {
+                printf("  keeping #%s <%s> - junk first message, but %d note(s) and status '%s'
+",
+                       $r['id'], $r['email'], $notes, $r['status'] ?? '?');
+                $bad = false;
+            }
+        }
         if ($bad && $dry) {
             echo "DRY: would prune junk lead #{$r['id']} <{$r['email']}>\n";
             $pruned++;
