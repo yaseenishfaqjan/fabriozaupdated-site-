@@ -131,6 +131,18 @@ function crm_db(): PDO {
         $pdo->exec('PRAGMA user_version = 5');
         $version = 5;
     }
+    if ($version < 6) {
+        // What a won lead was worth. The pipeline and reports.php already
+        // tracked every STAGE; nothing recorded an AMOUNT, so the reports
+        // could say how many deals and never how much money - or which
+        // channel brings the money rather than merely the leads.
+        // Nullable deliberately: unknown is not zero. The existing rows have
+        // no figure and a 0 default would silently drag the average down.
+        try { $pdo->exec('ALTER TABLE leads ADD COLUMN order_value REAL'); }
+        catch (Throwable $e) { /* already present */ }
+        $pdo->exec('PRAGMA user_version = 6');
+        $version = 6;
+    }
     return $pdo;
 }
 

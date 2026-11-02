@@ -40,6 +40,22 @@ $cycle = $db->query("SELECT AVG(julianday(a.created_at) - julianday(l.created_at
     WHERE a.action = 'status_changed:won'")->fetchColumn();
 $cycleDays = $cycle !== null && $cycle !== false && $cycle !== '' ? round((float)$cycle, 1) : null;
 
+/* money. A won lead with no figure is counted separately rather than
+   averaged in as zero - with only a handful of wins, two blank ones would
+   halve the AOV and nothing on the page would explain why. */
+$wonTotal  = (int)$db->query("SELECT COUNT(*) FROM leads WHERE status = 'won'")->fetchColumn();
+$wonValued = (int)$db->query("SELECT COUNT(*) FROM leads WHERE status = 'won' AND order_value IS NOT NULL")->fetchColumn();
+$revenue   = (float)$db->query("SELECT COALESCE(SUM(order_value), 0) FROM leads WHERE status = 'won'")->fetchColumn();
+$aov       = $wonValued ? $revenue / $wonValued : null;
+
+/* revenue by source: "does this channel bring money", not merely "leads".
+   The open question this exists to answer - ChatGPT is 18% of all leads and
+   100% of the attributable ones, and nothing could say whether it pays. */
+$revBySrc = $db->query("SELECT COALESCE(NULLIF(form_type, ''), '(unknown)') src,
+        COUNT(*) n, COALESCE(SUM(order_value), 0) v
+    FROM leads WHERE status = 'won' GROUP BY src ORDER BY v DESC, n DESC")->fetchAll();
+$maxRev = max(array_map(fn($r) => (float)$r['v'], $revBySrc) ?: [1.0]) ?: 1.0;
+
 /* top countries */
 $countries = $db->query("SELECT COALESCE(NULLIF(country,''),'(not given)') c, COUNT(*) n
     FROM leads WHERE status != 'spam' GROUP BY c ORDER BY n DESC LIMIT 10")->fetchAll();
@@ -65,6 +81,34 @@ adm_head('Reports');
   <div class="bg-white rounded-2xl shadow p-5">
     <div class="text-3xl font-extrabold"><?= $funnel['won'] ?></div>
     <div class="text-sm text-stone-500">Total won</div></div>
+  <div class="bg-white rounded-2xl shadow p-5">
+    <div class="text-3xl font-extrabold"><?= $revenue > 0 ? '$' . number_format($revenue) : '&mdash;' ?></div>
+    <div class="text-sm text-stone-500">Revenue booked (won)</div></div>
+  <div class="bg-white rounded-2xl shadow p-5">
+    <div class="text-3xl font-extrabold"><?= $aov === null ? '&mdash;' : '$' . number_format($aov) ?></div>
+    <div class="text-sm text-stone-500">Average order value</div></div>
+</div>
+
+<?php if ($wonTotal > $wonValued): ?>
+  <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl p-4 mb-8 text-sm">
+    <strong><?= $wonTotal - $wonValued ?> of <?= $wonTotal ?> won deals have no order value recorded.</strong>
+    Revenue and AOV above cover only the <?= $wonValued ?> that do, so both are understated.
+    Set the figure on each lead&rsquo;s page to close the gap.
+  </div>
+<?php endif; ?>
+
+<div class="bg-white rounded-2xl shadow p-6 mb-8">
+  <h2 class="font-bold mb-1">Revenue by source</h2>
+  <p class="text-xs text-stone-400 mb-4">Won deals only. This is the one that says whether a channel pays, rather than how loud it is.</p>
+  <?php foreach ($revBySrc as $r): ?>
+    <div class="flex items-center gap-3 mb-2 text-sm">
+      <span class="w-44 truncate"><?= e($r['src']) ?></span>
+      <span class="flex-1 bg-stone-100 rounded h-5 overflow-hidden">
+        <span class="block h-5 bg-emerald-600" style="width:<?= round((float)$r['v'] / $maxRev * 100) ?>%"></span></span>
+      <span class="w-24 text-right font-bold"><?= (float)$r['v'] > 0 ? '$' . number_format((float)$r['v']) : '&mdash;' ?></span>
+      <span class="w-14 text-right text-stone-400"><?= $r['n'] ?> won</span>
+    </div>
+  <?php endforeach; if (!$revBySrc) { echo '<p class="text-sm text-stone-400">No won deals yet.</p>'; } ?>
 </div>
 
 <div class="bg-white rounded-2xl shadow p-6 mb-8">

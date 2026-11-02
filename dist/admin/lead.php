@@ -20,11 +20,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $st = in_array($_POST['status'] ?? '', ADM_STATUSES, true) ? $_POST['status'] : 'new';
         $fu = preg_match('/^\d{4}-\d{2}-\d{2}$/', $_POST['next_follow_up'] ?? '') ? $_POST['next_follow_up'] : null;
         $as = mb_substr(trim((string)($_POST['assigned_to'] ?? '')), 0, 80);
-        $old = $db->prepare('SELECT status FROM leads WHERE id = ?');
-        $old->execute([$id]); $oldSt = $old->fetchColumn();
-        $db->prepare('UPDATE leads SET status = ?, next_follow_up = ?, assigned_to = ? WHERE id = ?')
-           ->execute([$st, $fu, $as !== '' ? $as : null, $id]);
+        // Blank stays NULL, never 0: "we did not record it" and "it was
+        // worth nothing" are different facts and the reports show them apart.
+        // Strip $ , and spaces so pasting "$4,500" from an invoice works.
+        $ovRaw = trim((string)($_POST['order_value'] ?? ''));
+        $ov = null;
+        if ($ovRaw !== '' && preg_match('/^[$ ,]*[0-9][0-9, ]*(\.[0-9]{1,2})?[$ ]*$/', $ovRaw)) {
+            $n = (float)str_replace(['$', ',', ' '], '', $ovRaw);
+            if ($n >= 0 && $n <= 10000000) { $ov = $n; }
+        }
+        $old = $db->prepare('SELECT status, order_value FROM leads WHERE id = ?');
+        $old->execute([$id]); $oldRow = $old->fetch(); $oldSt = $oldRow['status'];
+        $db->prepare('UPDATE leads SET status = ?, next_follow_up = ?, assigned_to = ?, order_value = ? WHERE id = ?')
+           ->execute([$st, $fu, $as !== '' ? $as : null, $ov, $id]);
         if ($oldSt !== $st) { adm_audit($db, "status_changed:$st", $id); }
+        // Audited without the figure - the audit log deliberately holds no
+        // business data, same rule the PII entries follow.
+        if ((string)$oldRow['order_value'] !== (string)$ov) { adm_audit($db, 'order_value_changed', $id); }
     }
     if ($act === 'log_reply') {
         // lead replied to an auto-mail: promote to quoted + stop sequences
@@ -203,6 +215,12 @@ adm_head('Lead #' . $L['id']);
         </select></label>
       <label class="block font-semibold">Next follow-up
         <input type="date" name="next_follow_up" value="<?= e($L['next_follow_up']) ?>" class="mt-1 w-full border rounded-lg px-2 py-2"></label>
+      <label class="block font-semibold">Order value (USD)
+        <input name="order_value" inputmode="decimal"
+               value="<?= $L['order_value'] === null ? '' : e(rtrim(rtrim(number_format((float)$L['order_value'], 2, '.', ''), '0'), '.')) ?>"
+               placeholder="e.g. 4500 &mdash; leave blank if not known"
+               class="mt-1 w-full border rounded-lg px-2 py-2">
+        <span class="text-xs font-normal text-stone-500">Set this when a deal is won. Blank is recorded as unknown, not zero.</span></label>
       <label class="block font-semibold">Assigned to
         <input name="assigned_to" value="<?= e($L['assigned_to']) ?>" placeholder="TODO(fabrioza): team member" class="mt-1 w-full border rounded-lg px-2 py-2"></label>
       <button class="w-full bg-emerald-700 text-white font-bold rounded-lg py-2.5 hover:bg-emerald-800">Save</button>
