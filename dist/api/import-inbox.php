@@ -50,7 +50,31 @@ $SKIP_PATTERNS = ['noreply', 'no-reply', 'no_reply', 'mailer-daemon', 'postmaste
     'marketing@', 'promo', 'deals@', 'offers@', 'digest@', 'team@', 'community@', 'events@',
     'webinar', 'invoice', 'receipt', 'welcome@', 'hello@tradingview', 'tradingview',
     'shotstack', 'cloudinary', 'supabase', 'columbia.edu', 'coursera', 'udemy', 'vercel',
-    'netlify', 'github', 'gitlab', 'digitalocean', 'aws.amazon', 'railway.app', 'render.com'];
+    'netlify', 'github', 'gitlab', 'digitalocean', 'aws.amazon', 'railway.app', 'render.com',
+    // ESP sending domains. 'hello@9186062.brevosend.com' got through because
+    // the bulk-subdomain pattern is '@send.' and this one is '@9186062.',
+    // so match the ESP itself rather than the shape of the subdomain.
+    'brevosend', 'brevo.com', 'sendinblue', 'mailgun', 'klaviyo', 'constantcontact',
+    'activecampaign', 'convertkit', 'aweber', 'getresponse', 'mailerlite',
+    'campaign-archive', 'mcsv.net', 'rsgsv.net', 'sparkpostmail', 'postmarkapp'];
+/* Subject rules. These exist because the sender list CANNOT catch a
+   calendar RSVP: "Accepted: Jamal Yakubu Sari and Fabrioza" arrives from
+   the attendee's own Gmail, which is indistinguishable from a prospect's.
+
+   ANCHORED AT THE START on purpose. Lead #15 reads "Re: Invitation from an
+   unknown sender: Dimitri kress and Fabrioza" and is a real prospect whose
+   message opens "My name is Dimitri" - a contains-match on "Invitation"
+   would have deleted him. A "Re:" or "Fwd:" prefix means a human typed
+   something, so the anchor keeps every one of those by construction. */
+$SKIP_SUBJECTS = '/^\\s*(Accepted|Declined|Tentative|Invitation|Updated invitation|'
+               . 'Cancell?ed|Rescheduled|Automatic reply|Out of office|'
+               . 'Delivery Status Notification|Undelivered Mail Returned):/i';
+
+/** True for machine-generated mail that no address list can recognise. */
+function subject_is_junk(string $subject, string $rx): bool {
+    return (bool) preg_match($rx, trim($subject));
+}
+
 // extra skips without code changes: CRM_INBOX_SKIP=comma,separated,patterns in .env
 foreach (array_filter(array_map('trim', explode(',', getenv('CRM_INBOX_SKIP') ?: ''))) as $extra) {
     $SKIP_PATTERNS[] = strtolower($extra);
@@ -100,10 +124,18 @@ $db = crm_db();
    messages stay in mail_seen so they are never re-imported. */
 if (in_array('--prune', $argv, true)) {
     $pruned = 0;
-    foreach ($db->query("SELECT id, email FROM leads WHERE form_type = 'Inbox Email'")->fetchAll() as $r) {
+    foreach ($db->query("SELECT id, email, message FROM leads WHERE form_type = 'Inbox Email'")->fetchAll() as $r) {
         $addr = strtolower($r['email']);
         $bad = in_array($addr, $SKIP_SENDERS, true);
         foreach ($SKIP_PATTERNS as $p) { if (!$bad && strpos($addr, $p) !== false) { $bad = true; } }
+        // the stored message begins with the subject in quotes
+        if (!$bad && preg_match('/^"([^"]*)"/', (string)$r['message'], $sm)
+            && subject_is_junk($sm[1], $SKIP_SUBJECTS)) { $bad = true; }
+        if ($bad && $dry) {
+            echo "DRY: would prune junk lead #{$r['id']} <{$r['email']}>\n";
+            $pruned++;
+            continue;
+        }
         if ($bad) {
             $db->prepare('DELETE FROM leads WHERE id = ?')->execute([$r['id']]);
             $db->prepare('INSERT INTO audit_log (action, lead_id, actor) VALUES (?,?,?)')
@@ -113,8 +145,8 @@ if (in_array('--prune', $argv, true)) {
             $pruned++;
         }
     }
-    echo "prune done: $pruned junk lead(s) removed
-";
+    echo ($dry ? "prune dry-run: $pruned junk lead(s) WOULD be removed\n"
+               : "prune done: $pruned junk lead(s) removed\n");
     exit(0);
 }
 
@@ -146,8 +178,19 @@ foreach ($uids as $uid) {
     if ($seen->fetchColumn()) { continue; }
 
     $skip = in_array($fromAddr, $SKIP_SENDERS, true);
-    foreach ($SKIP_PATTERNS as $p) { if (!$skip && strpos($fromAddr, $p) !== false) { $skip = true; } }
+    $skipReason = $skip ? 'sender' : '';
+    foreach ($SKIP_PATTERNS as $p) {
+        if (!$skip && strpos($fromAddr, $p) !== false) { $skip = true; $skipReason = "sender ~ $p"; }
+    }
+    // the sender can be a perfectly real human and the mail still be machine-sent
+    if (!$skip && subject_is_junk($subject, $SKIP_SUBJECTS)) { $skip = true; $skipReason = 'subject'; }
     if ($skip) {
+        // A skip is PERMANENT - the id goes into mail_seen and the message is
+        // never looked at again - so print what was dropped and why. Without
+        // this a false positive on the subject rule silently loses a customer
+        // and nothing anywhere would show it.
+        printf("  skip (%s): %s | %s
+", $skipReason, $fromAddr, mb_substr($subject, 0, 70));
         if (!$dry) { $db->prepare('INSERT OR IGNORE INTO mail_seen (message_id) VALUES (?)')->execute([$msgId]); }
         $skipped++;
         continue;
