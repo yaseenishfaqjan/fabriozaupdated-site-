@@ -76,6 +76,34 @@ code() {
 
 if [ "${1:-}" = "--deploy" ]; then
   hdr "Deploying"
+  # Changed assets behind an unchanged cache-buster reach nobody who has
+  # visited before. assets/index-*.js is served max-age=31536000 + immutable
+  # with a filename that never changes, so the ?v= query in index.html is the
+  # only versioning there is. On 2 Nov 2026 five changes shipped into that
+  # bundle, the suite reported 76/76, and a warm cache still served the old
+  # copy. Checked BEFORE the pull, because afterwards local and VPS match and
+  # the evidence is gone.
+  vps_before=$(ssh -o ConnectTimeout=20 -o BatchMode=yes "$VPS" \
+      'cd /opt/fabrioza && git rev-parse HEAD' 2>/dev/null || echo '')
+  if [ -n "$vps_before" ] && git cat-file -e "$vps_before^{commit}" 2>/dev/null; then
+    if ! git diff --quiet "$vps_before" HEAD -- "$REPO/dist/assets/" 2>/dev/null; then
+      q_old=$(git show "$vps_before:dist/index.html" 2>/dev/null \
+              | grep -o 'assets/index-[^"]*\.js?v=[^"]*' | head -1)
+      q_new=$(grep -o 'assets/index-[^"]*\.js?v=[^"]*' "$REPO/dist/index.html" | head -1)
+      if [ "$q_old" = "$q_new" ]; then
+        printf '\n  \033[31mREFUSING TO DEPLOY\033[0m  dist/assets/ changed but the cache-buster did not.\n'
+        printf '    still: %s\n' "$q_new"
+        printf '    That file is served max-age=31536000, immutable, and its name never\n'
+        printf '    changes - so every returning visitor would keep the old copy and this\n'
+        printf '    deploy would reach new traffic only.\n'
+        printf '    Bump the ?v= in dist/index.html, or give the build content-hashed\n'
+        printf '    filenames so this stops being manual.\n\n'
+        exit 1
+      fi
+      printf '  asset cache-buster bumped: %s -> %s\n' "${q_old##*?v=}" "${q_new##*?v=}"
+    fi
+  fi
+
   git push origin HEAD || { echo "push failed"; exit 1; }
 
   # pipefail is set, but nothing examined this pipeline's status, so a failed
@@ -238,6 +266,29 @@ fi
 
 hdr "Lead alerts (server side)"
 sshq "docker exec fabrioza-web grep -c crm_notify_whatsapp /var/www/html/api/db.php" >/dev/null 2>&1 && g "WhatsApp fan-out is in the deployed db.php" || b "WhatsApp fan-out missing from the deployed db.php"
+
+hdr "Assets"
+# The deploy can land while the asset the page actually requests is stale or
+# missing - a 404 here is invisible on the server and blanks the React app.
+# Compare what the live HTML asks for against the file in this checkout.
+asset_ref=$(curl -fsSL --max-time 30 "$SITE/" 2>/dev/null \
+            | grep -o 'assets/index-[^"]*\.js[^"]*' | head -1)
+if [ -z "$asset_ref" ]; then
+  b "could not read the asset reference from the live homepage"
+else
+  asset_code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "$SITE/$asset_ref")
+  if [ "$asset_code" = "200" ]; then
+    live_md5=$(curl -fsSL --max-time 60 "$SITE/$asset_ref" 2>/dev/null | md5sum | cut -c1-32)
+    repo_md5=$(md5sum "$REPO/dist/${asset_ref%%\?*}" 2>/dev/null | cut -c1-32)
+    if [ -n "$live_md5" ] && [ "$live_md5" = "$repo_md5" ]; then
+      g "the bundle the homepage requests is the one in this checkout (?v=${asset_ref##*?v=})"
+    else
+      b "the live bundle differs from this checkout (live $live_md5 vs repo $repo_md5)"
+    fi
+  else
+    b "the bundle the homepage requests returns $asset_code - the app will not boot"
+  fi
+fi
 
 hdr "Automated mail (cron)"
 # Nothing watched these until 1 Nov 2026. process-sequences.php and
