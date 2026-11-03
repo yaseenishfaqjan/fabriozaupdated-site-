@@ -63,6 +63,7 @@ Allow: /
 
 # --- LLMs.txt Pointer (AI Content Preference) ---
 LLMs: https://fabrioza.com/llms.txt
+LLMs-Full: https://fabrioza.com/llms-full.txt
 AI-Content-Preference: https://fabrioza.com/llms.txt
 
 # --- Sitemap ---
