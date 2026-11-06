@@ -35,6 +35,17 @@ services:
       WHATSAPP_CALLMEBOT_PHONE: ${WHATSAPP_CALLMEBOT_PHONE:-}
       WHATSAPP_CALLMEBOT_APIKEY: ${WHATSAPP_CALLMEBOT_APIKEY:-}
       CRM_INBOX_SKIP: ${CRM_INBOX_SKIP:-}
+      # Mailbox read by api/import-inbox.php. DELIBERATELY SEPARATE from the
+      # SMTP pair above: sending goes through Resend, so SMTP_USER/SMTP_PASS
+      # describe the cPanel mailbox and nothing else. Keeping these apart is
+      # what allows a second mailbox - Gmail with an app password at
+      # imap.gmail.com - to be read without disturbing the SMTP fallback.
+      # Unset, the importer falls back to the SMTP pair, which is the old
+      # behaviour. Same trap as the two notes above: a variable only reaches
+      # the container if it is listed HERE, not merely set in .env.
+      IMAP_HOST: ${IMAP_HOST:-}
+      IMAP_USER: ${IMAP_USER:-}
+      IMAP_PASS: ${IMAP_PASS:-}
     volumes:
       # CRM SQLite database - OUTSIDE the web root, survives rebuilds
       - crm_data:/var/data
