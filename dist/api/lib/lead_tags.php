@@ -76,3 +76,40 @@ $LEAD_LANG = [
 
 /** Tags worth a human reading the mail today, in priority order. */
 $LEAD_HOT = ['payment', 'low_qty'];
+
+/**
+ * The tags a message earns, as a comma-separated string, or null.
+ *
+ * Both callers go through this - tools/classify-leads.php for the existing
+ * rows and the inbox importer for new mail - so the vocabulary and the
+ * matching live in exactly one place. An earlier version had the loop
+ * written out at each call site, which is how the two drifted apart in the
+ * navigation menus and in the shells.
+ *
+ * $message is the CUSTOMER'S words only. Never pass our own notes: it
+ * changes the meaning of a tag from "they asked for this" to "this came up".
+ */
+function lead_interests(string $message, string $product_type = ''): ?string
+{
+    global $LEAD_TAGS, $LEAD_JUNK_MSG;
+    $msg = trim($message);
+    if ($msg !== '' && preg_match($LEAD_JUNK_MSG, $msg)) return 'junk-message';
+    $hay  = $message . ' ' . $product_type;
+    $hits = [];
+    foreach ($LEAD_TAGS as $tag => $rx) if (preg_match($rx, $hay)) $hits[] = $tag;
+    return $hits ? implode(',', $hits) : null;
+}
+
+/** Reply language from whatever text is available, or null. */
+function lead_reply_lang(string $text): ?string
+{
+    global $LEAD_LANG;
+    $best = 0; $lang = null;
+    foreach ($LEAD_LANG as $code => $rx) {
+        $n = preg_match_all($rx, $text);
+        if ($n > $best) { $best = $n; $lang = $code; }
+    }
+    /* One stray word is not a language: "hola" appears in plenty of
+       English mail and "hallo" belongs to two of these languages. */
+    return $best >= 2 ? $lang : null;
+}

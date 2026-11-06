@@ -17,7 +17,7 @@
  * Safe to re-run: tags are recomputed, and a date a human set is never
  * overwritten (the UPDATE re-tests next_follow_up IS NULL).
  */
-require __DIR__ . '/leadtags.php';
+require __DIR__ . '/../dist/api/lib/lead_tags.php';
 
 $dry  = in_array('--dry-run', $argv, true);
 $seed = in_array('--seed-followups', $argv, true);

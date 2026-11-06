@@ -24,9 +24,29 @@
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 require __DIR__ . '/db.php';
 
-$user = getenv('SMTP_USER') ?: '';
-$pass = getenv('SMTP_PASS') ?: '';
-if ($user === '' || $pass === '') { fwrite(STDERR, "SMTP_USER / SMTP_PASS not configured\n"); exit(1); }
+require_once __DIR__ . '/lib/inbox_extract.php';
+require_once __DIR__ . '/lib/lead_tags.php';
+
+/* IMAP credentials are SEPARATE from SMTP, falling back to it.
+ *
+ * They used to be the same pair, which made a second mailbox impossible.
+ * Sending goes through Resend now - mailer.php prefers it and keeps SMTP
+ * only as a fallback - so SMTP_USER/SMTP_PASS describe the cPanel mailbox
+ * and nothing else. Pointing the importer at Gmail meant overwriting the
+ * SMTP fallback config, and reading BOTH mailboxes could not be done.
+ *
+ * With IMAP_USER / IMAP_PASS / IMAP_HOST set independently, one run reads
+ * Gmail and another reads cPanel, SMTP untouched either way. mail_seen is
+ * keyed on Message-ID, which survives the fetch between the two, so a
+ * message present in both is imported exactly once - and that is what
+ * makes it safe to point this at Gmail when Gmail collects the cPanel mail.
+ */
+$user = getenv('IMAP_USER') ?: (getenv('SMTP_USER') ?: '');
+$pass = getenv('IMAP_PASS') ?: (getenv('SMTP_PASS') ?: '');
+if ($user === '' || $pass === '') {
+    fwrite(STDERR, "No mailbox credentials: set IMAP_USER/IMAP_PASS (or SMTP_USER/SMTP_PASS)\n");
+    exit(1);
+}
 
 $all = in_array('--all', $argv, true);
 $dry = in_array('--dry-run', $argv, true);
@@ -58,14 +78,17 @@ $SKIP_PATTERNS = ['noreply', 'no-reply', 'no_reply', 'mailer-daemon', 'postmaste
     'activecampaign', 'convertkit', 'aweber', 'getresponse', 'mailerlite',
     'campaign-archive', 'mcsv.net', 'rsgsv.net', 'sparkpostmail', 'postmarkapp'];
 /* Subject rules. These exist because the sender list CANNOT catch a
-   calendar RSVP: "Accepted: Jamal Yakubu Sari and Fabrioza" arrives from
-   the attendee's own Gmail, which is indistinguishable from a prospect's.
+   calendar RSVP: an "Accepted: ..." notification arrives from the
+   attendee's own Gmail account, which is indistinguishable from a
+   prospect's address.
 
-   ANCHORED AT THE START on purpose. Lead #15 reads "Re: Invitation from an
-   unknown sender: Dimitri kress and Fabrioza" and is a real prospect whose
-   message opens "My name is Dimitri" - a contains-match on "Invitation"
-   would have deleted him. A "Re:" or "Fwd:" prefix means a human typed
-   something, so the anchor keeps every one of those by construction. */
+   ANCHORED AT THE START on purpose, and that anchor is load-bearing. One
+   real prospect in the table has a subject reading "Re: Invitation from an
+   unknown sender: ..." - a contains-match on "Invitation" would have
+   deleted a genuine customer. A "Re:" or "Fwd:" prefix means a human typed
+   something, so anchoring keeps every one of those by construction.
+   (Customer names are deliberately not quoted here; the repo keeps PII out
+   of source. The row itself is in the CRM.) */
 $SKIP_SUBJECTS = '/^\\s*(Accepted|Declined|Tentative|Invitation|Updated invitation|'
                . 'Cancell?ed|Rescheduled|Automatic reply|Out of office|'
                . 'Delivery Status Notification|Undelivered Mail Returned):/i';
@@ -222,8 +245,22 @@ foreach ($uids as $uid) {
         $maybe = base64_decode(trim($body), true);
         if ($maybe !== false && mb_check_encoding($maybe, 'UTF-8')) { $body = $maybe; }
     }
-    $body = trim(preg_replace('/\s+/', ' ', strip_tags($body)));
-    $snippet = mb_substr($body, 0, 500);
+    /* ORDER IS LOAD-BEARING. inbox_strip_quoted() needs line breaks, and so
+       does signature extraction: a brand is only recoverable while the
+       lines still exist. The old code flattened whitespace here, first
+       thing, which is why no brand can be recovered from the rows imported
+       earlier. Strip, extract, THEN flatten. */
+    $body  = strip_tags($body);
+    $clean = inbox_strip_quoted($body);
+    list($brand, $brandHow) = inbox_brand($clean, $fromAddr, $subject);
+    $country = inbox_country($clean);
+    $lang    = lead_reply_lang($clean);
+
+    /* 2000, not 500. The point of importing is to read what they asked,
+       and real enquiries run past 500 characters - the longest already in
+       the table is over 600 and was being cut off mid-question. */
+    $snippet = inbox_query($clean, 2000);
+    if ($snippet === '') { $snippet = trim(preg_replace('/\s+/', ' ', $body)); }
 
     /* 4. route */
     $lead = $db->prepare('SELECT id, status FROM leads WHERE lower(email) = ? ORDER BY id DESC LIMIT 1');
@@ -231,7 +268,13 @@ foreach ($uids as $uid) {
     $L = $lead->fetch();
 
     if ($dry) {
-        echo 'DRY: ' . ($L ? "reply -> lead #{$L['id']}" : 'NEW lead') . " from $fromAddr | $subject\n";
+        printf("DRY: %-24s %s | %s\n     brand=%s (%s) country=%s lang=%s wants=%s\n",
+            $L ? "reply -> lead #" . $L['id'] : 'NEW lead',
+            $fromAddr, mb_substr($subject, 0, 58),
+            $brand === null ? '-' : $brand, $brandHow,
+            $country === null ? '-' : $country,
+            $lang === null ? '-' : $lang,
+            lead_interests($snippet, '') === null ? '-' : lead_interests($snippet, ''));
         continue;
     }
 
@@ -241,19 +284,41 @@ foreach ($uids as $uid) {
         $db->prepare("UPDATE leads SET sequences_paused = 1,
                 status = CASE WHEN status = 'new' THEN 'quoted' ELSE status END WHERE id = ?")
            ->execute([$L['id']]);
+        /* Backfill only what is MISSING. A reply often carries the brand and
+           country the original form never asked for, but a value a human
+           typed - or an earlier mail established - outranks anything
+           inferred from this one, so every guard requires the column to be
+           empty first. Never overwrite. */
+        foreach (array('company' => $brand, 'country' => $country, 'reply_lang' => $lang) as $col => $val) {
+            if ($val === null) continue;
+            $db->prepare("UPDATE leads SET $col = ? WHERE id = ?
+                          AND ($col IS NULL OR trim($col) = '')")
+               ->execute(array($val, $L['id']));
+        }
         $db->prepare('INSERT INTO audit_log (action, lead_id, actor) VALUES (?,?,?)')
            ->execute(['reply_received_auto', $L['id'], 'inbox-import']);
         echo "reply logged -> lead #{$L['id']} <$fromAddr>\n";
         $replies++;
     } else {
-        $name = $fromName !== '' ? mb_substr($fromName, 0, 120) : ucfirst(explode('@', $fromAddr)[0]);
-        $score = crm_lead_score(['name' => $name, 'email' => $fromAddr, 'company' => '',
-            'quantity' => '', 'form_type' => 'Inbox Email', 'utm_medium' => 'email']);
-        $db->prepare('INSERT INTO leads (name, email, message, form_type, source_page, lead_score, status, gdpr_consent, ip_hash)
-                      VALUES (?,?,?,?,?,?,?,0,?)')
-           ->execute([$name, $fromAddr, mb_substr("\"$subject\" - $snippet", 0, 5000),
-                      'Inbox Email', 'mailbox-import', $score, 'new', '']);
-        echo 'NEW lead #' . $db->lastInsertId() . " <$fromAddr> | $subject\n";
+        $parts = explode('@', $fromAddr);
+        $name = $fromName !== '' ? mb_substr($fromName, 0, 120) : ucfirst($parts[0]);
+        /* crm_lead_score() reads `company`, so give it the brand we found
+           instead of the empty string the old call always passed - a
+           business enquiry was scored as though it had no company at all. */
+        $score = crm_lead_score(['name' => $name, 'email' => $fromAddr,
+            'company' => $brand === null ? '' : $brand, 'quantity' => '',
+            'form_type' => 'Inbox Email', 'utm_medium' => 'email']);
+        $message = mb_substr('"' . $subject . '" - ' . $snippet, 0, 5000);
+        $db->prepare('INSERT INTO leads
+                      (name, email, company, country, message, form_type, source_page,
+                       lead_score, status, gdpr_consent, ip_hash, interests, reply_lang)
+                      VALUES (?,?,?,?,?,?,?,?,?,0,?,?,?)')
+           ->execute([$name, $fromAddr, $brand, $country, $message,
+                      'Inbox Email', 'mailbox-import', $score, 'new', '',
+                      lead_interests($snippet, ''), $lang]);
+        printf("NEW lead #%s <%s> | %s%s\n", $db->lastInsertId(), $fromAddr,
+            mb_substr($subject, 0, 58),
+            $brand === null ? '' : '  [brand: ' . $brand . ' via ' . $brandHow . ']');
         $created++;
     }
     $db->prepare('INSERT OR IGNORE INTO mail_seen (message_id) VALUES (?)')->execute([$msgId]);
