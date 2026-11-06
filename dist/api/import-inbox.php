@@ -18,6 +18,13 @@
  *   php import-inbox.php            # incremental: last 3 days
  *   php import-inbox.php --all      # historic backfill: whole inbox
  *   php import-inbox.php --dry-run  # preview, change nothing
+ *   php import-inbox.php --all --dry-run --reconsider
+ *                                   # preview INCLUDING messages earlier
+ *                                   # runs skipped (audit what was dropped)
+ *
+ * Mailbox: IMAP_USER / IMAP_PASS / IMAP_HOST, falling back to the SMTP
+ * pair. Set those three to read a different mailbox (e.g. Gmail with an
+ * app password at imap.gmail.com) without disturbing SMTP.
  *
  * Cron: every 30 minutes - exact line documented in CRM-HANDOFF.md
  */
@@ -50,6 +57,28 @@ if ($user === '' || $pass === '') {
 
 $all = in_array('--all', $argv, true);
 $dry = in_array('--dry-run', $argv, true);
+/* --reconsider: ignore mail_seen, so a dry run can show what EARLIER runs
+   skipped.
+ *
+ * A skip is permanent by design - the Message-ID goes into mail_seen and
+ * the message is never looked at again - which is correct for a newsletter
+ * and wrong if the rules that judged it were too broad. mail_seen holds 917
+ * ids while only a handful of leads and reply notes came out of them, and
+ * most of those judgements were made before the subject rules and the skip
+ * logging existed. So "what did we silently drop?" is a real question, and
+ * without this flag it cannot even be asked: the loop skips a seen message
+ * before it prints anything.
+ *
+ * DRY RUN ONLY, enforced below. Re-processing for real would append a
+ * second copy of every reply note to leads that already have them. */
+$reconsider = in_array('--reconsider', $argv, true);
+if ($reconsider && !$dry) {
+    fwrite(STDERR, "--reconsider is dry-run only (it would duplicate notes on leads that already have them).
+"
+                 . "Run: php import-inbox.php --all --dry-run --reconsider
+");
+    exit(1);
+}
 
 $SKIP_SENDERS = ['fabriozadotcom@gmail.com', 'info@fabrioza.com', 'sales@fabrioza.com'];
 $SKIP_PATTERNS = ['noreply', 'no-reply', 'no_reply', 'mailer-daemon', 'postmaster', 'notification',
@@ -214,9 +243,11 @@ foreach ($uids as $uid) {
     $subject = hdr_decode($H['subject'] ?? '(no subject)');
     $msgId = trim($H['message-id'] ?? '') ?: ('uid-' . $uid . '-' . md5($fromAddr . $subject));
 
-    $seen = $db->prepare('SELECT 1 FROM mail_seen WHERE message_id = ?');
-    $seen->execute([$msgId]);
-    if ($seen->fetchColumn()) { continue; }
+    if (!$reconsider) {
+        $seen = $db->prepare('SELECT 1 FROM mail_seen WHERE message_id = ?');
+        $seen->execute([$msgId]);
+        if ($seen->fetchColumn()) { continue; }
+    }
 
     $skip = in_array($fromAddr, $SKIP_SENDERS, true);
     $skipReason = $skip ? 'sender' : '';
