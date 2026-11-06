@@ -15,3 +15,8 @@ INBOX-FINDINGS.md
 # same category as the LEADS files above.
 LEAD-JUDITH-YUGO.md
 LEAD-JUDITH-REPLY-NL.md
+
+# Generated follow-up worklist: every lead with name, email and the words
+# they wrote. Same category as the LEADS files above. The GENERATOR
+# (tools/worklist.php) is committed; its output never is.
+FOLLOWUP-WORKLIST.md
