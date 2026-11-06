@@ -143,6 +143,26 @@ function crm_db(): PDO {
         $pdo->exec('PRAGMA user_version = 6');
         $version = 6;
     }
+    if ($version < 7) {
+        // What the enquiry actually asked for, and which language to answer
+        // in. Derived from the customer's own words by lead_interests() /
+        // lead_reply_lang() in lib/lead_tags.php - the importer fills both
+        // on arrival, and tools/classify-leads.php backfills existing rows.
+        //
+        // interests is ONE comma-separated column rather than a boolean per
+        // question, so a new question costs a line in the vocabulary instead
+        // of a migration, and the admin pages render it without knowing what
+        // the vocabulary contains.
+        //
+        // Both nullable: no tags is a real answer (a blank form submission),
+        // and an unknown language must not be asserted as English.
+        foreach (['interests', 'reply_lang'] as $col) {
+            try { $pdo->exec("ALTER TABLE leads ADD COLUMN $col TEXT"); }
+            catch (Throwable $e) { /* already present */ }
+        }
+        $pdo->exec('PRAGMA user_version = 7');
+        $version = 7;
+    }
     return $pdo;
 }
 
