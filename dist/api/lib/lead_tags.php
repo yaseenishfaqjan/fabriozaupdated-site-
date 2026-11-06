@@ -92,6 +92,12 @@ $LEAD_HOT = ['payment', 'low_qty'];
 function lead_interests(string $message, string $product_type = ''): ?string
 {
     global $LEAD_TAGS, $LEAD_JUNK_MSG;
+    /* Several of these patterns carry /u, which returns false on invalid
+       UTF-8 - so a Windows-1252 message would silently earn no tags. */
+    if (function_exists('inbox_utf8')) {
+        $message = inbox_utf8($message);
+        $product_type = inbox_utf8($product_type);
+    }
     $msg = trim($message);
     if ($msg !== '' && preg_match($LEAD_JUNK_MSG, $msg)) return 'junk-message';
     $hay  = $message . ' ' . $product_type;
@@ -104,6 +110,7 @@ function lead_interests(string $message, string $product_type = ''): ?string
 function lead_reply_lang(string $text): ?string
 {
     global $LEAD_LANG;
+    if (function_exists('inbox_utf8')) { $text = inbox_utf8($text); }
     $best = 0; $lang = null;
     foreach ($LEAD_LANG as $code => $rx) {
         $n = preg_match_all($rx, $text);

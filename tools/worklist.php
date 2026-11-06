@@ -78,7 +78,7 @@ function says($m, $max = 230) {
 }
 
 /* ---- bucket ------------------------------------------------------------ */
-$B = ['act'=>[], 'unreached'=>[], 'quiet'=>[], 'warm'=>[], 'thin'=>[]];
+$B = ['act'=>[], 'talking'=>[], 'unreached'=>[], 'quiet'=>[], 'warm'=>[], 'thin'=>[]];
 foreach ($leads as $L) {
     $id   = $L['id'];
     $tags = array_values(array_filter(explode(',', (string)$L['interests'])));
@@ -96,7 +96,14 @@ foreach ($leads as $L) {
     $gotreply = ($L['_reply'] !== null);
     $thin     = (mb_strlen(trim((string)$L['message'])) < 30 && count($tags) === 0);
 
-    if ($hot || $L['status'] === 'quoted') $B['act'][]       = $L;
+    /* "Quoted" stopped meaning what it used to. Any inbound reply
+       promotes a lead to it, so after the mailbox import 49 leads carried
+       that status and ACT TODAY held 55 people - not a day's work, and a
+       list nobody can act on is the same as no list. A decision waiting on
+       you (payment, or an order below MOQ) is a different job from a
+       conversation already running. */
+    if ($hot)                              $B['act'][]       = $L;
+    elseif ($L['status'] === 'quoted')     $B['talking'][]   = $L;
     elseif ($unreach)                      $B['unreached'][] = $L;
     elseif ($gotreply)                     $B['quiet'][]     = $L;
     elseif ($thin)                         $B['thin'][]      = $L;
@@ -144,8 +151,10 @@ echo 'Mail works again now - acknowledgements go out through Resend and are succ
      'But nothing retried the backlog, so those people are still owed a first reply.', $nl, $nl;
 
 $heads = [
-  'act' => ['ACT TODAY',
-    'At the payment step, asking for a small or trial order, or already quoted. The money is closest here.'],
+  'act' => ['ACT TODAY - a decision is waiting on you',
+    'At the payment step, or asking for an order below MOQ. These are the ones where a reply converts.'],
+  'talking' => ['IN CONVERSATION',
+    'They have written to us and the thread is open. Pick up whichever has been quiet longest.'],
   'unreached' => ['NEVER REACHED - owed a first reply',
     'Every email to them failed. Send the acknowledgement they never got, and apologise for the delay.'],
   'quiet' => ['REPLIED, THEN WENT QUIET',

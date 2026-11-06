@@ -293,6 +293,53 @@ foreach ($uids as $uid) {
     }
     // the sender can be a perfectly real human and the mail still be machine-sent
     if (!$skip && subject_is_junk($subject, $SKIP_SUBJECTS)) { $skip = true; $skipReason = 'subject'; }
+    /* A MEETING ACCEPTANCE IS NOT AN ENQUIRY, BUT THE PERSON IS A LEAD.
+     *
+     * Found by auditing the real mailbox: two people accepted a call with
+     * us and have NO other message in the inbox. The subject rule
+     * correctly judges the RSVP itself to be machine-generated, so both
+     * were skipped - and because a skip is permanent, neither would ever
+     * have become a lead at all. Somebody who booked a call is about the
+     * warmest lead there is.
+     *
+     * So the RSVP is still skipped as a MESSAGE (it has no enquiry text to
+     * store, and promoting it to "quoted" like a real reply would be a
+     * lie), but the SENDER is kept. Only an acceptance counts: a decline
+     * or a cancellation is not a signal worth acting on, and our own
+     * address is never a lead.
+     */
+    if ($skip && $skipReason === 'subject'
+        && preg_match('/^\s*(Accepted|Tentative):/i', $subject)
+        && stripos($fromAddr, 'fabrioza') === false) {
+        $known = $db->prepare('SELECT id FROM leads WHERE lower(email) = ? LIMIT 1');
+        $known->execute([$fromAddr]);
+        if (!$known->fetchColumn()) {
+            $who = $fromName !== '' ? mb_substr($fromName, 0, 120) : ucfirst(explode('@', $fromAddr)[0]);
+            if ($dry) {
+                printf("DRY: NEW lead (booked a call, no written enquiry)  %s | %s\n",
+                    $fromAddr, mb_substr($subject, 0, 58));
+            } else {
+                $db->prepare('INSERT INTO leads
+                      (name, email, message, form_type, source_page, lead_score,
+                       status, gdpr_consent, ip_hash)
+                      VALUES (?,?,?,?,?,?,?,0,?)')
+                   ->execute([$who, $fromAddr,
+                      'Accepted a meeting invitation. No written enquiry in the '
+                      . 'mailbox - the calendar reply is the only message from '
+                      . 'this address, so there is nothing recorded about what '
+                      . 'they want. Ask.',
+                      'Meeting RSVP', 'mailbox-import',
+                      crm_lead_score(['name' => $who, 'email' => $fromAddr,
+                          'company' => '', 'quantity' => '',
+                          'form_type' => 'Meeting RSVP', 'utm_medium' => 'email']),
+                      'new', '']);
+                printf("NEW lead #%s <%s> | booked a call, no written enquiry\n",
+                    $db->lastInsertId(), $fromAddr);
+                $created++;
+            }
+        }
+    }
+
     if ($skip) {
         // A skip is PERMANENT - the id goes into mail_seen and the message is
         // never looked at again - so print what was dropped and why. Without

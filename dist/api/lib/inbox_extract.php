@@ -19,6 +19,39 @@
  */
 
 /**
+ * Coerce text to valid UTF-8.
+ *
+ * MUST RUN BEFORE ANY /u REGEX, AND THAT IS NOT A STYLE POINT. preg_* with
+ * the /u modifier returns FALSE on invalid UTF-8 rather than failing
+ * loudly, so a Windows-1252 message - Outlook's default for a lot of
+ * senders, and what a smart apostrophe arrives as - made
+ * inbox_brand_tidy() hand back null. The caller then read that as "noise"
+ * and discarded a perfectly good STATED brand, falling through to the
+ * subject line instead.
+ *
+ * Measured on real mail: a sender whose body said "I'm the founder of
+ * <BRAND>" was recorded with the first half of their subject line as their
+ * company. The only visible symptom was a PHP warning on a line that looks
+ * like string tidying, which is why this went unnoticed through a 962
+ * message audit.
+ *
+ * Windows-1252 rather than ISO-8859-1 on purpose: it is a superset that
+ * also covers the curly quotes and dashes mail is full of, and decoding
+ * 1252 bytes as 8859-1 turns those into control characters.
+ */
+function inbox_utf8(string $s): string
+{
+    if ($s === '' || mb_check_encoding($s, 'UTF-8')) return $s;
+    $out = @iconv('Windows-1252', 'UTF-8//TRANSLIT', $s);
+    if ($out === false || $out === null) {
+        /* Last resort: drop the bytes that cannot be mapped. Losing a
+           character beats losing the whole message to a silent false. */
+        $out = mb_convert_encoding($s, 'UTF-8', 'Windows-1252');
+    }
+    return is_string($out) ? $out : '';
+}
+
+/**
  * Everything after a reply marker is THEIR copy of OUR email.
  *
  * This runs before anything else, and the rest of the file depends on it.
@@ -28,6 +61,7 @@
  */
 function inbox_strip_quoted(string $body): string
 {
+    $body = inbox_utf8($body);
     $body = str_replace(["\r\n", "\r"], "\n", $body);
 
     /* Reply separators, in the forms the real inbox actually contains:
@@ -74,7 +108,20 @@ function inbox_is_freemail(string $host): bool
         'inbox.lv', 'web.de', 'free.fr', 'orange.fr', 'libero.it',
         'seznam.cz', 'naver.com', 'daum.net', 'rediffmail.com',
     ];
-    return in_array(strtolower($host), $free, true);
+    $host = strtolower($host);
+    if (in_array($host, $free, true)) return true;
+    /* Match the PROVIDER, not the exact host. The list above had
+       outlook.com but not outlook.fr, so a French consumer address was
+       read as the brand "Outlook" and the real brand in the subject line
+       was never looked for. Consumer providers run dozens of ccTLDs
+       (gmail.*, yahoo.*, hotmail.*, live.*, outlook.*) and enumerating
+       them is a losing game. */
+    foreach (['gmail', 'googlemail', 'yahoo', 'ymail', 'hotmail', 'outlook',
+              'live', 'msn', 'aol', 'gmx', 'yandex', 'protonmail', 'proton',
+              'icloud', 'zoho', 'mail'] as $p) {
+        if (preg_match('/^' . preg_quote($p, '/') . '\.[a-z.]{2,8}$/', $host)) return true;
+    }
+    return false;
 }
 
 /** Never report ourselves as the customer's brand. */
@@ -110,8 +157,44 @@ function inbox_brand_is_noise(string $c): bool
         'evening', 'please', 'quote', 'quotation', 'enquiry', 'inquiry',
         'order', 'sample', 'samples', 'price', 'pricing', 'moq', 'yes', 'no',
         'ok', 'okay', 'owner', 'founder', 'director', 'manager', 'ceo',
+        /* Hyphenated titles. "Co-Founder" slipped through because the
+           legal-form test below accepted the "Co" in it, so a signature
+           line reading a person's TITLE was recorded as their company and
+           the real brand was never looked for. */
+        'co-founder', 'cofounder', 'co founder', 'managing director',
+        'creative director', 'brand owner', 'head of', 'coo', 'cto', 'cmo',
     ];
     if (in_array(strtolower($c), $stop, true)) return true;
+    /* A PHRASE MADE ENTIRELY OF TRADE VOCABULARY IS A DESCRIPTION, NOT A
+       NAME. This is what separates "Premium Oversized Tracksuit" and
+       "Manufacturing Inquiry" - both recorded as companies from subject
+       lines - from RVL, AACH and IGNE, which are also in their senders'
+       subject lines and are perfectly real. Position in the subject cannot
+       tell those apart, because people put their brand in the subject;
+       vocabulary can. */
+    static $trade = [
+        'premium', 'oversized', 'custom', 'manufacturing', 'manufacture',
+        'inquiry', 'enquiry', 'tracksuit', 'tracksuits', 'hoodie', 'hoodies',
+        'sweatshirt', 'sweatshirts', 'tshirt', 'tshirts', 't-shirt', 't-shirts',
+        'tee', 'tees', 'shirt', 'shirts', 'short', 'shorts', 'jacket',
+        'jackets', 'pant', 'pants', 'jogger', 'joggers', 'cap', 'caps', 'hat',
+        'hats', 'sock', 'socks', 'uniform', 'uniforms', 'activewear',
+        'sportswear', 'streetwear', 'knitwear', 'garment', 'garments',
+        'production', 'development', 'request', 'quotation', 'partnership',
+        'collection', 'heavyweight', 'lightweight', 'cotton', 'fleece',
+        'french', 'terry', 'gsm', 'moq', 'sample', 'samples', 'pricing',
+        'price', 'prices', 'order', 'orders', 'bulk', 'wholesale', 'fabric',
+        'and', 'the', 'for', 'of', 'with', 'new', 'womens', 'mens', 'kids',
+        'unisex', 'women', 'men',
+    ];
+    $words = preg_split('/[\s\-]+/u', mb_strtolower($c), -1, PREG_SPLIT_NO_EMPTY);
+    if (is_array($words) && count($words) >= 2) {
+        $alltrade = true;
+        foreach ($words as $w) {
+            if (!in_array(trim($w, '.,'), $trade, true)) { $alltrade = false; break; }
+        }
+        if ($alltrade) return true;
+    }
     /* A sentence is not a brand name - but an initial is not a sentence.
        The first version used /[.!?]\s+\S/ and threw away "R. Hale & Co.",
        exactly the kind of name it exists to keep. A LOWERCASE word after
@@ -125,6 +208,21 @@ function inbox_brand_tidy(string $c): string
 {
     $c = html_entity_decode($c, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     $c = trim(preg_replace('/\s+/', ' ', $c));
+    /* Cut at a sentence boundary before anything else. A stated brand
+       runs into the next sentence - "my brand is Hidden Haven. I'm
+       looking for..." captured "Hidden Haven. I'm", and
+       "partnership with Clothly.nl. Clothly" captured both halves.
+       The discriminator is the SAME one the prose test uses: a period
+       after a LOWERCASE letter ends a word, so it is a full stop; a
+       period after a capital is an initial, which is why "R. Hale & Co."
+       survives this untouched. */
+    $c = inbox_utf8($c);
+    /* preg_split returns FALSE on a pattern error, and indexing [0] on
+       false yielded null, which the caller then treated as noise. Guard
+       the result instead of trusting it: a failed split must leave the
+       candidate alone, not destroy it. */
+    $parts = preg_split('/(?<=\p{Ll})\.\s+/u', $c);
+    if (is_array($parts) && $parts !== []) { $c = (string) $parts[0]; }
     $c = trim($c, " \t\n\"'`,;:!?()[]-–—*");
     /* Trailing stop: strip it, UNLESS it belongs to an abbreviation that
        really ends in one. "R. Hale & Co." is the company's name; trimming
@@ -155,6 +253,8 @@ function inbox_brand_tidy(string $c): string
  */
 function inbox_brand(string $body, string $email, string $subject = ''): array
 {
+    $body    = inbox_utf8($body);
+    $subject = inbox_utf8($subject);
     /* ---- 1. stated outright ------------------------------------------- */
     /* A brand NAME, not the remainder of the sentence. The first version
        captured [^\n,.;!?]{1,48} and returned "Velour Athletics and we need
@@ -249,9 +349,14 @@ function inbox_brand(string $body, string $email, string $subject = ''): array
         foreach (array_slice($lines, 1) as $l) {
             if (inbox_brand_is_noise($l) || inbox_is_ours($l)) continue;
             $caps  = (mb_strtoupper($l) === $l && preg_match('/\p{L}{2}/u', $l));
-            $legal = preg_match('/\b(ltd|limited|llc|inc|co|corp|gmbh|bv|b\.v\.|'
-                              . 'sarl|s\.?l\.?|pty|plc|studio|studios|collective|'
-                              . 'apparel|clothing|brands?|wear|co\.)\b/i', $l);
+            /* A legal form sits at the END of a company name, and anchoring
+               it there is what stops "Co" matching the "Co-" of
+               "Co-Founder". The unanchored version accepted a job title as
+               a company. Descriptive words (studio, apparel, clothing,
+               wear) are also name-final in practice. */
+            $legal = preg_match('/\b(ltd|limited|llc|inc|corp|gmbh|bv|b\.v\.|'
+                              . 'sarl|s\.?l\.?|pty|plc|studios?|collective|'
+                              . 'apparel|clothing|brands?|wear|co)\.?$/i', $l);
             if ($caps || $legal) return [$l, 'signature'];
         }
     }
@@ -281,6 +386,7 @@ function inbox_brand(string $body, string $email, string $subject = ''): array
  */
 function inbox_country(string $body): ?string
 {
+    $body = inbox_utf8($body);
     static $map = [
         'United Kingdom' => '/\b(united kingdom|england|scotland|wales|u\.?k\.?)\b/i',
         'United States'  => '/\b(united states|u\.?s\.?a\.?|america)\b/i',

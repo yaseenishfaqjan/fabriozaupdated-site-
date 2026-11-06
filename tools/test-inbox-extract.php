@@ -144,6 +144,58 @@ ok('subject names the other party', [$b, $how], ['R. Hale & Co.', 'subject']);
 [$b, ] = inbox_brand('Hello.', 'x@gmail.com', 'FABRIOZA x FABRIOZA');
 ok('both sides ours gives nothing', $b, null);
 
+/* Faults found by auditing the real 962-message mailbox. Every one of
+   these cost a real brand name, or recorded a wrong one as fact. */
+
+[$b, ] = inbox_brand('Hello.', 'buyer@outlook.fr');
+ok('a consumer provider on another ccTLD is still freemail', $b, null);
+[$b, ] = inbox_brand('Hello.', 'buyer@gmail.co.uk');
+ok('gmail on any ccTLD is freemail', $b, null);
+[$b, $how] = inbox_brand('Hello.', 'buyer@outlookfurniture.com');
+ok('a company merely STARTING with a provider name is kept', [$b, $how], ['Outlookfurniture', 'domain']);
+
+[$b, ] = inbox_brand("Please quote.\n\nBest regards,\nAlex Leiter\nCo-Founder\n", 'a@gmail.com');
+ok('"Co-Founder" is a title, not a company', $b, null);
+[$b, $how] = inbox_brand("Please quote.\n\nBest regards,\nAlex Leiter\nHale Trading Co.\n", 'a@gmail.com');
+ok('a name-final legal form is still accepted', [$b, $how], ['Hale Trading Co.', 'signature']);
+
+[$b, ] = inbox_brand("Hi, my brand is Hidden Haven. I'm looking for hoodies.", 'h@gmail.com');
+ok('a stated name stops at the full stop', $b, 'Hidden Haven');
+[$b, ] = inbox_brand('Hello.', 'x@gmail.com', 'R. Hale & Co. x FABRIOZA');
+ok('an initial is not a full stop (unchanged)', $b, 'R. Hale & Co.');
+
+/* NON-UTF-8 MAIL. The bug this guards against was invisible: preg_* with
+   /u returns false rather than erroring, so a Windows-1252 body made the
+   tidy step hand back null, the caller read null as noise, and a correct
+   STATED brand was thrown away in favour of the subject line. Outlook
+   sends 1252 by default for plenty of senders. */
+$w1252 = "Hi, I" . chr(0x92) . "m the founder of AURELIX, a streetwear brand.";
+ok('the fixture really is invalid UTF-8', mb_check_encoding($w1252, 'UTF-8'), false);
+[$b, $how] = inbox_brand($w1252, 'x@gmail.com');
+ok('a brand is still extracted from Windows-1252 mail', [$b, $how], ['AURELIX', 'stated']);
+ok('the subject is not used when the body states a brand', $how, 'stated');
+
+$w1252b = "We are based in Espa" . chr(0xF1) . "a and need 300 tees.";
+ok('country still works on Windows-1252', inbox_country($w1252b), 'Spain');
+
+ok('inbox_utf8 leaves valid UTF-8 untouched', inbox_utf8('caf\xc3\xa9'), 'caf\xc3\xa9');
+ok('inbox_utf8 returns valid UTF-8 for 1252 input',
+   mb_check_encoding(inbox_utf8($w1252), 'UTF-8'), true);
+
+/* TRADE VOCABULARY IS NOT A NAME. Both of these were recorded as real
+   companies from subject lines, and the three below them are real brands
+   that ALSO appear in their senders' subject lines - so position cannot
+   separate them and vocabulary must. */
+ok('a product description is not a brand', inbox_brand_is_noise('Premium Oversized Tracksuit'), true);
+ok('an enquiry phrase is not a brand',     inbox_brand_is_noise('Manufacturing Inquiry'), true);
+ok('a short real brand survives',          inbox_brand_is_noise('RVL'), false);
+ok('an invented word survives',            inbox_brand_is_noise('AURELIX'), false);
+ok('a two-word real brand survives',       inbox_brand_is_noise('Mono Rotterdam'), false);
+ok('one trade word alone is still allowed (it may be the whole name)',
+   inbox_brand_is_noise('Streetwear'), false);
+ok('a brand mixing a trade word with a name survives',
+   inbox_brand_is_noise('Hale Sportswear'), false);
+
 /* ===================================================================== *
  * 6. Country - only when stated about themselves
  * ===================================================================== */
