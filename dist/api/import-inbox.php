@@ -18,6 +18,7 @@
  *   php import-inbox.php            # incremental: last 3 days
  *   php import-inbox.php --all      # historic backfill: whole inbox
  *   php import-inbox.php --dry-run  # preview, change nothing
+ *   php import-inbox.php --all --limit 50   # first 50 only, in batches
  *   php import-inbox.php --all --dry-run --reconsider
  *                                   # preview INCLUDING messages earlier
  *                                   # runs skipped (audit what was dropped)
@@ -72,6 +73,15 @@ $dry = in_array('--dry-run', $argv, true);
  * DRY RUN ONLY, enforced below. Re-processing for real would append a
  * second copy of every reply note to leads that already have them. */
 $reconsider = in_array('--reconsider', $argv, true);
+/* --limit N: stop after N messages have been CONSIDERED (skips included).
+   A 962-message mailbox is not something to walk blind the first time, and
+   it is how the connection-reuse fix above was measured rather than
+   assumed. 0 means no limit. */
+$limit = 0;
+foreach ($argv as $i => $a) {
+    if ($a === '--limit' && isset($argv[$i + 1])) { $limit = max(0, (int) $argv[$i + 1]); }
+    elseif (strpos($a, '--limit=') === 0) { $limit = max(0, (int) substr($a, 8)); }
+}
 if ($reconsider && !$dry) {
     fwrite(STDERR, "--reconsider is dry-run only (it would duplicate notes on leads that already have them).
 "
@@ -132,24 +142,44 @@ foreach (array_filter(array_map('trim', explode(',', getenv('CRM_INBOX_SKIP') ?:
     $SKIP_PATTERNS[] = strtolower($extra);
 }
 
-/** One IMAP command via curl. $urlPath is appended to the mailbox URL. */
+/**
+ * One IMAP command via curl. $urlPath is appended to the mailbox URL.
+ *
+ * ONE CONNECTION FOR THE WHOLE RUN, REUSED. This used to curl_init() and
+ * curl_close() per command, so every message cost two or three fresh TLS
+ * handshakes and IMAP LOGINs - roughly 2,900 logins to walk a
+ * 962-message mailbox. Measured against Gmail at about ONE MESSAGE PER
+ * MINUTE, a 16-hour run, because Gmail throttles repeated logins hard;
+ * it also risks the account being rate-limited outright. Holding the
+ * handle lets curl keep the authenticated connection open and reuse it.
+ *
+ * The handle is deliberately never closed: PHP frees it at exit, and
+ * closing it after a failure would throw away a connection that is
+ * usually still good.
+ */
 function imap_curl(string $user, string $pass, string $urlPath = '', ?string $customRequest = null): ?string {
-    $ch = curl_init();
+    static $ch = null;
+    if ($ch === null) { $ch = curl_init(); }
     curl_setopt_array($ch, [
         CURLOPT_URL => 'imaps://' . (getenv('IMAP_HOST') ?: 's99.veladns.com') . ':993/' . $urlPath,
         CURLOPT_USERPWD => $user . ':' . $pass,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_TIMEOUT => 60,
         CURLOPT_CONNECTTIMEOUT => 15,
+        CURLOPT_FORBID_REUSE => false,
+        CURLOPT_FRESH_CONNECT => false,
     ]);
-    if ($customRequest !== null) { curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $customRequest); }
+    /* CUSTOMREQUEST STICKS on a reused handle. Left set, the previous
+       command's FETCH would be re-sent against the next call's URL, which
+       is a silent wrong-data bug rather than an error. Passing null here
+       restores the default, so it is cleared on every call that does not
+       supply one. */
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $customRequest);
     $res = curl_exec($ch);
     if ($res === false) {
         fwrite(STDERR, 'IMAP curl error: ' . curl_error($ch) . "\n");
-        curl_close($ch);
         return null;
     }
-    curl_close($ch);
     return (string)$res;
 }
 
@@ -229,7 +259,14 @@ $uids = array_filter(array_map('intval', preg_split('/\s+/', trim($m[1] ?? '')))
 echo 'scanning ' . count($uids) . " message(s) [$criteria]\n";
 
 $replies = $created = $skipped = 0;
+$considered = 0;
+$t0 = microtime(true);
 foreach ($uids as $uid) {
+    if ($limit > 0 && $considered >= $limit) {
+        printf("stopping at --limit %d\n", $limit);
+        break;
+    }
+    $considered++;
     /* 2. headers */
     $raw = imap_curl($user, $pass, "INBOX;UID=$uid;SECTION=HEADER.FIELDS%20(FROM%20SUBJECT%20MESSAGE-ID)");
     if ($raw === null || trim($raw) === '') { continue; }
@@ -354,5 +391,7 @@ foreach ($uids as $uid) {
     }
     $db->prepare('INSERT OR IGNORE INTO mail_seen (message_id) VALUES (?)')->execute([$msgId]);
 }
+$secs = max(0.001, microtime(true) - $t0);
 crm_file_log("INBOX-IMPORT replies=$replies new=$created skipped=$skipped scanned=" . count($uids));
-echo "done: $replies replies logged, $created leads created, $skipped skipped\n";
+printf("done: %d replies logged, %d leads created, %d skipped | %d considered in %.1fs (%.1f msg/s)\n",
+    $replies, $created, $skipped, $considered, $secs, $considered / $secs);
