@@ -301,6 +301,28 @@ lacks /moq-calculator 'low MOQ of 50 pieces'             "/moq-calculator does n
 has   /moq-calculator '20 pieces'                        "/moq-calculator states the real minimum"
 has   /sitemap.xml 'precios-fabricacion-ropa'            "the Spanish price list is in the sitemap"
 
+# USA PRODUCT PAGES. The duty story is the OPPOSITE of the UK's and
+# getting it wrong costs a customer real money: Pakistan has no US trade
+# agreement, so cotton knits carry roughly 26.5% (16.5% MFN plus the 10%
+# Section 301 tariff on Pakistani goods), while the UK is 0% under DCTS.
+# These assert each page tells its own country the truth.
+has   /hoodie-manufacturer-usa '<title>Hoodie Manufacturer for USA Brands'  "USA hoodie page owns its phrase"
+has   /t-shirt-manufacturer-usa '<title>T-Shirt Manufacturer for USA Brands' "USA t-shirt page owns its phrase"
+has   /tracksuit-manufacturer-usa '<title>Tracksuit Manufacturer for USA Brands' "USA tracksuit page owns its phrase"
+has   /streetwear-manufacturer-usa '<title>Streetwear Manufacturer for USA Brands' "USA streetwear page owns its phrase"
+lacks /hoodie-manufacturer-usa 'Clothing Manufacturer for USA Brands'       "USA hoodie page does not compete with the USA landing page"
+lacks /hoodie-manufacturer-usa '0% import duty'                             "USA hoodie page does not claim the UK's 0% duty"
+lacks /streetwear-manufacturer-usa '0% import duty'                         "USA streetwear page does not claim the UK's 0% duty"
+lacks /hoodie-manufacturer-usa 'Developing Countries Trading Scheme'        "USA page does not cite a UK-only scheme"
+has   /hoodie-manufacturer-usa '26.5'                                       "USA page states the real duty rate"
+has   /hoodie-manufacturer-usa 'HTS 6110'                                   "USA page uses HTS, not HS"
+has   /hoodie-manufacturer-uk 'HS 6110'                                     "UK page still uses HS"
+has   /hoodie-manufacturer-uk '0% import duty'                              "UK page still states its 0% position"
+lacks /hoodie-manufacturer-uk '26.5'                                        "UK page does not carry the US rate"
+has   /sitemap.xml 'hoodie-manufacturer-usa'                                "USA hoodie page is in the sitemap"
+has   /sitemap.xml 'streetwear-manufacturer-usa'                            "USA streetwear page is in the sitemap"
+has   /clothing-manufacturer-usa 'hoodie-manufacturer-usa'                  "USA landing page links its product pages"
+
 hdr "Breadcrumbs"
 # 16 posts linked "Blog" to the homepage while their own JSON-LD said /blog
 for p in /blog/hoodie-brand-guide /blog/what-is-moq-clothing /blog/tech-pack-clothing-guide /blog/pakistan-vs-china-clothing; do
