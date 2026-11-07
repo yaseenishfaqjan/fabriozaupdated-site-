@@ -78,7 +78,7 @@ function says($m, $max = 230) {
 }
 
 /* ---- bucket ------------------------------------------------------------ */
-$B = ['act'=>[], 'talking'=>[], 'unreached'=>[], 'quiet'=>[], 'warm'=>[], 'thin'=>[]];
+$B = ['act'=>[], 'talking'=>[], 'unreached'=>[], 'quiet'=>[], 'warm'=>[], 'thin'=>[], 'closed'=>[]];
 foreach ($leads as $L) {
     $id   = $L['id'];
     $tags = array_values(array_filter(explode(',', (string)$L['interests'])));
@@ -90,6 +90,17 @@ foreach ($leads as $L) {
     $L['_notes'] = isset($inote[$id]) ? $inote[$id] : 0;
     $L['_geo']   = geo($L, $CC);
     $L['_age']   = age_days($L['created_at'], $today);
+
+    /* A CLOSED LEAD IS NOT WORK. /admin/followups.php already excludes
+       won/lost/spam, but this document did not - so the first lead anyone
+       closed stayed pinned to the top of ACT TODAY, and the list would
+       have filled with finished business as more were closed. Counted
+       separately below rather than silently dropped, because "we closed
+       14" is itself worth seeing. */
+    if (in_array($L['status'], ['won', 'lost', 'spam'], true)) {
+        $B['closed'][] = $L;
+        continue;
+    }
 
     $hot      = count(array_intersect($tags, ['payment', 'low_qty'])) > 0;
     $unreach  = ($m['ok'] == 0 && $m['bad'] > 0);
@@ -149,6 +160,15 @@ if ($dupes) {
 }
 echo 'Mail works again now - acknowledgements go out through Resend and are succeeding. ',
      'But nothing retried the backlog, so those people are still owed a first reply.', $nl, $nl;
+
+if ($B['closed']) {
+    $byst = [];
+    foreach ($B['closed'] as $L) $byst[$L['status']] = ($byst[$L['status']] ?? 0) + 1;
+    $parts = [];
+    foreach ($byst as $st => $n) $parts[] = "$n $st";
+    echo '_', count($B['closed']), ' closed lead(s) are left out of the lists below (',
+         implode(', ', $parts), ')._', $nl, $nl;
+}
 
 $heads = [
   'act' => ['ACT TODAY - a decision is waiting on you',
