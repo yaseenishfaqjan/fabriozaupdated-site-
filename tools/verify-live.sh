@@ -240,6 +240,29 @@ has  /clothing-manufacturer-australia '<title>Clothing Manufacturer for Australi
 has  /blog/clothing-manufacturer-australia-brands 'Importing Clothing to Australia' "AU blog post retargeted"
 lacks /blog/clothing-manufacturer-australia-brands 'Clothing Manufacturer for Australian Brands' "AU blog post no longer competes"
 
+# UK product pages. They exist to cover "<product> manufacturer uk", which
+# neither parent page targets - /custom-hoodie-manufacturer has no UK angle
+# and /clothing-manufacturer-uk has no product angle. They must NOT take the
+# phrase the UK landing page owns, or all three compete for one query.
+has   /hoodie-manufacturer-uk '<title>Hoodie Manufacturer for UK Brands'   "UK hoodie page owns its phrase"
+lacks /hoodie-manufacturer-uk 'Clothing Manufacturer for UK Brands'        "UK hoodie page does not compete with the UK landing page"
+has   /t-shirt-manufacturer-uk '<title>T-Shirt Manufacturer for UK Brands' "UK t-shirt page owns its phrase"
+lacks /t-shirt-manufacturer-uk 'Clothing Manufacturer for UK Brands'       "UK t-shirt page does not compete with the UK landing page"
+
+# The MOQ in the hero is inherited from the template and was wrong on the
+# first build: it read "MOQ 50 pieces" on a site whose every headline says
+# 20, which is the same contradiction that made the enquiry form unusable.
+lacks /hoodie-manufacturer-uk 'MOQ 50 pieces'                              "UK hoodie page hero does not contradict the 20-piece MOQ"
+lacks /t-shirt-manufacturer-uk 'MOQ 50 pieces'                             "UK t-shirt page hero does not contradict the 20-piece MOQ"
+
+# Prices are parsed from /pricing at build time. If someone edits the price
+# list and not these pages, the site quotes two different numbers for one
+# garment - so a spot price from each table is pinned to the source.
+has   /hoodie-manufacturer-uk '$19.20'                                     "UK hoodie page carries the live 20-piece price"
+has   /pricing '$19.20'                                                    "...and /pricing still agrees with it"
+has   /t-shirt-manufacturer-uk '$11.40'                                    "UK t-shirt page carries the live 20-piece price"
+has   /pricing '$11.40'                                                    "...and /pricing still agrees with it"
+
 hdr "Breadcrumbs"
 # 16 posts linked "Blog" to the homepage while their own JSON-LD said /blog
 for p in /blog/hoodie-brand-guide /blog/what-is-moq-clothing /blog/tech-pack-clothing-guide /blog/pakistan-vs-china-clothing; do
