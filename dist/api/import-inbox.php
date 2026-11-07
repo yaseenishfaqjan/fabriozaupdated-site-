@@ -132,6 +132,62 @@ $SKIP_SUBJECTS = '/^\\s*(Accepted|Declined|Tentative|Invitation|Updated invitati
                . 'Cancell?ed|Rescheduled|Automatic reply|Out of office|'
                . 'Delivery Status Notification|Undelivered Mail Returned):/i';
 
+/* Subjects that are not an enquiry but carry no colon, so the rule above
+   cannot see them. Each was found in the real cPanel mailbox.
+
+   THE SPAM TAG IS THE RELIABLE ONE. cPanel's own filter prefixes
+   "***SPAM***" - a judgement already made by software that has seen far
+   more mail than this script ever will, and no reason to second-guess it.
+
+   The autoresponders matter for a different reason: "We will get back to
+   you!" is a machine replying to OUR outreach, so importing it creates a
+   lead whose only recorded message is their robot answering us. */
+$SKIP_SUBJECT_ANY = '/(\*{3}\s*SPAM\s*\*{3}|^\s*\[Request received\]|'
+                  . '^\s*(Auto|Autoreply|Auto-reply)\b|'
+                  . '^\s*We will get back to you|'
+                  . '^\s*Thank you for (contacting|your (enquiry|inquiry|message)))/i';
+
+/* COLD OUTREACH SELLING US SOMETHING. The cPanel mailbox is roughly half
+   SEO, web-design and app-development agencies. They are real humans at
+   real addresses, so no sender rule catches them; what gives them away is
+   that they are selling a service nobody buys from an inbound email.
+
+   Matched on the SUBJECT and deliberately narrow. "Website" alone would
+   hit a customer asking about printing their website artwork, so each
+   alternative needs the sales framing too, not just the noun. Verified
+   against both lists from the real mailbox - every pitch dropped, every
+   genuine enquiry kept. */
+$SKIP_PITCH = '/^\s*(re\s*:\s*|rw\s*:\s*|fwd?\s*:\s*)*('
+            . 'seo\b|.*\bseo (rank|cost|service|package|plan)|'
+            . '.*\bseo\s*\+|website (development|design|review|redesign|offers?)|'
+            . 'rebuild your website|web (issues|design|development)|'
+            . 'developers? and designers|'
+            . '(let.?s talk|interested in) (app|website|web)|'
+            . '(1st|first) page\b|page 1 discussion|'
+            . 'improvement ideas|empower your business|'
+            . 'increase (business|traffic|sales)\b|'
+            . 'rate promo|business financing|'
+            . 'i want to connect\s*$|^\s*call\s*$'
+            . ')/i';
+
+/* Words that simply do not occur in an apparel enquiry, wherever they sit
+   in the subject. The rule above is anchored at the start, which a pitch
+   defeats just by prefixing "Quick Follow-Up -". These are unanchored
+   because the risk is the other way round: no customer asking about
+   hoodies writes "SEO" or "mobile app development" to a clothing factory.
+   Checked against the keep-list in tools/test-inbox-filters.php, which
+   includes subjects that mention a website and designers innocently. */
+/* Written with LOOKAROUNDS, not a word-boundary escape. Putting \b here
+   through a shell did not drop the escape - it interpreted it, writing a
+   literal backspace byte into this file. The pattern then compiled with no
+   boundaries at all, matched 'seo' inside other words, and looked entirely
+   normal on screen. The lookaround form carries no backslash, so no shell
+   layer can mangle it. */
+$SKIP_PITCH_ANYWHERE = '/(?<![a-z])(seo|serp|backlinks?|mobile app|app development|'
+                     . 'web development|website (fix|offers?|proposal)|'
+                     . 'crawl-?able|search engine (optimi|ranking)|'
+                     . 'digital marketing|guest post|mobile solutions)(?![a-z])/i';
+
 /** True for machine-generated mail that no address list can recognise. */
 function subject_is_junk(string $subject, string $rx): bool {
     return (bool) preg_match($rx, trim($subject));
@@ -293,6 +349,12 @@ foreach ($uids as $uid) {
     }
     // the sender can be a perfectly real human and the mail still be machine-sent
     if (!$skip && subject_is_junk($subject, $SKIP_SUBJECTS)) { $skip = true; $skipReason = 'subject'; }
+    if (!$skip && preg_match($SKIP_SUBJECT_ANY, $subject)) { $skip = true; $skipReason = 'auto/spam-tagged'; }
+    if (!$skip && preg_match($SKIP_PITCH, $subject))       { $skip = true; $skipReason = 'cold pitch'; }
+    if (!$skip && preg_match($SKIP_PITCH_ANYWHERE, $subject)) { $skip = true; $skipReason = 'cold pitch'; }
+    /* Our own domain is never a lead: cpanel@fabrioza.com is this server
+       mailing itself, and anything else @fabrioza.com is us. */
+    if (!$skip && preg_match('/@fabrioza\.com$/i', $fromAddr)) { $skip = true; $skipReason = 'our own domain'; }
     /* A MEETING ACCEPTANCE IS NOT AN ENQUIRY, BUT THE PERSON IS A LEAD.
      *
      * Found by auditing the real mailbox: two people accepted a call with
