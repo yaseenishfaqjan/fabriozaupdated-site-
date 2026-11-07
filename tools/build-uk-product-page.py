@@ -59,6 +59,47 @@ PRODUCTS = {
         'hero_img': '/images/cat-hoodies-hero.jpg',
         'hero_alt': 'Custom hoodies and sweatshirts manufactured for UK brands',
     },
+    'tracksuit': {
+        'slug': 'tracksuit-manufacturer-uk',
+        'h1': 'Tracksuit Manufacturer for UK Brands',
+        'title': 'Tracksuit Manufacturer for UK Brands | 0% Duty, MOQ from 20 | FABRIOZA',
+        'desc': ('Custom tracksuits for UK brands: matching zip jacket and joggers, '
+                 'MOQ from 20 sets, 0% UK import duty under DCTS, DDP delivery. Real '
+                 'prices and commodity codes, not estimates.'),
+        'rows': ['Tracksuit Set'],
+        'hs': '6112',
+        'hs_label': 'Track suits, ski suits and swimwear, knitted or crocheted',
+        'gsm': '280-340gsm',
+        'tag': 'Tracksuits',
+        'noun': 'tracksuits',
+        'noun_short': 'tracksuits',
+        'hero_img': '/images/sw-tracksuit.jpg',
+        'hero_alt': 'Custom tracksuits manufactured for UK brands',
+    },
+    'streetwear': {
+        'slug': 'streetwear-manufacturer-uk',
+        'h1': 'Streetwear Manufacturer for UK Brands',
+        'title': 'Streetwear Manufacturer for UK Brands | 0% Duty, MOQ from 20 | FABRIOZA',
+        'desc': ('Custom streetwear for UK brands: garment-dyed acid wash tees, '
+                 'heavyweight tees and oversized hoodies, MOQ from 20 pieces, 0% UK '
+                 'import duty under DCTS, DDP delivery.'),
+        'rows': ['Streetwear Acid Wash Tee', 'Heavyweight T-Shirt', 'Premium Hoodie'],
+        # No single code: this page covers several garments, and a category
+        # does not have one. Listed rather than invented.
+        'hs': None,
+        'hs_multi': ('Streetwear spans several commodity codes rather than one: tees sit '
+                     'under <strong>HS 6109</strong>, hoodies and crews under '
+                     '<strong>HS 6110</strong>, and knitted cargo trousers under '
+                     '<strong>HS 6103</strong>. We confirm the code for each garment in '
+                     'your range before quoting.'),
+        'hs_label': '',
+        'gsm': '180-350gsm',
+        'tag': 'Streetwear',
+        'noun': 'streetwear',
+        'noun_short': 'streetwear',
+        'hero_img': '/images/st-acidwash-tee.jpg',
+        'hero_alt': 'Custom streetwear manufactured for UK brands',
+    },
     'tshirt': {
         'slug': 't-shirt-manufacturer-uk',
         'h1': 'T-Shirt Manufacturer for UK Brands',
@@ -279,7 +320,7 @@ def faq_for(P):
         ("Will I pay UK import duty on " + P["noun"] + "?",
          "Most likely 0%, under the UK's Developing Countries Trading Scheme. "
          "That covers 92% of product lines rather than all of them, so we check "
-         "your commodity code (HS " + P["hs"] + " for this garment) and tell you "
+         "your commodity code" + (" (HS " + P["hs"] + " for this garment)" if P.get("hs") else "") + " and tell you "
          "the rate before you order. Import VAT at 20% applies either way and is "
          "normally reclaimable if you are VAT-registered."),
         ("How long does it take to reach the UK?",
@@ -292,6 +333,14 @@ def faq_for(P):
 
 
 def body_html(P, table):
+    # A single garment has one commodity code. A CATEGORY does not, and
+    # claiming one would be a wrong answer to the question a UK buyer is
+    # actually asking - so a multi-garment page lists them instead.
+    if P.get('hs'):
+        hs_sentence = ('Your commodity code for this garment is <strong>HS %s</strong> - '
+                       '<em>%s</em>.' % (P['hs'], P['hs_label']))
+    else:
+        hs_sentence = P['hs_multi']
     faq_html = "".join(
         '<div class="faq-item"><h3>%s</h3><p>%s</p></div>'
         % (html.escape(q), html.escape(a)) for q, a in faq_for(P))
@@ -316,8 +365,7 @@ there. A sample comes first either way, so you approve the fit and the fabric
 before committing to a run.</p>
 
 <h2>What UK import actually costs you</h2>
-<p>Your commodity code for this garment is <strong>HS {P['hs']}</strong> -
-<em>{P['hs_label']}</em>. Pakistan sits in the Enhanced Preferences tier of the
+<p>{hs_sentence} Pakistan sits in the Enhanced Preferences tier of the
 UK's Developing Countries Trading Scheme, which carries 0% import duty on 92%
 of product lines.</p>
 <p>Two things we would rather state than have you discover. It is 92% of lines,

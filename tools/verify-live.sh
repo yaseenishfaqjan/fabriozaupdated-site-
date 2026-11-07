@@ -262,6 +262,27 @@ has   /hoodie-manufacturer-uk '$19.20'                                     "UK h
 has   /pricing '$19.20'                                                    "...and /pricing still agrees with it"
 has   /t-shirt-manufacturer-uk '$11.40'                                    "UK t-shirt page carries the live 20-piece price"
 has   /pricing '$11.40'                                                    "...and /pricing still agrees with it"
+has   /tracksuit-manufacturer-uk '<title>Tracksuit Manufacturer for UK Brands'   "UK tracksuit page owns its phrase"
+lacks /tracksuit-manufacturer-uk 'Clothing Manufacturer for UK Brands'          "UK tracksuit page does not compete"
+lacks /tracksuit-manufacturer-uk 'MOQ 50 pieces'                                "UK tracksuit hero does not contradict the 20-piece MOQ"
+has   /tracksuit-manufacturer-uk '$26.40'                                       "UK tracksuit page carries the live 20-piece price"
+has   /pricing '$26.40'                                                         "...and /pricing still agrees with it"
+
+has   /streetwear-manufacturer-uk '<title>Streetwear Manufacturer for UK Brands' "UK streetwear page owns its phrase"
+lacks /streetwear-manufacturer-uk 'Clothing Manufacturer for UK Brands'          "UK streetwear page does not compete"
+lacks /streetwear-manufacturer-uk 'MOQ 50 pieces'                                "UK streetwear hero does not contradict the 20-piece MOQ"
+has   /streetwear-manufacturer-uk '$13.20'                                       "UK streetwear page carries the live 20-piece price"
+has   /pricing '$13.20'                                                          "...and /pricing still agrees with it"
+# Streetwear covers several garments, so it must NOT claim a single code -
+# naming one would be a wrong answer to the question a UK buyer is asking.
+has   /streetwear-manufacturer-uk 'spans several commodity codes'                "UK streetwear page does not claim one commodity code"
+
+# every UK product page must be reachable, not an orphan
+has   /sitemap.xml 'hoodie-manufacturer-uk'                                      "UK hoodie page is in the sitemap"
+has   /sitemap.xml 't-shirt-manufacturer-uk'                                     "UK t-shirt page is in the sitemap"
+has   /sitemap.xml 'tracksuit-manufacturer-uk'                                   "UK tracksuit page is in the sitemap"
+has   /sitemap.xml 'streetwear-manufacturer-uk'                                  "UK streetwear page is in the sitemap"
+has   /clothing-manufacturer-uk 'hoodie-manufacturer-uk'                         "UK landing page links its product pages"
 
 hdr "Breadcrumbs"
 # 16 posts linked "Blog" to the homepage while their own JSON-LD said /blog
