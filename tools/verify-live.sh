@@ -284,6 +284,23 @@ has   /sitemap.xml 'tracksuit-manufacturer-uk'                                  
 has   /sitemap.xml 'streetwear-manufacturer-uk'                                  "UK streetwear page is in the sitemap"
 has   /clothing-manufacturer-uk 'hoodie-manufacturer-uk'                         "UK landing page links its product pages"
 
+# THE SITE MUST NOT CONTRADICT ITS OWN MOQ. Every country landing page
+# opened with "MOQ 50 pieces" while the homepage title, the hero, the
+# product cards and the enquiry form all say 20 - and /moq-calculator, a
+# page named for the question, never mentioned 20 at all. 50 is still
+# correct where it appears as the BULK threshold, which is why these check
+# the hero claim rather than the number.
+lacks /clothing-manufacturer-uk 'MOQ 50 pieces'          "UK page hero does not claim a 50-piece minimum"
+lacks /clothing-manufacturer-usa 'MOQ 50 pieces'         "USA page hero does not claim a 50-piece minimum"
+lacks /clothing-manufacturer-australia 'MOQ 50 pieces'   "AU page hero does not claim a 50-piece minimum"
+lacks /clothing-manufacturer-canada 'MOQ 50 pieces'      "CA page hero does not claim a 50-piece minimum"
+lacks /clothing-manufacturer-germany 'MOQ 50 pieces'     "DE page hero does not claim a 50-piece minimum"
+lacks /clothing-manufacturer-uae 'MOQ 50 pieces'         "UAE page hero does not claim a 50-piece minimum"
+has   /clothing-manufacturer-uk 'MOQ from 20 pieces'     "UK page hero states the real minimum"
+lacks /moq-calculator 'low MOQ of 50 pieces'             "/moq-calculator does not state 50 as the minimum"
+has   /moq-calculator '20 pieces'                        "/moq-calculator states the real minimum"
+has   /sitemap.xml 'precios-fabricacion-ropa'            "the Spanish price list is in the sitemap"
+
 hdr "Breadcrumbs"
 # 16 posts linked "Blog" to the homepage while their own JSON-LD said /blog
 for p in /blog/hoodie-brand-guide /blog/what-is-moq-clothing /blog/tech-pack-clothing-guide /blog/pakistan-vs-china-clothing; do
