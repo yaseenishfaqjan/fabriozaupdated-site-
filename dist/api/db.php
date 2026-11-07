@@ -202,7 +202,19 @@ function crm_rate_limit_ok(PDO $db, string $ipHash, int $max = 5, int $windowSec
 /** Rule-based lead score (see CRM brief). */
 function crm_lead_score(array $d): int {
     $score = 0;
-    $qty = (int)preg_replace('/\D+/', '', (string)($d['quantity'] ?? ''));
+    /* The LOW end of the range, not every digit in it.
+     *
+     * This stripped non-digits from the whole string, so the form's
+     * "50-100" became the number 50100 and "100-250" became 100250 -
+     * every range landed above the top threshold and scored 20. The three
+     * tiers below have therefore never discriminated between any two form
+     * submissions since the form has only ever offered ranges.
+     *
+     * Reading the first number restores what the tiers were written for,
+     * and is also the conservative reading: someone who picks "20-50" is
+     * promising 20, not 50. */
+    preg_match('/\d+/', (string)($d['quantity'] ?? ''), $qm);
+    $qty = (int)($qm[0] ?? 0);
     if ($qty >= 100)     { $score += 20; }
     elseif ($qty >= 50)  { $score += 15; }
     elseif ($qty >= 20)  { $score += 10; }
