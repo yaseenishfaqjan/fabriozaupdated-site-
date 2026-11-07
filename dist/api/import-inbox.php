@@ -19,6 +19,11 @@
  *   php import-inbox.php --all      # historic backfill: whole inbox
  *   php import-inbox.php --dry-run  # preview, change nothing
  *   php import-inbox.php --all --limit 50   # first 50 only, in batches
+ *   php import-inbox.php --all --mailbox=hostinger
+ *                                   # a SECOND mailbox, from
+ *                                   # IMAP_HOSTINGER_HOST/_USER/_PASS,
+ *                                   # leaving the cron's own credentials
+ *                                   # untouched
  *   php import-inbox.php --all --dry-run --reconsider
  *                                   # preview INCLUDING messages earlier
  *                                   # runs skipped (audit what was dropped)
@@ -49,11 +54,48 @@ require_once __DIR__ . '/lib/lead_tags.php';
  * message present in both is imported exactly once - and that is what
  * makes it safe to point this at Gmail when Gmail collects the cPanel mail.
  */
-$user = getenv('IMAP_USER') ?: (getenv('SMTP_USER') ?: '');
-$pass = getenv('IMAP_PASS') ?: (getenv('SMTP_PASS') ?: '');
-if ($user === '' || $pass === '') {
-    fwrite(STDERR, "No mailbox credentials: set IMAP_USER/IMAP_PASS (or SMTP_USER/SMTP_PASS)\n");
-    exit(1);
+/* --mailbox=NAME reads IMAP_<NAME>_HOST / _USER / _PASS instead.
+ *
+ * There are THREE mailboxes holding this company's mail, not one: Gmail,
+ * the cPanel account the MX currently points at, and an older Hostinger
+ * box that still holds everything from before the DNS moved. Each needs
+ * its own credentials, and the default pair is the one the every-30-minutes
+ * cron uses, so a second mailbox must not borrow it.
+ *
+ * The alternative was editing .env before and after each run, which breaks
+ * the cron for as long as the values are swapped, and leaves it broken if
+ * anyone forgets to swap back. A named set cannot do that, and it makes a
+ * second cron entry possible later without further changes.
+ */
+$mailbox = '';
+foreach ($argv as $i => $a) {
+    if (strpos($a, '--mailbox=') === 0) { $mailbox = strtoupper(substr($a, 10)); }
+    elseif ($a === '--mailbox' && isset($argv[$i + 1])) { $mailbox = strtoupper($argv[$i + 1]); }
+}
+$mailbox = preg_replace('/[^A-Z0-9]/', '', $mailbox);
+
+if ($mailbox !== '') {
+    $user = getenv("IMAP_{$mailbox}_USER") ?: '';
+    $pass = getenv("IMAP_{$mailbox}_PASS") ?: '';
+    $host = getenv("IMAP_{$mailbox}_HOST") ?: '';
+    if ($user === '' || $pass === '') {
+        fwrite(STDERR, "Mailbox '$mailbox' is not configured: set IMAP_{$mailbox}_USER, "
+                     . "IMAP_{$mailbox}_PASS and IMAP_{$mailbox}_HOST\n"
+                     . "(and list them in docker-compose.yml - a variable only reaches "
+                     . "the container if it is named there).\n");
+        exit(1);
+    }
+    /* IMAP_HOST is read later by imap_curl() from the environment, so the
+       named host is put there rather than threaded through every call. */
+    if ($host !== '') { putenv("IMAP_HOST=$host"); }
+    fwrite(STDERR, "reading mailbox '$mailbox' at " . ($host ?: '(default host)') . "\n");
+} else {
+    $user = getenv('IMAP_USER') ?: (getenv('SMTP_USER') ?: '');
+    $pass = getenv('IMAP_PASS') ?: (getenv('SMTP_PASS') ?: '');
+    if ($user === '' || $pass === '') {
+        fwrite(STDERR, "No mailbox credentials: set IMAP_USER/IMAP_PASS (or SMTP_USER/SMTP_PASS)\n");
+        exit(1);
+    }
 }
 
 $all = in_array('--all', $argv, true);

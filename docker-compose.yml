@@ -46,6 +46,16 @@ services:
       IMAP_HOST: ${IMAP_HOST:-}
       IMAP_USER: ${IMAP_USER:-}
       IMAP_PASS: ${IMAP_PASS:-}
+      # A SECOND, NAMED mailbox, read with --mailbox=hostinger. There are
+      # three mail stores holding this company's history - Gmail, the cPanel
+      # account the MX points at now, and this older Hostinger box from
+      # before the DNS moved. The pair above belongs to the every-30-minutes
+      # cron, so a one-off import of another mailbox must not borrow it:
+      # swapping those values breaks the cron while they are swapped, and
+      # leaves it broken if nobody swaps them back.
+      IMAP_HOSTINGER_HOST: ${IMAP_HOSTINGER_HOST:-imap.hostinger.com}
+      IMAP_HOSTINGER_USER: ${IMAP_HOSTINGER_USER:-}
+      IMAP_HOSTINGER_PASS: ${IMAP_HOSTINGER_PASS:-}
     volumes:
       # CRM SQLite database - OUTSIDE the web root, survives rebuilds
       - crm_data:/var/data
