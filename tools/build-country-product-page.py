@@ -79,7 +79,133 @@ brokerage invoice afterwards. The full breakdown is on our
 <a href="/clothing-manufacturer-usa">USA manufacturing page</a>.</p>"""
 
 
+def canada_duty(P, C):
+    lead = (('Your tariff heading for this garment is <strong>HS %s</strong> - '
+             '<em>%s</em>.' % (P['hs'], P['hs_label'])) if P.get('hs')
+            else P['hs_multi_uk'])
+    return f"""<p>{lead}</p>
+<p><strong>Apparel is excluded from Canada's General Preferential Tariff</strong>,
+so Pakistani goods pay the standard MFN rate rather than a reduced one. As of
+October 2026 that is <strong>18% on knitwear</strong> and 16-18% on woven items,
+plus <strong>5% GST</strong>.</p>
+<p>If your business is GST-registered you reclaim the 5% as an input tax credit,
+which leaves duty as the only part that stays a cost. Our DDP quotes include
+both, so the figure you approve is the figure you pay. We confirm the rate for
+your commodity code in writing before you order - the full position is on our
+<a href="/clothing-manufacturer-canada">Canada manufacturing page</a>.</p>"""
+
+
+def australia_duty(P, C):
+    lead = (('Your tariff heading for this garment is <strong>HS %s</strong> - '
+             '<em>%s</em>.' % (P['hs'], P['hs_label'])) if P.get('hs')
+            else P['hs_multi_uk'])
+    return f"""<p>{lead}</p>
+<p>Australia is one of the friendlier import markets for this: a <strong>flat 5%
+apparel duty</strong> plus <strong>10% GST</strong>, rates current as of October
+2026. Both are included in our DDP quotes, and a GST-registered business
+reclaims the 10% as an input tax credit - so the 5% duty is the only part that
+stays a cost.</p>
+<p>We confirm the rate against your commodity code before you order rather than
+assuming it. The full position is on our
+<a href="/clothing-manufacturer-australia">Australia manufacturing page</a>.</p>"""
+
+
+def germany_duty(P, C):
+    lead = (('Your commodity code for this garment is <strong>HS %s</strong> - '
+             '<em>%s</em>.' % (P['hs'], P['hs_label'])) if P.get('hs')
+            else P['hs_multi_uk'])
+    return f"""<p>{lead}</p>
+<p>Pakistan holds <strong>EU GSP+ status, valid to 2027</strong>, which removes
+duty on covered tariff lines - and apparel MFN duty into the EU runs roughly
+<strong>8.4-12%</strong>, so on a covered garment that is the whole line gone.</p>
+<p><strong>We will not quote you a flat 0% into Germany the way we can into
+Britain, and the reason matters.</strong> EU rules of origin for clothing are
+stricter: Britain dropped its two-stage requirement on 1 January 2026, so a
+garment cut and sewn here from imported fabric now enters the UK at 0%. The EU
+has made no equivalent change, and eligibility still turns on where the fabric
+itself was produced. We check your commodity code and your fabric's origin, then
+give you the actual rate before you commit - because a supplier who promises
+duty-free and is wrong does not pay the correction at the border, you do.</p>
+<p><strong>German import VAT at 19%</strong> applies regardless and is normally
+reclaimable as input tax if you are VAT-registered. The full position is on our
+<a href="/clothing-manufacturer-germany">Germany and EU manufacturing page</a>.</p>"""
+
+
+def uae_duty(P, C):
+    lead = (('Your tariff heading for this garment is <strong>HS %s</strong> - '
+             '<em>%s</em>.' % (P['hs'], P['hs_label'])) if P.get('hs')
+            else P['hs_multi_uk'])
+    return f"""<p>{lead}</p>
+<p>The <strong>5% GCC common customs duty</strong> and <strong>5% import VAT</strong>
+are both included in our DDP quotes. VAT is charged on CIF plus duty, and a
+VAT-registered business reclaims it as input tax - which leaves the 5% duty as
+the only part that stays a cost.</p>
+<p>Proximity is the real advantage here: Dubai is a short air corridor from
+Pakistan, so restocks land in days rather than weeks. The full position is on our
+<a href="/clothing-manufacturer-uae">UAE manufacturing page</a>.</p>"""
+
+
 COUNTRIES = {
+    'canada': {
+        'slug': 'canada', 'template': 'clothing-manufacturer-canada',
+        'landing': '/clothing-manufacturer-canada',
+        'brands': 'Canadian Brands', 'brands_lc': 'Canadian brands',
+        'dest': 'Canada', 'duty_html': canada_duty,
+        'duty_blurb': 'DDP quotes with Canadian duty and GST included',
+        'faq_duty_q': 'What duty will I pay on {noun} into Canada?',
+        'faq_duty_a': ("18% on knitwear and 16-18% on woven items as of October "
+                       "2026, plus 5% GST. Apparel is excluded from Canada's GPT, "
+                       "so the standard MFN rate applies{code}. GST is reclaimable "
+                       "if you are registered; our DDP quote includes both."),
+        'faq_ship_a': ('Express is 4-7 business days, air freight 8-11, sea to '
+                       'Vancouver or Montreal 32-42 for planned inventory. All DDP.'),
+    },
+    'australia': {
+        'slug': 'australia', 'template': 'clothing-manufacturer-australia',
+        'landing': '/clothing-manufacturer-australia',
+        'brands': 'Australian Brands', 'brands_lc': 'Australian brands',
+        'dest': 'Australia', 'duty_html': australia_duty,
+        'duty_blurb': '5% duty and 10% GST included in DDP quotes',
+        'faq_duty_q': 'What duty will I pay on {noun} into Australia?',
+        'faq_duty_a': ("A flat 5% apparel duty plus 10% GST, current as of October "
+                       "2026{code}. Both are in our DDP quote, and a GST-registered "
+                       "business reclaims the 10% as an input tax credit."),
+        'faq_ship_a': ('Express is 4-6 business days, air freight 7-10, sea to '
+                       'Sydney or Melbourne 25-32 for large inventory. All DDP.'),
+    },
+    'germany': {
+        'slug': 'germany', 'template': 'clothing-manufacturer-germany',
+        'landing': '/clothing-manufacturer-germany',
+        'brands': 'German & EU Brands', 'brands_h1': 'German Brands',
+        'brands_lc': 'German and EU brands',
+        'dest': 'Germany', 'duty_html': germany_duty,
+        'duty_blurb': 'EU GSP+ where origin qualifies, 19% VAT',
+        'faq_duty_q': 'What duty will I pay on {noun} into Germany?',
+        'faq_duty_a': ("Possibly none - Pakistan holds EU GSP+ to 2027, and apparel "
+                       "MFN runs 8.4-12%, so a covered garment loses that line "
+                       "entirely{code}. But EU rules of origin still turn on where "
+                       "the fabric was made, so we check your code and your fabric "
+                       "origin and give you the real rate rather than promising 0%. "
+                       "German import VAT at 19% applies regardless and is normally "
+                       "reclaimable."),
+        'faq_ship_a': ('Express is 3-5 business days, air freight 6-9, sea to '
+                       'Hamburg or Rotterdam 26-34 for container-scale. All DDP.'),
+    },
+    'uae': {
+        'slug': 'uae', 'template': 'clothing-manufacturer-uae',
+        'landing': '/clothing-manufacturer-uae',
+        'brands': 'UAE & GCC Brands', 'brands_h1': 'UAE Brands',
+        'brands_lc': 'UAE and GCC brands',
+        'dest': 'the UAE', 'duty_html': uae_duty,
+        'duty_blurb': '5% GCC duty and 5% VAT included in DDP quotes',
+        'faq_duty_q': 'What duty will I pay on {noun} into the UAE?',
+        'faq_duty_a': ("The 5% GCC common customs duty plus 5% import VAT{code}. "
+                       "VAT is charged on CIF plus duty and a VAT-registered "
+                       "business reclaims it, leaving the 5% duty as the only "
+                       "lasting cost. Both are in our DDP quote."),
+        'faq_ship_a': ('Air freight is 4-6 days - Dubai is a short corridor from '
+                       'Pakistan, so restocks land in days rather than weeks.'),
+    },
     'uk': {
         'slug': 'uk',
         'template': 'clothing-manufacturer-uk',
@@ -284,7 +410,11 @@ clearance paperwork handled.</li>
 def build(country, product, write):
     C, P = COUNTRIES[country], PRODUCTS[product]
     slug = '%s-manufacturer-%s' % (P['slug'], C['slug'])
-    h1 = '%s Manufacturer for %s' % (P['title_noun'], C['brands'])
+    # Germany's and the UAE's landing pages own "... for German & EU Brands"
+    # and "... for UAE & GCC Brands". The product page must take a DIFFERENT
+    # phrase or the two compete, so it uses the shorter country form.
+    brands_for_h1 = C.get('brands_h1', C['brands'])
+    h1 = '%s Manufacturer for %s' % (P['title_noun'], brands_for_h1)
     title = '%s | MOQ from 20, DDP | FABRIOZA' % h1
     desc = ('Custom %s for %s: %s, MOQ from 20 pieces, %s, DDP delivery. Real '
             'prices and tariff codes, not estimates.'

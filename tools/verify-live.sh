@@ -323,6 +323,32 @@ has   /sitemap.xml 'hoodie-manufacturer-usa'                                "USA
 has   /sitemap.xml 'streetwear-manufacturer-usa'                            "USA streetwear page is in the sitemap"
 has   /clothing-manufacturer-usa 'hoodie-manufacturer-usa'                  "USA landing page links its product pages"
 
+# CANADA / AUSTRALIA / GERMANY / UAE product pages. Six countries, six
+# different tariff positions, and the failure mode is one page quoting
+# another country's rate - a number somebody budgets against and pays at
+# the border. Each is asserted to state its OWN position and not a
+# neighbour's.
+has   /hoodie-manufacturer-canada 'General Preferential Tariff'     "Canada page states apparel is excluded from GPT"
+has   /hoodie-manufacturer-canada '18%'                             "Canada page states the real knitwear rate"
+lacks /hoodie-manufacturer-canada '0% import duty'                  "Canada page does not claim the UK's 0%"
+lacks /hoodie-manufacturer-canada 'Section 301'                     "Canada page does not carry the US tariff"
+
+has   /hoodie-manufacturer-australia 'flat 5%'                      "Australia page states the real duty rate"
+has   /hoodie-manufacturer-australia '10% GST'                      "Australia page states GST"
+lacks /hoodie-manufacturer-australia '0% import duty'               "Australia page does not claim the UK's 0%"
+
+has   /hoodie-manufacturer-germany 'GSP+'                           "Germany page cites the EU scheme"
+has   /hoodie-manufacturer-germany 'will not quote you a flat 0%'   "Germany page keeps its rules-of-origin caveat"
+has   /hoodie-manufacturer-germany '19%'                            "Germany page states German import VAT"
+lacks /hoodie-manufacturer-germany 'Developing Countries Trading'   "Germany page does not cite the UK-only scheme"
+
+has   /hoodie-manufacturer-uae 'GCC common customs'                 "UAE page states the GCC duty"
+lacks /hoodie-manufacturer-uae '0% import duty'                     "UAE page does not claim the UK's 0%"
+
+has   /sitemap.xml 'hoodie-manufacturer-canada'                     "Canada product page is in the sitemap"
+has   /sitemap.xml 'streetwear-manufacturer-uae'                    "UAE product page is in the sitemap"
+has   /clothing-manufacturer-germany 'hoodie-manufacturer-germany'  "Germany landing page links its product pages"
+
 hdr "Breadcrumbs"
 # 16 posts linked "Blog" to the homepage while their own JSON-LD said /blog
 for p in /blog/hoodie-brand-guide /blog/what-is-moq-clothing /blog/tech-pack-clothing-guide /blog/pakistan-vs-china-clothing; do
