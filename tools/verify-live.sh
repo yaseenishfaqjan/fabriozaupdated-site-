@@ -86,7 +86,15 @@ if [ "${1:-}" = "--deploy" ]; then
   vps_before=$(ssh -o ConnectTimeout=20 -o BatchMode=yes "$VPS" \
       'cd /opt/fabrioza && git rev-parse HEAD' 2>/dev/null || echo '')
   if [ -n "$vps_before" ] && git cat-file -e "$vps_before^{commit}" 2>/dev/null; then
-    if ! git diff --quiet "$vps_before" HEAD -- "$REPO/dist/assets/" 2>/dev/null; then
+    # Scoped to the files that are actually AT RISK: the ones served
+    # immutable under a name that never changes, which is index-*.
+    # A brand-new file in dist/assets/ cannot be stale in anybody's cache -
+    # nobody has a cached copy of a file that did not exist - and it carries
+    # its own ?v= in its own tag. The first version of this guard diffed the
+    # whole directory and refused a deploy that added product-detail.js,
+    # where bumping the bundle's ?v= would have thrown away the 609 KB
+    # bundle cache for every returning visitor to fix nothing.
+    if ! git diff --quiet "$vps_before" HEAD -- "$REPO/dist/assets/index-*" 2>/dev/null; then
       q_old=$(git show "$vps_before:dist/index.html" 2>/dev/null \
               | grep -o 'assets/index-[^"]*\.js?v=[^"]*' | head -1)
       q_new=$(grep -o 'assets/index-[^"]*\.js?v=[^"]*' "$REPO/dist/index.html" | head -1)
