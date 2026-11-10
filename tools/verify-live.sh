@@ -591,8 +591,17 @@ motion_css=$(curl -fsSL --compressed --max-time 25 "$SITE/assets/site-motion.css
 if [ -z "$motion_css" ]; then
   b "could not fetch site-motion.css to audit it"
 else
-  bad_hide=$(printf '%s' "$motion_css" | tr '}' '
-'     | grep -E 'opacity[[:space:]]*:[[:space:]]*0' | grep -vc 'fz-reveal' || true)
+  # Newlines are stripped BEFORE splitting on braces, so each line becomes
+  # one whole "selector{declarations" rule. Splitting a pretty-printed
+  # stylesheet on braces alone leaves the selector and its declarations on
+  # separate lines, so a line-by-line grep sees a bare "opacity: 0;" with no
+  # selector attached and reports every rule as unscoped - which is exactly
+  # what the first version of this check did. The sed drops any leading
+  # comment, because the comment above this very rule contains the characters
+  # opacity:0 while describing them.
+  bad_hide=$(printf '%s' "$motion_css" | tr -d '
+' | tr '}' '
+'     | grep -E 'opacity[[:space:]]*:[[:space:]]*0[^.0-9]'     | sed 's|.*\*/||' | grep -vc 'fz-reveal' || true)
   [ "${bad_hide:-0}" = "0" ]     && g "motion CSS hides nothing outside .fz-reveal (fails open)"     || b "motion CSS has $bad_hide opacity:0 rule(s) OUTSIDE .fz-reveal - content can be hidden with JS off"
 fi
 
