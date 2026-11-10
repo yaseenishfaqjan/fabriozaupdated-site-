@@ -1,0 +1,88 @@
+/* FABRIOZA site navigation - ONE source for every static page.
+   Generated into pages by tools/build-nav.py. Do not restate these rules
+   in a page's inline <style>: the whole point of this file is that the
+   top bar is identical everywhere, and 160 inline copies are how it came
+   to differ in the first place (101 pages white, 42 black, 3 gradient).
+
+   The .fz- prefix is deliberate. Every page carries its own inline CSS
+   styling .site-header / .header / header, and none of them has ever used
+   .fz-, so these rules cannot be overridden by, or collide with, anything
+   already on the page. A class (0,1,0) also outranks the bare `header`
+   (0,0,1) rules on the 16 classless pages regardless of source order. */
+
+/* SCOPED RESET - this is not belt-and-braces, it is required.
+   Specificity cannot protect a property you never declared. 13 pages carry
+   `header{text-align:center;padding:40px 0;margin-bottom:40px}` in their own
+   inline CSS; because the first version of this file set background and
+   border but not padding or margin, that rule applied and turned the bar on
+   /moq-calculator into a 200px-tall centred block with the links pushed out
+   of sight. The bare header/nav rules across the site set, in order of
+   frequency: margin-bottom, border-bottom, text-align, padding, font-size,
+   color, background, position, top, z-index. All of them are neutralised
+   here and only the ones this file wants are set again below.
+
+   This reset must stay ABOVE the rules that follow: it has the same
+   specificity as them, so source order is what lets them win. This file is
+   injected as the LAST stylesheet in <head> on every page (verified: 0 pages
+   put a <style> after it, 0 put one in the body), so it also wins ties
+   against the page's own inline CSS. */
+.fz-nav,.fz-nav *{margin:0;padding:0;border:0;outline:0;float:none;
+  text-align:left;text-indent:0;text-transform:none;letter-spacing:normal;
+  font-size:100%;line-height:normal;background:none;box-shadow:none;
+  border-radius:0;width:auto;height:auto;max-width:none;min-height:0;
+  text-decoration:none;list-style:none}
+
+.fz-nav{position:sticky;top:0;z-index:9000;background:#0A0A0A;color:#fff;line-height:1;
+  border-bottom:1px solid rgba(255,255,255,.09);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.fz-nav *{box-sizing:border-box}
+.fz-nav__bar{max-width:1200px;margin:0 auto;padding:0 20px;height:64px;
+  display:flex;align-items:center;gap:20px}
+
+.fz-nav__brand{display:flex;align-items:center;gap:10px;text-decoration:none;
+  margin-right:auto;flex-shrink:0}
+.fz-nav__brand img{width:34px;height:34px;border-radius:50%;display:block;
+  object-fit:cover;background:#fff}
+.fz-nav__brand span{color:#fff;font-size:15px;font-weight:600;letter-spacing:1.4px;
+  text-transform:uppercase;white-space:nowrap}
+
+.fz-nav__menu{display:flex;align-items:center;gap:22px}
+.fz-nav__menu a{color:rgba(255,255,255,.78);text-decoration:none;font-size:11px;
+  font-weight:500;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap;
+  padding:6px 0;border-bottom:1.5px solid transparent;transition:color .18s,border-color .18s}
+.fz-nav__menu a:hover,.fz-nav__menu a:focus-visible{color:#fff}
+/* the current page is named, so a visitor always knows where they are -
+   the old navs gave no such signal, which is part of why moving between
+   pages felt like moving between sites */
+.fz-nav__menu a[aria-current="page"]{color:#fff;border-bottom-color:#4A7C59}
+
+.fz-nav__cta,.fz-nav__menu a.fz-nav__cta{background:#4A7C59;color:#fff;
+  padding:9px 17px;border-radius:4px;border-bottom:0;font-weight:600;
+  letter-spacing:.7px;transition:background .18s}
+.fz-nav__cta:hover,.fz-nav__cta:focus-visible{background:#3d6749;color:#fff}
+
+.fz-nav__toggle{display:none;background:none;border:0;cursor:pointer;padding:10px;
+  margin-left:auto;flex-direction:column;gap:5px;border-radius:4px}
+.fz-nav__toggle span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;
+  transition:transform .22s,opacity .22s}
+.fz-nav__toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.fz-nav__toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
+.fz-nav__toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.fz-nav__toggle:focus-visible,.fz-nav a:focus-visible{outline:2px solid #8FBF9F;outline-offset:3px}
+
+@media (max-width:900px){
+  .fz-nav__bar{gap:0}
+  .fz-nav__toggle{display:flex}
+  .fz-nav__menu{position:absolute;left:0;right:0;top:64px;background:#0A0A0A;
+    border-bottom:1px solid rgba(255,255,255,.09);flex-direction:column;
+    align-items:stretch;gap:0;padding:6px 20px 18px;
+    max-height:0;overflow:hidden;visibility:hidden;transition:max-height .26s ease,visibility .26s}
+  .fz-nav__menu.is-open{max-height:80vh;overflow:auto;visibility:visible}
+  .fz-nav__menu a{font-size:13px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+  .fz-nav__menu a[aria-current="page"]{border-bottom-color:#4A7C59}
+  .fz-nav__menu a.fz-nav__cta{margin-top:14px;text-align:center;padding:13px 17px;border-bottom:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .fz-nav__menu,.fz-nav__toggle span,.fz-nav__menu a,.fz-nav__cta{transition:none}
+}

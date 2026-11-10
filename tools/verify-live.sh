@@ -473,6 +473,57 @@ case "$last_status" in
   *)     b "the most recent email FAILED ($last_status) - cron mail is down" ;;
 esac
 
+hdr "Navigation (one shared top bar - tools/build-nav.py)"
+# Before 10 Nov 2026 this site had 35 distinct navigations: 101 pages with a
+# WHITE top bar, 42 near-black, 3 gradient, and 13 pages whose header had no
+# navigation at all. These checks are written so that a regression on any one
+# of those three faults turns the suite red.
+
+code /assets/site-nav.css 200 "the one shared nav stylesheet serves"
+code /assets/site-nav.js  200 "the one shared nav script serves"
+
+# A spread of pages that previously had THREE different top bars.
+for p in /moq-calculator /clothing-manufacturer-uk /blog /pricing \
+         /streetwear-manufacturer /what-we-make /sample-order; do
+  has "$p" 'class="fz-nav"'        "$p carries the shared nav"
+  has "$p" 'site-nav.css'          "$p loads the shared nav stylesheet"
+done
+
+# The pages that had a header with NO nav at all, and the one with no header.
+# /moq-calculator is the sharpest case: a buyer using the price calculator
+# had no route to pricing or the quote form from it.
+has /moq-calculator          'fz-nav__cta'   "the MOQ calculator now offers a quote CTA"
+has /streetwear-manufacturer 'fz-nav__cta'   "streetwear manufacturing now offers a quote CTA"
+has /blog                    'fz-nav__menu'  "the blog index now has a top bar at all"
+
+# The OLD divergent markup must be gone, not merely outnumbered. These three
+# are the exact class names behind the white/black/gradient split.
+lacks /clothing-manufacturer-uk 'class="site-header"' "the white site-header markup is gone from /clothing-manufacturer-uk"
+lacks /pricing                  'class="site-header"' "the white site-header markup is gone from /pricing"
+lacks /moq-calculator           'fab-brandmark'       "the nav-less brandmark block is gone from /moq-calculator"
+
+# Per-page attribution. The CTA carries ?from=<this page> into the homepage
+# enquiry form; a constant href would wipe that on every page and nothing
+# would error. Each of these must name ITS OWN path.
+has /moq-calculator          '/?from=/moq-calculator#contact'          "the MOQ calculator CTA carries its own attribution"
+has /clothing-manufacturer-uk '/?from=/clothing-manufacturer-uk#contact' "the UK page CTA carries its own attribution"
+has /sample-order            '/?from=/sample-order#contact'            "the sample page CTA carries its own attribution"
+
+# The six translated languages must keep their own words. Overwriting them
+# with the English nav is the most likely way this generator goes wrong.
+has  /fabricante-de-roupa 'Início'      "the Portuguese nav stays Portuguese"
+has  /fabricante-de-roupa 'Pedir or'    "the Portuguese CTA stays Portuguese"
+lacks /fabricante-de-roupa 'Sportswear' "the Portuguese nav did not take English labels"
+has  /fabricante-de-ropa  'Colecciones' "the Spanish nav stays Spanish"
+has  /fabricante-de-ropa  '/precios-fabricacion-ropa' "Spanish pricing still points at the Spanish price list"
+has  /bekleidungshersteller 'Kollektionen' "the German nav stays German"
+lacks /bekleidungshersteller 'Samples'     "the German nav did not take English labels"
+
+# The bar must be usable on a phone: the drawer control and its state.
+has /pricing 'fz-nav__toggle'   "the mobile drawer control is present"
+has /pricing 'aria-expanded'    "the drawer control reports its state to screen readers"
+has /pricing 'aria-label="Menu"' "the drawer control is labelled"
+
 hdr "Result"
 printf '  %d passed, %d failed\n\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1
