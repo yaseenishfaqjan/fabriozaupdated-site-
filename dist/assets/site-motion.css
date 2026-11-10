@@ -1,0 +1,55 @@
+/* Site-wide motion. One source, loaded on every static page.
+
+   THE SAFETY RULE THIS FILE IS BUILT AROUND: nothing here hides content on
+   its own. There is no rule that sets opacity:0 on page markup. The hidden
+   state lives ONLY under .fz-reveal, a class that is added by JavaScript at
+   runtime and only when an IntersectionObserver exists and the visitor has
+   not asked for reduced motion. So with JS broken, blocked, or still
+   loading, every element renders exactly as it did before this file
+   existed. A reveal-on-scroll effect that fails closed takes the page's
+   content with it, and on a site whose traffic comes from search that is a
+   far worse outcome than having no animation.
+
+   The .fz- prefix is for the same reason as site-nav.css: 160 pages carry
+   their own inline CSS and none of them has ever used it. */
+
+.fz-reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  will-change: opacity, transform;
+}
+.fz-reveal.fz-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity .55s cubic-bezier(.22,.61,.36,1),
+              transform .55s cubic-bezier(.22,.61,.36,1);
+  will-change: auto;
+}
+
+/* Cards in a row arrive in sequence rather than together. Capped at 6 so a
+   grid of 40 product cards never makes anyone wait for a stagger to finish. */
+.fz-reveal.fz-d1.fz-in { transition-delay: .05s }
+.fz-reveal.fz-d2.fz-in { transition-delay: .10s }
+.fz-reveal.fz-d3.fz-in { transition-delay: .15s }
+.fz-reveal.fz-d4.fz-in { transition-delay: .20s }
+.fz-reveal.fz-d5.fz-in { transition-delay: .25s }
+
+/* The shared top bar gains a shadow once the page has scrolled, so it reads
+   as lifted off the content rather than painted onto it. */
+.fz-nav { transition: box-shadow .25s ease }
+.fz-nav.fz-stuck { box-shadow: 0 6px 24px rgba(0,0,0,.4) }
+
+/* Anything already interactive gets a consistent, quiet hover. Scoped to
+   elements this project owns so it cannot restyle a page's own buttons. */
+.fz-nav__cta { transform: translateZ(0) }
+.fz-nav__cta:hover { transform: translateY(-1px) }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Belt and braces: the script already refuses to mark anything, but if a
+     .fz-reveal ever reaches the DOM some other way it must still be visible
+     and still, not merely still. */
+  .fz-reveal, .fz-reveal.fz-in {
+    opacity: 1; transform: none; transition: none; will-change: auto;
+  }
+  .fz-nav, .fz-nav__cta, .fz-nav__cta:hover { transition: none; transform: none }
+}

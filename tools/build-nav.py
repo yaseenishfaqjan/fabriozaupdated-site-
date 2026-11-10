@@ -120,8 +120,20 @@ def nav_html(page_path, lang):
     )
 
 
-CSS_LINK = '<link rel="stylesheet" href="/assets/site-nav.css?v=%s">' % VER
-JS_TAG = '<script src="/assets/site-nav.js?v=%s" defer></script>' % VER
+# Two stylesheets and two scripts, all shared, all cached for a year.
+# site-motion.* is the scroll/hover motion. It is separate from the nav on
+# purpose: the nav must work even if motion is ever pulled, and motion is the
+# piece most likely to be reverted on taste.
+ASSETS = [
+    ('css', 'site-nav.css'),
+    ('css', 'site-motion.css'),
+    ('js', 'site-nav.js'),
+    ('js', 'site-motion.js'),
+]
+CSS_LINK = ''.join('<link rel="stylesheet" href="/assets/%s?v=%s">' % (n, VER)
+                   for k, n in ASSETS if k == 'css')
+JS_TAG = ''.join('<script src="/assets/%s?v=%s" defer></script>' % (n, VER)
+                 for k, n in ASSETS if k == 'js')
 
 HEADER_RE = re.compile(r'<header[\s>].*?</header>', re.S)
 
@@ -171,20 +183,29 @@ for p in pages:
         s2 = s[:bm.end()] + new_header + s[bm.end():]
         stats['inserted'] += 1
 
-    # stylesheet in the head, script deferred at the end
-    if 'site-nav.css' not in s2:
-        hm = re.search(r'</head>', s2, re.I)
-        if not hm:
-            problems.append('%s: no </head> - SKIPPED' % page_path)
-            stats['skipped'] += 1
-            continue
-        s2 = s2[:hm.start()] + CSS_LINK + s2[hm.start():]
-    if 'site-nav.js' not in s2:
-        bm = re.search(r'</body>', s2, re.I)
-        if bm:
-            s2 = s2[:bm.start()] + JS_TAG + s2[bm.start():]
-        else:
-            s2 = s2 + JS_TAG
+    # Stylesheets in the head, scripts deferred at the end.
+    #
+    # Previously injected tags are STRIPPED first and all of them re-added,
+    # rather than each being added only when absent. An "insert if missing"
+    # guard converges on whatever the file happened to gain first: when
+    # site-motion was added later, every page already carrying site-nav.css
+    # would have been skipped and never received it. Strip-and-rewrite means
+    # a re-run always produces the current set, whatever a page has now.
+    s2 = re.sub(r'<link rel="stylesheet" href="/assets/site-(?:nav|motion)\.css\?v=[^"]*">', '', s2)
+    s2 = re.sub(r'<script src="/assets/site-(?:nav|motion)\.js\?v=[^"]*" defer></script>', '', s2)
+
+    hm = re.search(r'</head>', s2, re.I)
+    if not hm:
+        problems.append('%s: no </head> - SKIPPED' % page_path)
+        stats['skipped'] += 1
+        continue
+    s2 = s2[:hm.start()] + CSS_LINK + s2[hm.start():]
+
+    bm = re.search(r'</body>', s2, re.I)
+    if bm:
+        s2 = s2[:bm.start()] + JS_TAG + s2[bm.start():]
+    else:
+        s2 = s2 + JS_TAG
 
     if APPLY and s2 != s:
         with open(p, 'w', encoding='utf-8', newline='') as fh:

@@ -571,6 +571,37 @@ ccache /pricing       'stale-while-revalidate' "pricing repaints instantly from 
 # Hashed assets stay immutable for a year - that part was already right.
 ccache /assets/site-nav.css 'immutable' "hashed assets stay cached for a year"
 
+hdr "Motion (scroll and hover animation - must fail OPEN)"
+# The hidden state used by the reveal effect lives ONLY under .fz-reveal, a
+# class that JavaScript adds at runtime. No rule in the stylesheet hides page
+# markup on its own, so if the script is blocked, broken or still loading,
+# every page renders exactly as it did before motion existed. On a site whose
+# traffic comes from search, a reveal effect that fails CLOSED takes the
+# content with it - these checks are what stop that regressing.
+code /assets/site-motion.css 200 "the shared motion stylesheet serves"
+code /assets/site-motion.js  200 "the shared motion script serves"
+enc  /assets/site-motion.css gzip "the motion stylesheet is compressed"
+enc  /assets/site-motion.js  gzip "the motion script is compressed"
+has  /what-we-make 'site-motion.css' "pages load the shared motion stylesheet"
+has  /what-we-make 'site-motion.js'  "pages load the shared motion script"
+
+# The stylesheet must not ship an opacity:0 that applies to anything other
+# than .fz-reveal. Checked against the SERVED file, not the repo copy.
+motion_css=$(curl -fsSL --compressed --max-time 25 "$SITE/assets/site-motion.css" 2>/dev/null || echo '')
+if [ -z "$motion_css" ]; then
+  b "could not fetch site-motion.css to audit it"
+else
+  bad_hide=$(printf '%s' "$motion_css" | tr '}' '
+'     | grep -E 'opacity[[:space:]]*:[[:space:]]*0' | grep -vc 'fz-reveal' || true)
+  [ "${bad_hide:-0}" = "0" ]     && g "motion CSS hides nothing outside .fz-reveal (fails open)"     || b "motion CSS has $bad_hide opacity:0 rule(s) OUTSIDE .fz-reveal - content can be hidden with JS off"
+fi
+
+# Reduced motion must be honoured, in the stylesheet as well as the script.
+case "$motion_css" in
+  *"prefers-reduced-motion"*) g "motion respects prefers-reduced-motion" ;;
+  *) b "motion does NOT respect prefers-reduced-motion" ;;
+esac
+
 hdr "Result"
 printf '  %d passed, %d failed\n\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1
