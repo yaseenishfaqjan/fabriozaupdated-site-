@@ -349,6 +349,18 @@ has   /sitemap.xml 'hoodie-manufacturer-canada'                     "Canada prod
 has   /sitemap.xml 'streetwear-manufacturer-uae'                    "UAE product page is in the sitemap"
 has   /clothing-manufacturer-germany 'hoodie-manufacturer-germany'  "Germany landing page links its product pages"
 
+# PRODUCT DETAIL. 349 product cards across 13 collection pages were plain
+# divs - visible, priced, and impossible to click. Every one was a dead
+# end for a buyer who wanted to know more.
+has   /assets/product-detail.js 'fz-card-clickable'        "the product-detail script is served"
+has   /intimate-apparel 'product-detail.js'                "intimate-apparel loads it"
+has   /soccer-kits 'product-detail.js'                     "soccer-kits loads it"
+has   /premium-hoodies 'product-detail.js'                 "premium-hoodies loads it"
+has   /basketball-kits 'product-detail.js'                 "basketball-kits loads it"
+has   /medical-scrubs 'product-detail.js'                  "medical-scrubs loads it"
+has   /assets/product-detail.js 'wa.me'                    "the panel offers a per-product WhatsApp quote"
+has   /assets/product-detail.js 'aria-modal'               "the panel is announced as a dialog"
+
 hdr "Breadcrumbs"
 # 16 posts linked "Blog" to the homepage while their own JSON-LD said /blog
 for p in /blog/hoodie-brand-guide /blog/what-is-moq-clothing /blog/tech-pack-clothing-guide /blog/pakistan-vs-china-clothing; do
