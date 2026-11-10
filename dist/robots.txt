@@ -21,6 +21,17 @@ Disallow: /*.pdf$
 Disallow: /?s=
 Disallow: /*?s=
 
+# Attribution-only duplicates of the homepage.
+# Every Get a Quote button links to /?from=<that page>#contact so the
+# enquiry form knows which page produced the lead. They are the homepage
+# and they say so with a canonical, but Google was still crawling 160 of
+# them - on a site with 161 real pages that is half the crawl budget spent
+# re-reading the homepage. Measured in Search Console 10 Nov 2026 as 89
+# URLs under Alternative page with proper canonical tag.
+# The parameter must keep working for humans; only crawling stops.
+Disallow: /?from=
+Disallow: /*?from=
+
 # --- AI Crawlers (GEO Optimization) ---
 User-agent: GPTBot
 Allow: /

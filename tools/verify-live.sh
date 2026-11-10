@@ -673,6 +673,23 @@ else
   fi
 fi
 
+hdr "Crawl budget (the ?from= attribution URLs)"
+# Every Get a Quote button links to /?from=<that page>#contact so the enquiry
+# form knows which page produced the lead. Each is the homepage wearing a
+# query string, and each declares a canonical to "/" - correct, and Search
+# Console files them as "Alternative page with proper canonical tag", which
+# is informational rather than an error. But on 10 Nov 2026 Google had
+# crawled 89 of them, and the site emits 160 distinct ones against 161 real
+# pages: half the crawl budget spent re-reading the homepage.
+
+has /robots.txt "Disallow: /?from=" "robots.txt stops the attribution URLs being crawled"
+has /pricing    "rel=\"nofollow\""  "the quote CTA is not followed"
+
+# ...but the parameter must still WORK. It is how a lead is attributed, and
+# blocking crawlers must never break it for a human.
+code "/?from=/pricing" 200 "the attribution URL still serves for real visitors"
+has  "/?from=/pricing" "rel=\"canonical\" href=\"https://fabrioza.com/\""      "the attribution URL still points its canonical at the homepage"
+
 hdr "Result"
 printf '  %d passed, %d failed\n\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1

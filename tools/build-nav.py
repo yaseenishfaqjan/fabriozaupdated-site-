@@ -98,13 +98,26 @@ def nav_html(page_path, lang):
     else:
         links, cta = list(EN), EN_CTA
 
+    # Links carrying ?from= are the homepage with an attribution parameter.
+    # They declare a canonical to "/" and are correct, but Search Console
+    # showed Google crawling 160 of them (10 Nov 2026) - on a site with 161
+    # real pages, half the crawl budget spent re-reading the homepage.
+    # rel="nofollow" stops them being followed; robots.txt stops them being
+    # crawled at all, including the ~85 more that live in page bodies and
+    # that this generator does not control. Humans and the attribution
+    # itself are unaffected.
+    def anchor(label, href, extra=''):
+        rel = ' rel="nofollow"' if href.startswith('/?from=') else ''
+        return '<a href="%s"%s%s>%s</a>' % (esc(href), rel, extra, esc(label))
+
     out = []
     for label, href in links:
         cur = ''
         if href != '/' and href.rstrip('/') == page_path.rstrip('/'):
             cur = ' aria-current="page"'
-        out.append('<a href="%s"%s>%s</a>' % (esc(href), cur, esc(label)))
-    out.append('<a class="fz-nav__cta" href="%s">%s</a>' % (esc(quote), esc(cta)))
+        out.append(anchor(label, href, cur))
+    out.append('<a class="fz-nav__cta" href="%s" rel="nofollow">%s</a>'
+               % (esc(quote), esc(cta)))
 
     return (
         '<header class="fz-nav"><div class="fz-nav__bar">'
