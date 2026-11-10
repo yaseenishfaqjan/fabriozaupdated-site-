@@ -94,7 +94,21 @@ if [ "${1:-}" = "--deploy" ]; then
     # whole directory and refused a deploy that added product-detail.js,
     # where bumping the bundle's ?v= would have thrown away the 609 KB
     # bundle cache for every returning visitor to fix nothing.
-    if ! git diff --quiet "$vps_before" HEAD -- "$REPO/dist/assets/index-*" 2>/dev/null; then
+    # RELATIVE pathspec, and the git exit code is inspected rather than
+    # inverted. git-bash hands a Windows git binary a POSIX $REPO, which it
+    # rejects: "fatal: Invalid path '/c/Users/...'", exit 128. The original
+    # line was `if ! git diff --quiet ... 2>/dev/null`, so that 128 read as
+    # "assets changed" and the check fell through to the ?v= comparison on
+    # EVERY deploy - it never once compared what it claimed to. It looked
+    # fine because the ?v= usually differed; the first deploy where it
+    # matched refused for no reason.
+    git diff --quiet "$vps_before" HEAD -- 'dist/assets/index-*'; asset_rc=$?
+    if [ "$asset_rc" -gt 1 ]; then
+      printf '  [31mcache-buster check could not run[0m (git exit %s) - not deploying blind.
+' "$asset_rc"
+      exit 1
+    fi
+    if [ "$asset_rc" -eq 1 ]; then
       q_old=$(git show "$vps_before:dist/index.html" 2>/dev/null \
               | grep -o 'assets/index-[^"]*\.js?v=[^"]*' | head -1)
       q_new=$(grep -o 'assets/index-[^"]*\.js?v=[^"]*' "$REPO/dist/index.html" | head -1)
