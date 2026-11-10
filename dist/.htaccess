@@ -61,7 +61,13 @@ ErrorDocument 404 /404.html
   RewriteRule ^services/?$ https://fabrioza.com/what-we-make                    [R=301,L]
   RewriteRule ^contact/?$  https://fabrioza.com/#contact    [R=301,NE,L]
   RewriteRule ^products/?$ https://fabrioza.com/#collections [R=301,NE,L]
-  RewriteRule ^moq/?$      https://fabrioza.com/#calculator [R=301,NE,L]
+  # /moq points at the MOQ CALCULATOR, not a homepage anchor.
+  # It used to send /moq -> /#calculator. Google strips the fragment, so
+  # that was really a redirect to the homepage - and it threw away the
+  # topical relevance of a URL that is literally this business's core
+  # keyword. /moq-calculator is a real page serving 200 and is exactly
+  # what someone typing /moq wants. Changed 10 Nov 2026.
+  RewriteRule ^moq/?$      https://fabrioza.com/moq-calculator [R=301,NE,L]
 
   # --- 4b. Removed womenswear pages (client design conflict / catalog reset).
   # All 301 to the collections hub; retarget if replacements are built. ---
