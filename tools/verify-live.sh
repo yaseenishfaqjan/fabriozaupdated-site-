@@ -319,6 +319,10 @@ lacks /clothing-manufacturer-canada 'MOQ 50 pieces'      "CA page hero does not 
 lacks /clothing-manufacturer-germany 'MOQ 50 pieces'     "DE page hero does not claim a 50-piece minimum"
 lacks /clothing-manufacturer-uae 'MOQ 50 pieces'         "UAE page hero does not claim a 50-piece minimum"
 has   /clothing-manufacturer-uk 'MOQ from 20 pieces'     "UK page hero states the real minimum"
+# Matched on the ELEMENT, not the bare string. The nav-less brandmark markup
+# is gone, but the dead .fab-brandmark CSS rule still sits in these pages
+# inline <style>, so grepping for the plain name reports a failure on a page
+# that is correct.
 lacks /moq-calculator 'low MOQ of 50 pieces'             "/moq-calculator does not state 50 as the minimum"
 has   /moq-calculator '20 pieces'                        "/moq-calculator states the real minimum"
 has   /sitemap.xml 'precios-fabricacion-ropa'            "the Spanish price list is in the sitemap"
@@ -500,7 +504,7 @@ has /blog                    'fz-nav__menu'  "the blog index now has a top bar a
 # are the exact class names behind the white/black/gradient split.
 lacks /clothing-manufacturer-uk 'class="site-header"' "the white site-header markup is gone from /clothing-manufacturer-uk"
 lacks /pricing                  'class="site-header"' "the white site-header markup is gone from /pricing"
-lacks /moq-calculator           'fab-brandmark'       "the nav-less brandmark block is gone from /moq-calculator"
+lacks /moq-calculator           'class="fab-brandmark"'       "the nav-less brandmark block is gone from /moq-calculator"
 
 # Per-page attribution. The CTA carries ?from=<this page> into the homepage
 # enquiry form; a constant href would wipe that on every page and nothing
