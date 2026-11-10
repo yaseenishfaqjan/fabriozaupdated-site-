@@ -688,7 +688,18 @@ has /pricing    "rel=\"nofollow\""  "the quote CTA is not followed"
 # ...but the parameter must still WORK. It is how a lead is attributed, and
 # blocking crawlers must never break it for a human.
 code "/?from=/pricing" 200 "the attribution URL still serves for real visitors"
-has  "/?from=/pricing" "rel=\"canonical\" href=\"https://fabrioza.com/\""      "the attribution URL still points its canonical at the homepage"
+# Fetched directly rather than through page(). That helper caches each page to
+# a temp file named after the URL with "/" turned into "_", and "?" is not a
+# legal filename character on Windows - so the write fails, the body is empty,
+# and the check reports "page not fetched" for a URL that is perfectly healthy.
+canon=$(curl -fsSL --compressed --max-time 25 "$SITE/?from=/pricing" 2>/dev/null \
+        | grep -oiE 'rel="canonical" href="[^"]*"' | head -1)
+case "$canon" in
+  *'href="https://fabrioza.com/"'*)
+      g "the attribution URL still points its canonical at the homepage" ;;
+  "") b "could not read a canonical from the attribution URL" ;;
+  *)  b "the attribution URL canonical is unexpected: $canon" ;;
+esac
 
 hdr "Result"
 printf '  %d passed, %d failed\n\n' "$PASS" "$FAIL"
