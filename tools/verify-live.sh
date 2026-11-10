@@ -611,6 +611,68 @@ case "$motion_css" in
   *) b "motion does NOT respect prefers-reduced-motion" ;;
 esac
 
+hdr "DNS, mail and origin certificate"
+# These exist because of the CDN move (deploy/CDN-CLOUDFLARE.md). The mail
+# checks matter MOST, and they matter whether or not a CDN is in front:
+# proxying a mail record through an HTTP CDN silently stops the business
+# receiving email, and nothing on the website looks wrong when it happens.
+
+# dnsq <name> <type> -> prints the answer data, one per line
+dnsq() {
+  curl -sS --max-time 20 -H 'accept: application/dns-json' \
+    "https://dns.google/resolve?name=$1&type=$2" 2>/dev/null \
+  | tr ',' '\n' | grep -o '"data":"[^"]*"' | cut -d'"' -f4
+}
+
+mail_a=$(dnsq mail.fabrioza.com A | head -1)
+[ "$mail_a" = "95.216.243.216" ] \
+  && g "mail.fabrioza.com still points at the mail server ($mail_a)" \
+  || b "mail.fabrioza.com is '$mail_a', expected 95.216.243.216 - EMAIL IS AT RISK (is it proxied?)"
+
+mx=$(dnsq fabrioza.com MX | head -1)
+case "$mx" in
+  *mail.fabrioza.com*) g "MX still points at mail.fabrioza.com" ;;
+  *) b "MX is '$mx', expected mail.fabrioza.com - inbound email is at risk" ;;
+esac
+
+spf=$(dnsq fabrioza.com TXT | grep -i 'v=spf1' | head -1)
+case "$spf" in
+  *"ip4:95.216.243.216"*) g "SPF still authorises the mail server explicitly" ;;
+  "") b "no SPF record found - outbound mail may be spam-foldered" ;;
+  *) b "SPF no longer lists ip4:95.216.243.216 ('$spf')" ;;
+esac
+
+# Informational: is the edge in front yet? Never a failure either way - this
+# line is here so the suite's output says which mode the site is running in.
+cfh=$(curl -sSI --max-time 25 "$SITE/" | grep -ic '^cf-' || true)
+if [ "${cfh:-0}" -gt 0 ]; then
+  printf '        CDN: Cloudflare edge is in front (%s cf-* headers)\n' "$cfh"
+else
+  printf '        CDN: not in front yet - requests go straight to the origin\n'
+fi
+
+# The origin certificate. With Cloudflare on "Full (strict)" an expired origin
+# cert takes the WHOLE SITE down, and renewal is a silent background job due
+# around 30 Dec 2026. This turns that into a visible countdown.
+exp=$(echo | openssl s_client -connect 209.145.55.76:443 -servername fabrioza.com 2>/dev/null \
+      | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2)
+if [ -z "$exp" ]; then
+  b "could not read the origin certificate expiry"
+else
+  exp_s=$(date -d "$exp" +%s 2>/dev/null || echo 0)
+  now_s=$(date +%s)
+  if [ "$exp_s" -eq 0 ]; then
+    printf '        origin cert expires: %s (could not compute days)\n' "$exp"
+    g "origin certificate is readable"
+  else
+    days=$(( (exp_s - now_s) / 86400 ))
+    printf '        origin cert expires in %s days (%s)\n' "$days" "$exp"
+    [ "$days" -gt 14 ] \
+      && g "origin certificate has more than 14 days left" \
+      || b "origin certificate expires in $days days - on Full (strict) this takes the site down"
+  fi
+fi
+
 hdr "Result"
 printf '  %d passed, %d failed\n\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1

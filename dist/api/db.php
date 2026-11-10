@@ -168,7 +168,21 @@ function crm_db(): PDO {
 
 /** SHA-256 of (secret salt | client IP). Raw IPs are never stored (GDPR minimization). */
 function crm_ip_hash(): string {
-    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+    // CF-Connecting-IP first. Cloudflare sets it to the true client and a
+    // visitor cannot pre-seed it, whereas X-Forwarded-For is appended to
+    // whatever the visitor sent, so its first entry is caller-controlled and
+    // can be used to dodge the rate limit. Falls back to the old behaviour
+    // when the header is absent, so this is a no-op until the CDN is live.
+    //
+    // Taking element [0] is what keeps this correct behind a CDN at all:
+    // nginx uses $proxy_add_x_forwarded_for, which APPENDS, so the header
+    // arrives as "<client>, <cdn-edge>" and the edge IP varies per request.
+    // Hashing the whole string would give the same visitor a different hash
+    // on every hit - breaking both the rate limit and the stored lead
+    // fingerprint. Do not "simplify" this back to the raw header.
+    $ip = $_SERVER['HTTP_CF_CONNECTING_IP']
+        ?? $_SERVER['HTTP_X_FORWARDED_FOR']
+        ?? $_SERVER['REMOTE_ADDR'] ?? '';
     $ip = trim(explode(',', $ip)[0]);
     $salt = getenv('CRM_IP_SALT') ?: 'fabrioza-crm-fallback-salt';
     return hash('sha256', $salt . '|' . $ip);
