@@ -528,6 +528,49 @@ has /pricing 'fz-nav__toggle'   "the mobile drawer control is present"
 has /pricing 'aria-expanded'    "the drawer control reports its state to screen readers"
 has /pricing 'aria-label="Menu"' "the drawer control is labelled"
 
+hdr "Performance (headers that decide how much a visitor downloads and waits)"
+# Measured 10 Nov 2026, against the live site:
+#   inside the container   TTFB 5ms
+#   VPS host via nginx+TLS TTFB 79ms
+#   a remote client        TTFB 1500ms
+# The server is not slow. Distance to the German VPS is, so the only things
+# fixable in this repo are BYTES and ROUND TRIPS - which is what these check.
+
+# enc <path> <expected-encoding> <label>
+enc() {
+  local e
+  e=$(curl -sSI --compressed -H 'Accept-Encoding: gzip, br' --max-time 25 "$SITE$1" \
+      | grep -i '^content-encoding' | tr -d '\r' | awk '{print tolower($2)}')
+  [ "$e" = "$2" ] && g "$3 ($e)" || b "$3 (got '${e:-none}', want $2)"
+}
+# ccache <path> <substring> <label>
+ccache() {
+  local c
+  c=$(curl -sSI --compressed --max-time 25 "$SITE$1" | grep -i '^cache-control' | tr -d '\r')
+  case "$c" in *"$2"*) g "$3" ;; *) b "$3 (got '${c:-none}')" ;; esac
+}
+
+# The homepage bundle is the single biggest download on the site. It shipped
+# UNCOMPRESSED at 624 KB until 10 Nov 2026: dist/.htaccess listed
+# application/javascript, Apache serves .js as text/javascript, and
+# AddOutputFilterByType in a directory context REPLACES the inherited list
+# instead of merging - so this one file fell out while every other text
+# resource stayed gzipped. Nothing errored and nothing logged.
+enc /assets/index-C6-wz3bb.js gzip "the homepage JS bundle is compressed"
+enc /assets/site-nav.css      gzip "the shared nav stylesheet is compressed"
+enc /assets/product-detail.js gzip "the product-detail script is compressed"
+enc /what-we-make             gzip "page HTML is compressed"
+
+# A returning visitor used to block ~1.5s on a 304 carrying 0 bytes before
+# anything painted. stale-while-revalidate lets the cached page show at once
+# and refresh behind it. must-revalidate must NOT come back: it forbids
+# serving stale, which cancels this entirely.
+ccache /what-we-make  'stale-while-revalidate' "HTML may repaint instantly from cache"
+ccache /pricing       'stale-while-revalidate' "pricing repaints instantly from cache"
+
+# Hashed assets stay immutable for a year - that part was already right.
+ccache /assets/site-nav.css 'immutable' "hashed assets stay cached for a year"
+
 hdr "Result"
 printf '  %d passed, %d failed\n\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1

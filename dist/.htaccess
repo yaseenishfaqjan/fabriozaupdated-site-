@@ -147,7 +147,15 @@ ErrorDocument 404 /404.html
 # --- Compression (Gzip) ---
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
-  AddOutputFilterByType DEFLATE application/javascript application/json
+  # text/javascript MUST be here. Apache serves .js as text/javascript
+  # (/etc/mime.types), and AddOutputFilterByType in a directory context
+  # REPLACES the inherited list rather than merging with it - so although
+  # the server-wide deflate.conf does include text/javascript, this block
+  # overrode it and the 624 KB homepage bundle shipped UNCOMPRESSED while
+  # every other text resource on the site was gzipped. Measured 10 Nov 2026.
+  AddOutputFilterByType DEFLATE text/javascript application/javascript
+  AddOutputFilterByType DEFLATE application/x-javascript application/ecmascript
+  AddOutputFilterByType DEFLATE application/json application/manifest+json
   AddOutputFilterByType DEFLATE application/rss+xml application/xml
   AddOutputFilterByType DEFLATE image/svg+xml
 </IfModule>
@@ -173,9 +181,23 @@ ErrorDocument 404 /404.html
 
 # --- Security Headers ---
 <IfModule mod_headers.c>
-  # Force revalidation for all HTML documents (pairs with the expires rule)
+  # HTML revalidates, but may be shown INSTANTLY from cache while it does.
+  #
+  # This rule previously forced a revalidation on every view, and its comment
+  # called the result a cheap 304. Measured against the live site on 10 Nov
+  # 2026, that 304 costs 1.5 SECONDS and returns 0 bytes: TTFB here is ~1.5s
+  # (0.5s connect + 0.5s TLS + server time), so it was cheap in bytes and
+  # expensive in exactly the thing customers complained about. Every repeat
+  # navigation blocked a second and a half on an empty response.
+  #
+  # stale-while-revalidate lets the browser paint the cached page at once and
+  # refresh it in the background, so a deploy still appears without a hard
+  # reload - on the next navigation rather than this one.
+  # must-revalidate is dropped DELIBERATELY: it forbids serving stale, which
+  # would cancel stale-while-revalidate and leave this exactly as it was.
+  # Browsers lacking SWR fall back to max-age=0, i.e. the old behaviour.
   <FilesMatch "\.html$">
-    Header set Cache-Control "no-cache, must-revalidate"
+    Header set Cache-Control "public, max-age=0, stale-while-revalidate=600"
   </FilesMatch>
   Header always set X-Content-Type-Options "nosniff"
   Header always set X-Frame-Options "SAMEORIGIN"
