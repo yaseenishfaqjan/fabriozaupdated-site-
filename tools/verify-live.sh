@@ -541,7 +541,17 @@ enc() {
   local e
   e=$(curl -sSI --compressed -H 'Accept-Encoding: gzip, br' --max-time 25 "$SITE$1" \
       | grep -i '^content-encoding' | tr -d '\r' | awk '{print tolower($2)}')
-  [ "$e" = "$2" ] && g "$3 ($e)" || b "$3 (got '${e:-none}', want $2)"
+  # Accept gzip OR brotli. Both are real compression; br is BETTER and is
+  # what Cloudflare serves from the edge. The first version demanded the
+  # exact string "gzip" and so reported a FAILURE the moment the CDN
+  # upgraded the encoding - a check that goes red when the site improves
+  # is worse than no check, because the next person learns to ignore it.
+  # It still fails on NO compression, which is the fault worth catching.
+  case "$e" in
+    gzip|br) g "$3 ($e)" ;;
+    "")      b "$3 (no compression at all)" ;;
+    *)       b "$3 (got '$e', want gzip or br)" ;;
+  esac
 }
 # ccache <path> <substring> <label>
 ccache() {
