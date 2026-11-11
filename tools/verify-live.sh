@@ -717,26 +717,37 @@ hdr "Product cards (3D tilt)"
 # image reads as broken rather than premium. Parallax tilt is what a single
 # image DOES support.
 #
-# These assert against the SCRIPT, not the page. The glare layer is created
-# by JavaScript at runtime and the tilt code lives in the asset, so grepping
-# a page's HTML for either finds nothing and fails on a healthy site - which
-# is exactly what the first version of this section did.
-has /assets/product-detail.js 'fz-glare'        "the light-sweep layer ships"
-has /assets/product-detail.js 'perspective(900' "the tilt engine ships"
-enc /assets/product-detail.js gzip              "the product script is still compressed"
-
-# The guards that keep it off devices where it would misfire or stick.
-pd=$(curl -fsSL --compressed --max-time 25 "$SITE/assets/product-detail.js" 2>/dev/null)
-case "$pd" in
-  *"hover:hover"*) g "tilt is limited to pointer-fine devices (no stuck tilt on touch)" ;;
-  *) b "tilt is NOT limited to hover-capable devices" ;;
-esac
-case "$pd" in
-  *"prefers-reduced-motion"*) g "tilt honours prefers-reduced-motion" ;;
-  *) b "tilt does NOT honour prefers-reduced-motion" ;;
-esac
-# The cards must still be clickable - the tilt writes to the same element.
-has /assets/product-detail.js 'fz-card-clickable' "cards are still wired as buttons"
+# This fetches the EXACT url the page asks for, cache-buster included, rather
+# than the bare /assets/product-detail.js. That file is served immutable for
+# a year under a filename that never changes and is edge-cached by Cloudflare,
+# so the unversioned path keeps answering with whatever shipped last time -
+# the first version of this section tested the OLD file and failed against a
+# site that was already correct.
+pd_url=$(curl -fsSL --compressed --max-time 25 "$SITE/soccer-kits" 2>/dev/null \
+         | grep -o '/assets/product-detail\.js?v=[0-9]*' | head -1)
+if [ -z "$pd_url" ]; then
+  b "could not find the product-detail script tag on /soccer-kits"
+else
+  printf '        script the page requests: %s\n' "$pd_url"
+  pd=$(curl -fsSL --compressed --max-time 25 "$SITE$pd_url" 2>/dev/null)
+  if [ -z "$pd" ]; then
+    b "the product-detail script the page requests does not serve"
+  else
+    g "the product-detail script the page requests serves"
+    case "$pd" in *"fz-glare"*) g "the light-sweep layer ships" ;;
+      *) b "the light-sweep layer is MISSING - stale asset behind the cache-buster?" ;; esac
+    case "$pd" in *"perspective(900"*) g "the tilt engine ships" ;;
+      *) b "the tilt engine is MISSING - stale asset behind the cache-buster?" ;; esac
+    # Guards that keep it off devices where it would misfire or stick.
+    case "$pd" in *"hover:hover"*) g "tilt is limited to pointer-fine devices (no stuck tilt on touch)" ;;
+      *) b "tilt is NOT limited to hover-capable devices" ;; esac
+    case "$pd" in *"prefers-reduced-motion"*) g "tilt honours prefers-reduced-motion" ;;
+      *) b "tilt does NOT honour prefers-reduced-motion" ;; esac
+    # The tilt writes to the same element the click handler lives on.
+    case "$pd" in *"fz-card-clickable"*) g "cards are still wired as buttons" ;;
+      *) b "the clickable wiring is gone - cards would no longer open" ;; esac
+  fi
+fi
 
 hdr "Result"
 printf '  %d passed, %d failed\n\n' "$PASS" "$FAIL"
