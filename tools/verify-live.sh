@@ -711,6 +711,33 @@ case "$canon" in
   *)  b "the attribution URL canonical is unexpected: $canon" ;;
 esac
 
+hdr "Product cards (3D tilt)"
+# Every product has ONE photograph - 285 cards, 113 distinct images - so a
+# real 360 spin is not buildable, only faked, and a fake rotation of a flat
+# image reads as broken rather than premium. Parallax tilt is what a single
+# image DOES support.
+#
+# These assert against the SCRIPT, not the page. The glare layer is created
+# by JavaScript at runtime and the tilt code lives in the asset, so grepping
+# a page's HTML for either finds nothing and fails on a healthy site - which
+# is exactly what the first version of this section did.
+has /assets/product-detail.js 'fz-glare'        "the light-sweep layer ships"
+has /assets/product-detail.js 'perspective(900' "the tilt engine ships"
+enc /assets/product-detail.js gzip              "the product script is still compressed"
+
+# The guards that keep it off devices where it would misfire or stick.
+pd=$(curl -fsSL --compressed --max-time 25 "$SITE/assets/product-detail.js" 2>/dev/null)
+case "$pd" in
+  *"hover:hover"*) g "tilt is limited to pointer-fine devices (no stuck tilt on touch)" ;;
+  *) b "tilt is NOT limited to hover-capable devices" ;;
+esac
+case "$pd" in
+  *"prefers-reduced-motion"*) g "tilt honours prefers-reduced-motion" ;;
+  *) b "tilt does NOT honour prefers-reduced-motion" ;;
+esac
+# The cards must still be clickable - the tilt writes to the same element.
+has /assets/product-detail.js 'fz-card-clickable' "cards are still wired as buttons"
+
 hdr "Result"
 printf '  %d passed, %d failed\n\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1

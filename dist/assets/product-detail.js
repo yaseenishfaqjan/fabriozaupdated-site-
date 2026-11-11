@@ -35,6 +35,17 @@
     '.fz-card-clickable{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}',
     '.fz-card-clickable:hover{transform:translateY(-4px)}',
     '.fz-card-clickable:focus-visible{outline:3px solid #4a8f5b;outline-offset:3px}',
+    /* 3D tilt. transform-style and the shadow live here; the rotation
+       itself is written inline per frame by the tilt engine below. */
+    '.fz-card-clickable{transform-style:preserve-3d}',
+    '.fz-card-clickable.fz-tilting{transition:box-shadow .2s ease;',
+    'box-shadow:0 18px 40px rgba(0,0,0,.28)}',
+    /* The light sweep. mix-blend-mode makes it read as light ON the
+       garment rather than a white film floating above it. */
+    '.fz-glare{position:absolute;inset:0;pointer-events:none;opacity:0;',
+    'border-radius:inherit;mix-blend-mode:overlay;transition:opacity .22s ease}',
+    '@media(prefers-reduced-motion:reduce){.fz-card-clickable{transition:none}',
+    '.fz-glare{display:none}}',
     '.fz-view{position:absolute;left:12px;bottom:12px;font:600 12px/1 system-ui,sans-serif;',
     'letter-spacing:.04em;text-transform:uppercase;padding:7px 11px;border-radius:999px;',
     'background:rgba(0,0,0,.62);color:#fff;opacity:0;transition:opacity .18s ease;pointer-events:none}',
@@ -198,11 +209,83 @@
     });
   }
 
+  /* ---------- 3D parallax tilt ---------------------------------------- */
+  /* Every product has ONE photo, so a 360 spin is not buildable. Tilt is
+     what a single flat image does support: perspective that follows the
+     cursor, so the card reads as a physical object with depth. */
+  var TILT_MAX = 9;   /* degrees. Past ~10 it stops reading as depth and
+                         starts reading as a rendering bug. */
+  var tEl = null, tRect = null, tRaf = 0, tX = 0, tY = 0;
+
+  function tiltAllowed() {
+    if (!window.matchMedia) return false;
+    /* No hover on a touch screen: the effect would never fire, or worse,
+       fire once on tap and stay stuck mid-rotation. */
+    return window.matchMedia('(hover:hover) and (pointer:fine)').matches &&
+           !window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  }
+
+  function tiltFrame() {
+    tRaf = 0;
+    if (!tEl || !tRect || !tRect.width || !tRect.height) return;
+    var px = (tX - tRect.left) / tRect.width;
+    var py = (tY - tRect.top) / tRect.height;
+    if (px < 0) px = 0; else if (px > 1) px = 1;
+    if (py < 0) py = 0; else if (py > 1) py = 1;
+    var ry = (px - 0.5) * 2 * TILT_MAX;
+    var rx = (0.5 - py) * 2 * TILT_MAX;
+    tEl.style.transform =
+      'perspective(900px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' +
+      ry.toFixed(2) + 'deg) translateY(-6px) scale(1.02)';
+    var g = tEl.querySelector('.fz-glare');
+    if (g) {
+      g.style.background = 'radial-gradient(circle at ' + (px * 100).toFixed(1) +
+        '% ' + (py * 100).toFixed(1) + '%, rgba(255,255,255,.30), rgba(255,255,255,0) 55%)';
+      g.style.opacity = '1';
+    }
+  }
+
+  function tiltClear() {
+    if (!tEl) return;
+    tEl.style.transform = '';
+    tEl.classList.remove('fz-tilting');
+    var g = tEl.querySelector('.fz-glare');
+    if (g) g.style.opacity = '0';
+    tEl = null;
+    tRect = null;
+  }
+
+  function tiltInit() {
+    if (!tiltAllowed()) return;
+    /* ONE delegated listener rather than 285, and every read of the
+       geometry is cached per card - getBoundingClientRect inside a raw
+       pointermove on a 40-card grid is how this becomes a jank machine. */
+    document.addEventListener('pointermove', function (e) {
+      var el = e.target && e.target.closest ?
+               e.target.closest('.fz-card-clickable') : null;
+      if (!el) { tiltClear(); return; }
+      if (el !== tEl) {
+        tiltClear();
+        tEl = el;
+        tRect = el.getBoundingClientRect();
+        el.classList.add('fz-tilting');
+      }
+      tX = e.clientX; tY = e.clientY;
+      if (!tRaf) tRaf = window.requestAnimationFrame(tiltFrame);
+    }, { passive: true });
+
+    /* The cached rectangle goes stale the moment the page moves. */
+    window.addEventListener('scroll', tiltClear, { passive: true });
+    window.addEventListener('resize', tiltClear, { passive: true });
+  }
+
   /* ---------- wire the cards ------------------------------------------ */
   function init() {
     var cards = document.querySelectorAll('.product-card');
     if (!cards.length) return;
     injectCss();
+
+    tiltInit();
 
     var bySku = {};
     Array.prototype.forEach.call(cards, function (card) {
@@ -221,6 +304,11 @@
         hint.className = 'fz-view';
         hint.textContent = 'View details';
         card.appendChild(hint);
+
+        var glare = document.createElement('span');
+        glare.className = 'fz-glare';
+        glare.setAttribute('aria-hidden', 'true');
+        card.appendChild(glare);
       }
 
       card.addEventListener('click', function (e) {
