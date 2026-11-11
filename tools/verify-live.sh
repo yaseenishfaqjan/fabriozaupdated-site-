@@ -548,9 +548,9 @@ enc() {
   # is worse than no check, because the next person learns to ignore it.
   # It still fails on NO compression, which is the fault worth catching.
   case "$e" in
-    gzip|br) g "$3 ($e)" ;;
+    gzip|br|zstd) g "$3 ($e)" ;;
     "")      b "$3 (no compression at all)" ;;
-    *)       b "$3 (got '$e', want gzip or br)" ;;
+    *)       b "$3 (got '$e', want gzip, br or zstd)" ;;
   esac
 }
 # ccache <path> <substring> <label>
