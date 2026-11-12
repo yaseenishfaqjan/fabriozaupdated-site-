@@ -59,13 +59,12 @@ $utmMedium   = mb_substr(sanitize($data['utm_medium'] ?? ''), 0, 120);
 $utmCampaign = mb_substr(sanitize($data['utm_campaign'] ?? ''), 0, 120);
 $gclid       = mb_substr(sanitize($data['gclid'] ?? ''), 0, 200);
 $fbclid      = mb_substr(sanitize($data['fbclid'] ?? ''), 0, 200);
-/* These two are URLs, and sanitize() escapes & as &amp; - correct for a
-   name or a message, wrong for a query string, which came back stored as
-   ...?utm_source=google&amp;utm_medium=cpc. Only the ampersand is undone:
-   it cannot open a tag, so the value stays safe to echo while being a
-   real URL again. < > " and ' remain escaped. */
-$referrer    = str_replace('&amp;', '&', mb_substr(sanitize($data['referrer'] ?? ''), 0, 400));
-$landingPage = str_replace('&amp;', '&', mb_substr(sanitize($data['landing_page'] ?? ''), 0, 200));
+/* The str_replace('&amp;', '&') that used to wrap these two is gone with
+   the escaping that made it necessary. sanitize() no longer turns & into
+   &amp;, so a query string stays a real query string on its own and a
+   workaround that undoes half of an escape is no longer needed. */
+$referrer    = mb_substr(sanitize($data['referrer'] ?? ''), 0, 400);
+$landingPage = mb_substr(sanitize($data['landing_page'] ?? ''), 0, 200);
 $sourcePage  = mb_substr(sanitize($data['source_page'] ?? ($_SERVER['HTTP_REFERER'] ?? '')), 0, 300);
 
 if ($clientName === '') { http_response_code(400); echo json_encode(['success' => false, 'message' => 'Your name is required']); exit; }
@@ -271,9 +270,30 @@ if ($leadId !== null || $notifSent) {
 /* ================= helpers ================= */
 
 
+/* Stores what the person actually typed. It deliberately does NOT
+   html-escape any more.
+ *
+ * Escaping here was double-escaping: EVERY consumer of this data already
+ * escapes at output, which is the correct place -
+ *     admin/*.php              e()            = htmlspecialchars
+ *     api/daily-digest.php:35  htmlspecialchars($fmt($r))
+ *     api/email-templates/*    htmlspecialchars($lead[...])
+ *     api/mailer.php           h((string)$val)
+ * - so a company called "Hoodies & Jackets" was stored as
+ *   "Hoodies &amp; Jackets", escaped again on the way out, and the admin
+ *   rendered the literal "&amp;" to staff. 25 rows were affected.
+ *
+ * strip_tags STAYS. Escaping at output is what makes the data safe to
+ * display; stripping tags at input is just keeping junk out of the table.
+ *
+ * The newline collapse also stays, deliberately untouched: changing it
+ * would alter how every stored message reads, which is a separate decision
+ * from this one. (Worth knowing: because of it, the nl2br() applied to
+ * $message in buildNotificationEmail has nothing left to convert.)
+ */
 function sanitize($str) {
     $str = preg_replace('/[\r\n]+/', ' ', (string)$str);
-    return htmlspecialchars(strip_tags(trim($str)), ENT_QUOTES, 'UTF-8');
+    return trim(strip_tags($str));
 }
 
 
