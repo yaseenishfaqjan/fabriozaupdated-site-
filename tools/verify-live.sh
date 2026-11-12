@@ -749,6 +749,46 @@ else
   fi
 fi
 
+hdr "Category cards (/sportswear-catalog)"
+# The page advertises 21 categories and shows 16 cards. Twelve of them had
+# no link at all - identical markup minus the closing </a> - so a visitor
+# clicked a category and nothing happened. Eight already had a page on this
+# site that was simply never wired up.
+cat=$(curl -fsSL --compressed --max-time 25 "$SITE/sportswear-catalog" 2>/dev/null)
+if [ -z "$cat" ]; then
+  b "could not fetch /sportswear-catalog"
+else
+  total=$(printf '%s' "$cat" | grep -c 'class="cat-card"' || true)
+  # count cards that contain no <a> at all: split on the card opener, drop
+  # the preamble, and look at each fragment up to its own closing markup.
+  dead=$(printf '%s' "$cat" | tr '>' '
+' | awk '
+    /class="cat-card"/ { incard=1; haslink=0; next }
+    incard && /^<a href=/ { haslink=1 }
+    incard && /^<div class="cat-card"/ { if (!haslink) d++; haslink=0 }
+    END { print d+0 }')
+  printf '        %s category cards on the page
+' "$total"
+  [ "${total:-0}" -ge 16 ] && g "all 16 category cards are present"                            || b "expected 16 category cards, found ${total:-0}"
+  case "$cat" in
+    *"/rugby-kit-manufacturer"*)   g "the rugby card links to its page" ;;
+    *) b "the rugby card has lost its link" ;;
+  esac
+  case "$cat" in
+    *"/custom-cheer-uniforms"*)    g "the cheer card links to its page" ;;
+    *) b "the cheer card has lost its link" ;;
+  esac
+  case "$cat" in
+    *"/custom-hoodie-manufacturer"*) g "the hoodie card links to its page" ;;
+    *) b "the hoodie card has lost its link" ;;
+  esac
+  # The four categories with no page of their own must still offer a route.
+  case "$cat" in
+    *"Request ice hockey uniforms"*) g "categories with no page still offer a quote route" ;;
+    *) b "the no-page categories have lost their quote route" ;;
+  esac
+fi
+
 hdr "Result"
 printf '  %d passed, %d failed\n\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1

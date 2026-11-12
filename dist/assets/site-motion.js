@@ -232,4 +232,43 @@
   magInit();
   paraInit();
 
+
+  /* ==================================================================
+     WHOLE-CARD CLICK TARGETS
+     A category card is a picture, a heading, a description and a small
+     text link at the bottom. People click the PICTURE - by far the biggest
+     thing on the card - and nothing happens. Where a card already contains
+     an internal link, the whole card becomes that link's click target.
+
+     NO role=button and NO tabindex here, deliberately. The inner <a> is
+     already focusable and already announces where it goes, so adding the
+     card to the tab order would create a second stop leading to the same
+     place - worse for a keyboard or screen-reader user, not better. This
+     is a mouse convenience layered over a link that already works.
+
+     Cards that are themselves an <a> (the ones on /what-we-make) are
+     skipped: they are already whole-card links.
+     ================================================================== */
+  function cardTargets() {
+    var cards = document.querySelectorAll('.cat-card');
+    for (var i = 0; i < cards.length; i++) {
+      var card = cards[i];
+      if (card.tagName === 'A') continue;
+      var link = card.querySelector('a[href]');
+      if (!link) continue;
+      card.style.cursor = 'pointer';
+      (function (c, href) {
+        c.addEventListener('click', function (e) {
+          /* a real link, button or form control keeps its own behaviour */
+          if (e.target.closest && e.target.closest('a,button,input,select,textarea,label')) return;
+          /* modified clicks keep the browser's own new-tab behaviour */
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+          window.location.href = href;
+        });
+      })(card, link.getAttribute('href'));
+    }
+  }
+
+  cardTargets();
+
 })();
