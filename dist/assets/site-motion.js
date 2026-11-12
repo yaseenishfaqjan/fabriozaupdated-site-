@@ -105,4 +105,131 @@
     for (var m = 0; m < marked.length; m++) marked[m].classList.add('fz-in');
     io.disconnect();
   }, 3000);
+
+  /* ==================================================================
+     MAGNETIC BUTTONS
+     The cursor pulls the button a few pixels toward itself. Tiny, but it
+     is what makes a control feel physical rather than painted on.
+     Pointer-fine only: on a touch screen there is no cursor to track, and
+     a transform applied on tap would stick.
+     ================================================================== */
+  var MAG_SEL = '.fz-nav__cta,.btn-primary,.btn-secondary,.btn,.lq-btn,.cta-btn,.header-cta';
+  var MAG_PULL = 0.28;   /* fraction of the distance from centre */
+  var MAG_MAX = 7;       /* px. Past ~8 the label starts to detach from
+                            the box it sits in and reads as a glitch. */
+  var mEl = null, mRect = null, mRaf = 0, mX = 0, mY = 0;
+
+  function magFrame() {
+    mRaf = 0;
+    if (!mEl || !mRect) return;
+    var dx = (mX - (mRect.left + mRect.width / 2)) * MAG_PULL;
+    var dy = (mY - (mRect.top + mRect.height / 2)) * MAG_PULL;
+    if (dx > MAG_MAX) dx = MAG_MAX; else if (dx < -MAG_MAX) dx = -MAG_MAX;
+    if (dy > MAG_MAX) dy = MAG_MAX; else if (dy < -MAG_MAX) dy = -MAG_MAX;
+    mEl.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(1.03)';
+  }
+
+  function magClear() {
+    if (!mEl) return;
+    mEl.style.transform = '';
+    mEl.classList.remove('fz-magnetic');
+    mEl = null; mRect = null;
+  }
+
+  function magInit() {
+    if (reduced || !window.matchMedia ||
+        !window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+    document.addEventListener('pointermove', function (e) {
+      var el = e.target && e.target.closest ? e.target.closest(MAG_SEL) : null;
+      if (!el) { magClear(); return; }
+      if (el !== mEl) {
+        magClear();
+        mEl = el;
+        mRect = el.getBoundingClientRect();
+        el.classList.add('fz-magnetic');
+      }
+      mX = e.clientX; mY = e.clientY;
+      if (!mRaf) mRaf = window.requestAnimationFrame(magFrame);
+    }, { passive: true });
+    /* A cached rectangle is wrong the moment the page moves. */
+    window.addEventListener('scroll', magClear, { passive: true });
+    window.addEventListener('resize', magClear, { passive: true });
+  }
+
+  /* ==================================================================
+     HERO PARALLAX
+     The hero's content drifts slower than the page, which is what reads
+     as depth. Transform only - never top/margin - so it stays on the
+     compositor and never triggers layout.
+
+     MODULE 4's REQUIREMENT IS THE IMPORTANT PART HERE: the scroll handler
+     does nothing at all unless a hero is actually on screen. An
+     IntersectionObserver flips a boolean; once the hero is scrolled past,
+     the work stops entirely rather than running for the whole page.
+     ================================================================== */
+  var PARA_MAX = 26;     /* px of drift. Deliberately small: these are 145
+                            different hero layouts and a large offset would
+                            collide with something on one of them. */
+  var heroes = [], heroVisible = 0, pRaf = 0;
+
+  function paraFrame() {
+    pRaf = 0;
+    for (var i = 0; i < heroes.length; i++) {
+      var h = heroes[i];
+      if (!h.vis) continue;
+      var r = h.el.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > (window.innerHeight || 0)) continue;
+      /* 0 at the top of travel, 1 once the hero has left upward */
+      var prog = -r.top / (r.height || 1);
+      if (prog < 0) prog = 0; else if (prog > 1) prog = 1;
+      h.inner.style.transform = 'translate3d(0,' + (prog * PARA_MAX).toFixed(1) + 'px,0)';
+      h.inner.style.opacity = (1 - prog * 0.55).toFixed(3);
+    }
+  }
+
+  function paraInit() {
+    if (reduced || !('IntersectionObserver' in window)) return;
+    var nodes = document.querySelectorAll('.hero,.article-hero');
+    for (var i = 0; i < nodes.length && i < 4; i++) {
+      var el = nodes[i];
+      /* Parallax the hero's CONTENT, not the hero box itself: moving the
+         box would drag its background away from the section below it. */
+      var inner = el.querySelector('.container') || el.firstElementChild;
+      if (!inner || inner.nodeType !== 1) continue;
+      heroes.push({ el: el, inner: inner, vis: false });
+    }
+    if (!heroes.length) return;
+
+    var io = new IntersectionObserver(function (entries) {
+      for (var j = 0; j < entries.length; j++) {
+        for (var k = 0; k < heroes.length; k++) {
+          if (heroes[k].el !== entries[j].target) continue;
+          var was = heroes[k].vis;
+          heroes[k].vis = entries[j].isIntersecting;
+          heroVisible += (heroes[k].vis ? 1 : 0) - (was ? 1 : 0);
+          /* will-change is a PROMISE TO THE BROWSER, not a speed switch.
+             Left on permanently it holds a compositor layer per element
+             for the life of the page, which is how "optimisation" turns
+             into memory pressure on a phone. It goes on when the element
+             is about to move and comes straight off again. */
+          heroes[k].inner.style.willChange = heroes[k].vis ? 'transform,opacity' : 'auto';
+          if (!heroes[k].vis) {
+            heroes[k].inner.style.transform = '';
+            heroes[k].inner.style.opacity = '';
+          }
+        }
+      }
+    }, { threshold: [0, 0.01, 1] });
+
+    for (var m = 0; m < heroes.length; m++) io.observe(heroes[m].el);
+
+    window.addEventListener('scroll', function () {
+      if (heroVisible < 1) return;   /* nothing on screen: do no work */
+      if (!pRaf) pRaf = window.requestAnimationFrame(paraFrame);
+    }, { passive: true });
+  }
+
+  magInit();
+  paraInit();
+
 })();

@@ -53,3 +53,38 @@
   }
   .fz-nav, .fz-nav__cta, .fz-nav__cta:hover { transition: none; transform: none }
 }
+
+/* Magnetic buttons. The transform is written per frame by site-motion.js;
+   this only supplies the easing for the snap BACK, and a shadow that makes
+   the lift read as physical rather than as a jump. */
+.fz-magnetic {
+  transition: box-shadow .2s ease;
+  box-shadow: 0 10px 24px rgba(0,0,0,.22);
+}
+.fz-nav__cta.fz-magnetic { box-shadow: 0 10px 24px rgba(74,124,89,.45) }
+/* The snap back when the cursor leaves: site-motion.js clears the inline
+   transform, and this is what makes that return a glide instead of a jump. */
+/* `background` is listed here on purpose. This file loads AFTER
+   site-nav.css, so this rule replaces that file's
+   `.fz-nav__cta{transition:background .18s}` outright - omit background
+   and the quote button's hover colour would start snapping instead of
+   fading, a regression caused by the fix rather than by the bug. */
+/* `.fz-nav__menu a.fz-nav__cta` is repeated from site-nav.css deliberately.
+   That file sets the CTA's transition through a selector LIST whose other
+   member is `.fz-nav__menu a.fz-nav__cta` - specificity (0,2,1) - and the
+   quote button matches it, so a plain `.fz-nav__cta` here at (0,1,0) loses
+   even though this file loads later. Measured: the button kept reporting
+   `transition: background 0.18s` and no magnetic glide, on a page that had
+   already loaded the new stylesheet. */
+.fz-nav__menu a.fz-nav__cta,
+.fz-nav__cta,.btn-primary,.btn-secondary,.btn,.lq-btn,.cta-btn,.header-cta {
+  transition: transform .35s cubic-bezier(.22,.61,.36,1),
+              box-shadow .2s ease,
+              background .18s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fz-magnetic { box-shadow: none }
+  .fz-nav__cta,.btn-primary,.btn-secondary,.btn,.lq-btn,.cta-btn,.header-cta {
+    transition: none;
+  }
+}

@@ -44,7 +44,10 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DIST = ROOT / 'dist'
 APPLY = '--apply' in sys.argv
-VER = '20261110'
+VER = '20261112'   # bump whenever site-nav/site-motion assets change:
+                       # they are served immutable for a year under a fixed
+                       # filename, so an unchanged ?v= reaches nobody who has
+                       # visited before - the edge keeps answering HIT.
 
 # ---------------------------------------------------------------- link sets
 # English: 7 links + CTA. Every destination was checked to exist and to
