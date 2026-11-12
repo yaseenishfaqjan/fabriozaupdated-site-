@@ -44,7 +44,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DIST = ROOT / 'dist'
 APPLY = '--apply' in sys.argv
-VER = '20261112b'   # bump whenever site-nav/site-motion assets change:
+VER = '20261112c'   # bump whenever site-nav/site-motion assets change:
                        # they are served immutable for a year under a fixed
                        # filename, so an unchanged ?v= reaches nobody who has
                        # visited before - the edge keeps answering HIT.
@@ -145,6 +145,7 @@ ASSETS = [
     ('css', 'site-motion.css'),
     ('js', 'site-nav.js'),
     ('js', 'site-motion.js'),
+    ('js', 'quote-drawer.js'),
 ]
 CSS_LINK = ''.join('<link rel="stylesheet" href="/assets/%s?v=%s">' % (n, VER)
                    for k, n in ASSETS if k == 'css')
@@ -208,7 +209,7 @@ for p in pages:
     # would have been skipped and never received it. Strip-and-rewrite means
     # a re-run always produces the current set, whatever a page has now.
     s2 = re.sub(r'<link rel="stylesheet" href="/assets/site-(?:nav|motion)\.css\?v=[^"]*">', '', s2)
-    s2 = re.sub(r'<script src="/assets/site-(?:nav|motion)\.js\?v=[^"]*" defer></script>', '', s2)
+    s2 = re.sub(r'<script src="/assets/(?:site-nav|site-motion|quote-drawer)\.js\?v=[^"]*" defer></script>', '', s2)
 
     hm = re.search(r'</head>', s2, re.I)
     if not hm:

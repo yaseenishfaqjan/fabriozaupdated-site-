@@ -163,12 +163,27 @@
           '<div class="fz-facts">' + facts + '</div>' +
           '<p class="fz-note">Minimum 20 pieces per style for a trial run; the MOQ above is the ' +
           'bulk-pricing quantity. Your own labels and tags, sampled before production.</p>' +
+          /* The PRIMARY action now keeps the buyer on this page. Measured
+             against the live CRM on 12 Nov 2026: 73 of ~89 web leads came
+             from the homepage, because the homepage was the only page with
+             a form; every other page handed the visitor to WhatsApp or a
+             mail client at peak intent. And 65% of all leads never named a
+             product, so the first reply was spent asking - the drawer knows
+             the product and the SKU already.
+
+             It is a real link to the homepage form, so it still works if
+             quote-drawer.js never loads; the drawer intercepts the click.
+             WhatsApp is KEPT as the second option rather than replaced -
+             it is a channel real customers already use, and removing a
+             working route to win an argument about forms would cost leads.
+             The mailto is the one dropped: it is what the drawer replaces. */
           '<div class="fz-cta">' +
-            '<a class="fz-btn fz-btn-1" target="_blank" rel="noopener" href="https://wa.me/' +
-              WHATSAPP + '?text=' + encodeURIComponent(msg) + '">Ask about this product</a>' +
-            '<a class="fz-btn fz-btn-2" href="mailto:' + EMAIL + '?subject=' +
-              encodeURIComponent('Quote request: ' + data.name + (data.sku ? ' (' + data.sku + ')' : '')) +
-              '&body=' + encodeURIComponent(msg) + '">Email a quote request</a>' +
+            '<a class="fz-btn fz-btn-1" href="/?from=' + encodeURIComponent(location.pathname) +
+              '#contact" rel="nofollow" data-fz-quote ' +
+              'data-fz-quote-product="' + esc(data.name) + '" ' +
+              'data-fz-quote-sku="' + esc(data.sku || '') + '">Request a quote</a>' +
+            '<a class="fz-btn fz-btn-2" target="_blank" rel="noopener" href="https://wa.me/' +
+              WHATSAPP + '?text=' + encodeURIComponent(msg) + '">Ask on WhatsApp</a>' +
             '<a class="fz-btn fz-btn-2" href="/pricing">See full price list</a>' +
           '</div>' +
           '<p class="fz-note">Tap the photo to zoom.</p>' +
