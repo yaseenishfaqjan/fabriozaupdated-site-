@@ -789,6 +789,52 @@ else
   esac
 fi
 
+hdr "Quote drawer (lead capture on the page)"
+# Built because the live CRM showed 73 of ~89 web leads coming from the
+# HOMEPAGE, 65% of all leads never naming a product, and 0 leads carrying
+# the ?from= page attribution. The drawer captures the enquiry where the
+# buyer already is, with the product and the page attached.
+#
+# Proven end to end against production on 12 Nov 2026: a honeypot-filled
+# POST returned success and stored nothing (224 -> 224), and a real
+# submission landed with form_type="Product Quote", the product name, and
+# source_page=/soccer-kits - the attribution that was always "/#contact"
+# before. That test row was deleted.
+qd_url=$(curl -fsSL --compressed --max-time 25 "$SITE/soccer-kits" 2>/dev/null \
+         | grep -o "/assets/quote-drawer\.js?v=[0-9a-z]*" | head -1)
+if [ -z "$qd_url" ]; then
+  b "pages do not load the quote drawer"
+else
+  printf '        drawer script: %s\n' "$qd_url"
+  qd=$(curl -fsSL --compressed --max-time 25 "$SITE$qd_url" 2>/dev/null)
+  if [ -z "$qd" ]; then
+    b "the quote drawer script does NOT serve"
+  else
+    g "the quote drawer script serves"
+    # It must feed the EXISTING pipeline. A second lead path with weaker
+    # guards is a spam hole and puts two kinds of lead in one table.
+    case "$qd" in *"/api/send-email.php"*) g "the drawer posts to the existing lead endpoint" ;;
+      *) b "the drawer no longer posts to /api/send-email.php" ;; esac
+    case "$qd" in *"csrf.php"*) g "the drawer fetches a CSRF token" ;;
+      *) b "the drawer has lost CSRF protection" ;; esac
+    case "$qd" in *"website"*) g "the drawer carries the honeypot field" ;;
+      *) b "the drawer has lost the honeypot" ;; esac
+    case "$qd" in *"gdpr_consent"*) g "the drawer sends GDPR consent" ;;
+      *) b "the drawer no longer sends GDPR consent" ;; esac
+    # The two fields that are the entire point of the feature.
+    case "$qd" in *"product_type"*) g "the drawer sends the product" ;;
+      *) b "the drawer no longer sends the product" ;; esac
+    case "$qd" in *"source_page"*) g "the drawer sends the originating page" ;;
+      *) b "the drawer no longer sends the originating page" ;; esac
+  fi
+fi
+
+code /api/csrf.php 200 "the CSRF endpoint serves"
+
+# Every trigger must remain a REAL link, so a script that fails to load can
+# never strand a buyer with no way to reach a form.
+has /pricing "fz-nav__cta" "the quote CTA is still a real link if the script fails"
+
 hdr "Result"
 printf '  %d passed, %d failed\n\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1
