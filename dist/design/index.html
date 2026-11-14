@@ -578,6 +578,78 @@ function setView(v){
   for(var i=0;i<btns.length;i++) btns[i].classList.toggle('on', btns[i].getAttribute('data-v')===v);
   render();
 }
+
+  /* A flattened PNG of the preview, so the factory can SEE the placement
+     instead of reconstructing it from percentages.
+
+     The garment photo is inlined as base64 FIRST, and that is the whole
+     difficulty. The stage SVG carries <image href="/images/design/x.webp">,
+     and an SVG loaded into an Image through a data: URL cannot fetch
+     external resources - a browser restriction, not a bug. Serialising it
+     as-is yields the artwork on an empty beige rectangle that LOOKS like a
+     finished mockup, which would be approved and then manufactured.
+
+     It NEVER fails the send. Every failure path calls back with null and
+     the enquiry goes without the picture; a lost mockup is a nuisance, a
+     lost lead is revenue. */
+  function mockupPng(cb){
+    var done=false, finish=function(v){ if(!done){ done=true; cb(v); } };
+    /* Belt and braces: if anything hangs - a slow image, a browser quirk -
+       the enquiry still sends. */
+    setTimeout(function(){ finish(null); }, 6000);
+    try{
+      var host=$('#dzStage'), svg=host&&host.querySelector('svg');
+      if(!svg){ finish(null); return; }
+      var clone=svg.cloneNode(true);
+      /* EVERY image with a URL href, not just the first. defs() renders the
+         LOGO image before the garment one, so querySelector('image') returns
+         the logo - which is already a data: URI and needs nothing - while the
+         garment photo stayed a URL and silently vanished from the mockup.
+         That is the precise failure this function exists to prevent, and the
+         first version of it walked straight into it. */
+      var imgs=[].slice.call(clone.querySelectorAll('image'));
+      var jobs=imgs.map(function(im){
+        im.removeAttribute('onerror');   /* its fallback is another URL that
+                                            also cannot load once serialised */
+        var href=im.getAttribute('href')||im.getAttribute('xlink:href')||'';
+        if(!href || href.indexOf('data:')===0) return Promise.resolve();
+        return fetch(href,{credentials:'same-origin'})
+          .then(function(r){ if(!r.ok) throw 0; return r.blob(); })
+          .then(function(b){
+            return new Promise(function(res,rej){
+              var fr=new FileReader();
+              fr.onload=function(){ res(fr.result); };
+              fr.onerror=rej;
+              fr.readAsDataURL(b);
+            });
+          })
+          .then(function(dataUrl){
+            im.setAttribute('href', dataUrl);
+            im.removeAttribute('xlink:href');
+          });
+      });
+
+      Promise.all(jobs)
+        .then(function(){
+          var xml=new XMLSerializer().serializeToString(clone);
+          var img=new Image();
+          img.onload=function(){
+            try{
+              var W=800, H=880;           /* 2x the 400x440 viewBox */
+              var c=document.createElement('canvas'); c.width=W; c.height=H;
+              var g=c.getContext('2d');
+              g.fillStyle='#ffffff'; g.fillRect(0,0,W,H);
+              g.drawImage(img,0,0,W,H);
+              finish(c.toDataURL('image/png').split(',')[1]);
+            }catch(e){ finish(null); }
+          };
+          img.onerror=function(){ finish(null); };
+          img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(xml);
+        })
+        .catch(function(){ finish(null); });
+    }catch(e){ finish(null); }
+  }
+
 /* where the logo sits, as a percentage of the garment - what a cutter needs */
 function boxPercent(){
   var g=(GARMENT_BOX[state.view||'front']||{})[state.product.slug];
@@ -815,7 +887,7 @@ function init(){
              'Weight: '+(state.gsmCustom?state.gsmCustom+' gsm (customer specified)':state.gsm+' gsm'),
              'Colour: '+state.colour.name,
              'Technique: '+(state.techniqueCustom?state.techniqueCustom+' (customer specified)':state.technique.name),
-      (function(){var q=state.moved?boxPercent():null; return q?'Logo position: '+q.cx+'% across, '+q.cy+'% down the garment, '+q.w+'% of its width'+(q.rot?', rotated '+q.rot+'\u00b0':'')+' (set by the customer)':null;})(),
+      (function(){/* Sent whether or not the artwork was dragged. This read `state.moved?boxPercent():null`, so a customer who accepted the standard placement sent NO coordinates and the factory got a zone name and a file. The default is still a position. */var q=boxPercent(); if(!q) return null; return 'Logo position: '+q.cx+'% across, '+q.cy+'% down the garment, '+q.w+'% of its width'+(q.rot?', rotated '+q.rot+'\u00b0':'')+(state.moved?' (set by the customer)':' (standard placement, not adjusted)');})(),
              'Placement: '+(state.placement?state.placement.name:'-'),
              'Artwork: '+(state.logoName||'not supplied')].join('\n');
     var fd=new FormData(form);
@@ -830,6 +902,13 @@ function init(){
       body.files=[{name:state.logoName,data:String(state.logo).split(',')[1]}];
     }
     btn.disabled=true; btn.textContent='Sending…';
+    /* Attach a flattened mockup. See mockupPng(): it never fails the send -
+       the enquiry is worth incomparably more than the picture. */
+    mockupPng(function(png){
+      if(png){
+        body.files = body.files || [];
+        body.files.push({name:'mockup-'+(state.product.slug||'garment')+'-'+(state.view||'front')+'.png', data:png});
+      }
     fetch('/api/csrf.php',{credentials:'same-origin'})
       .then(function(r){return r.json()})
       .then(function(t){
@@ -854,6 +933,7 @@ function init(){
         msg.className='dz-msg err';
         msg.textContent='We could not send that. Please email info@fabrioza.com and we will pick it up.';
       });
+    });  /* mockupPng */
   });
 }
 
