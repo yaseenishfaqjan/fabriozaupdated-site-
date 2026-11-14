@@ -44,7 +44,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DIST = ROOT / 'dist'
 APPLY = '--apply' in sys.argv
-VER = '20261112c'   # bump whenever site-nav/site-motion assets change:
+VER = '20261114'   # bump whenever site-nav/site-motion assets change:
                        # they are served immutable for a year under a fixed
                        # filename, so an unchanged ?v= reaches nobody who has
                        # visited before - the edge keeps answering HIT.
@@ -58,6 +58,15 @@ VER = '20261112c'   # bump whenever site-nav/site-motion assets change:
 EN = [
     ('Home', '/'),
     ('Collections', '/what-we-make'),
+    # /design is the configurator: garment, fabric, GSM, 10 decoration
+    # methods, colourway, placement, artwork upload and a live mockup. It
+    # has produced 0 of 224 leads, and the reason is discoverability, not
+    # the tool - measured 14 Nov 2026 it was linked from 0 navs, 0 footers
+    # and 6 page bodies out of 161 pages. I REMOVED it from the nav on
+    # 10 Nov (it was on 38 pages) because it still had body links; that was
+    # the wrong call for the one page that turns a browser into a specified
+    # enquiry.
+    ('Design', '/design'),
     ('Sportswear', '/sportswear-catalog'),
     ('Pricing', '/pricing'),
     ('Samples', '/sample-order'),
