@@ -885,6 +885,69 @@ else
     *) b "the configurator no longer posts to /api/send-email.php" ;; esac
 fi
 
+hdr "Equestrian garments in the configurator"
+# Four garments added 15 Nov 2026 to match /custom-equestrian-apparel.
+# Yard polos and team hoodies were NOT added: they are already in the
+# configurator as Polo shirt and Pullover hoodie, and a second copy under
+# an equestrian name would be forty more photographs for no capability.
+if [ -z "$dz" ]; then
+  b "could not fetch /design to audit the equestrian garments"
+else
+  for t in "Competition show shirt" "Riding tights / breeches" \
+           "Club softshell jacket" "Technical base layer"; do
+    case "$dz" in *"$t"*) g "/design offers: $t" ;;
+      *) b "/design has LOST the garment: $t" ;; esac
+  done
+
+  # The decoration clip is chosen by shape. A shape missing from the map
+  # falls through to TOP, the torso silhouette - which is right for the
+  # softshell and WRONG for breeches, and nothing throws. Verified by
+  # removing the entry: the sublimation tile clipped to a chest on a pair
+  # of legs. This is the one line here that can fail silently.
+  case "$dz" in *"breeches:JOGGERS"*) g "breeches clip to the LEGWEAR silhouette" ;;
+    *) b "breeches are missing from CLIP_BY_SHAPE - sublimation would clip them to a torso" ;; esac
+  case "$dz" in *"CLIP_BY_SHAPE[shape]"*) g "the clip is a lookup, not an inline ternary a new shape can miss" ;;
+    *) b "CLIP_BY_SHAPE is gone - the clip choice reverted to an inline expression" ;; esac
+
+  # Colours are per garment. Without this the swatch row offers all ten,
+  # six of which have no photograph for these garments: photoSrc() would
+  # request a file that does not exist and the stage would render empty.
+  case "$dz" in *"colourByShape"*) g "colours are filtered per garment" ;;
+    *) b "colourByShape is gone - garments would offer colours with no photo" ;; esac
+
+  # Fabric order. fillFabrics filtered D.fabrics by membership, so the
+  # dropdown followed the GLOBAL order and each garment's own first
+  # choice was discarded - 5 of the 8 original shapes opened on the wrong
+  # fabric, and state.fabric is list[0], so an untouched dropdown sent
+  # that fabric in the tech pack.
+  case "$dz" in *"Ordered by fabricByShape, NOT by D.fabrics"*)
+      g "the fabric dropdown honours each garment's own order" ;;
+    *) b "fillFabrics may have reverted - check a polo opens on Cotton pique, not Poly/cotton" ;; esac
+fi
+
+# Every colour offered must have a photograph, both views. 48 files.
+eqmiss=0
+for g_ in "show-shirt:off-white navy black burgundy bottle-green royal-blue" \
+          "riding-breeches:off-white navy black charcoal burgundy sand" \
+          "club-softshell:navy black charcoal burgundy bottle-green royal-blue" \
+          "base-layer:off-white navy black charcoal burgundy bottle-green"; do
+  slug=${g_%%:*}
+  for c in ${g_#*:}; do
+    for suf in "" "--back"; do
+      cc=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 \
+           "$SITE/images/design/${slug}--${c}${suf}.webp")
+      [ "$cc" = "200" ] || { eqmiss=$((eqmiss+1)); b "photo missing: ${slug}--${c}${suf}.webp ($cc)"; }
+    done
+  done
+done
+[ "$eqmiss" = "0" ] && g "all 48 equestrian garment photos serve (4 garments x 6 colours x 2 views)"
+
+# The configurator is reachable from the page that sells these garments.
+# /design produced 0 of 224 leads while it was linked from no nav and no
+# footer; a garment nobody can find repeats that exactly.
+has /custom-equestrian-apparel '"/design"' "the equestrian page links to the configurator"
+
+
 hdr "Result"
 printf '  %d passed, %d failed\n\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1
