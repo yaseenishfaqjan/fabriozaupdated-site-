@@ -187,7 +187,14 @@ UP=$(sshq "docker ps -q --filter name=fabrioza-web" || echo '')
 
 hdr "Configurator photos"
 N=$(sshq "docker exec fabrioza-web sh -c 'ls /var/www/html/images/design/*.webp | wc -l'" | tr -d ' ')
-[ "$N" = "280" ] && g "280 product photos in the container" || b "expected 280 photos, found '${N:-none}'"
+# Compared against the repo, NOT a hard-coded number. This read "= 280"
+# and went red the moment four equestrian garments added 48 photos - the
+# check was pinned to a count that every new garment invalidates, which
+# is the same staleness as a hand-written list of route names. Both sides
+# are derived now, and it still catches the thing it is for: photos that
+# never reached the container.
+WANT=$(ls "$REPO"/dist/images/design/*.webp 2>/dev/null | wc -l | tr -d ' ')
+[ -n "$N" ] && [ "$N" = "$WANT" ]   && g "all $N configurator photos reached the container (repo has $WANT)"   || b "container has '${N:-none}' configurator photos, repo has $WANT"
 code /images/design/pullover-hoodie--black--back.webp 200 "a back view serves"
 code /images/design/club-tracksuit--royal-blue.webp   200 "a front view serves"
 
@@ -195,7 +202,11 @@ hdr "Configurator behaviour"
 has  /design '"front":{'                     "placement map has a front view"
 has  /design '"back":{'                      "placement map has a back view"
 has  /design 'long-sleeve-tee'               "long-sleeve tee present"
-has  /design '"shape":"tee"}]'               "long-sleeve tee is shaped as a tee, not a hoodie"
+# Matches the whole record, not '"shape":"tee"}]'. That trailing }] was
+# the END OF THE PRODUCTS ARRAY, so the check asserted "the last product
+# is shaped tee" - true only while the long-sleeve tee happened to be
+# last. Appending four garments broke it while the data was untouched.
+has  /design '{"slug":"long-sleeve-tee","name":"Long-sleeve t-shirt","shape":"tee"}'      "long-sleeve tee is shaped as a tee, not a hoodie"
 has  /design 'accept=".png,.jpg,.jpeg,.svg,.pdf"' "upload accepts PDF tech packs"
 has  /design 'enter GSM'                   "custom GSM option"
 has  /design 'dzGsmOther'                  "custom GSM input field"
