@@ -835,6 +835,56 @@ code /api/csrf.php 200 "the CSRF endpoint serves"
 # never strand a buyer with no way to reach a form.
 has /pricing "fz-nav__cta" "the quote CTA is still a real link if the script fails"
 
+hdr "Design configurator / tech pack"
+# /design holds garment, fabric, GSM, colourway, 10 decoration techniques,
+# placement, artwork and a cutter-ready position. It had produced 0 of 224
+# leads because it was linked from 0 navs and 0 footers - fixed 14 Nov 2026.
+has /pricing     '"/design"'   "Design is in the nav (it was invisible, and produced 0 leads)"
+code /design 200               "the configurator serves"
+
+dz=$(curl -fsSL --compressed --max-time 25 "$SITE/design" 2>/dev/null)
+if [ -z "$dz" ]; then
+  b "could not fetch /design to audit the tech pack"
+else
+  case "$dz" in *"mockupPng"*) g "the mockup exporter ships" ;;
+    *) b "the mockup exporter is GONE - enquiries carry no visual placement" ;; esac
+
+  # The placement must be sent whether or not the buyer dragged the artwork.
+  # It used to read `state.moved?boxPercent():null`, so accepting the
+  # standard placement sent no coordinates at all.
+  # The POSITIVE marker is tested first, deliberately. The code comment that
+  # explains this fix quotes the old expression verbatim, so a case testing
+  # for "state.moved?boxPercent()" first matches the comment describing the
+  # repair and reports the bug as present on a page that is correct - which
+  # is exactly what the first version of this check did.
+  case "$dz" in
+    *"standard placement, not adjusted"*)
+      g "the placement is sent even when the buyer does not drag it" ;;
+    *"state.moved?boxPercent():null,"*)
+      b "the placement is conditional again - a buyer who does not drag sends NO coordinates" ;;
+    *) b "the placement labelling is missing" ;;
+  esac
+
+  # The garment photo must be inlined before rasterising. An SVG loaded via a
+  # data: URL cannot fetch external images, so a naive export shows artwork
+  # on an empty background while LOOKING like a finished mockup - which would
+  # be approved and then manufactured.
+  case "$dz" in *"querySelectorAll('image')"*) g "every external image is inlined before rasterising" ;;
+    *) b "the mockup no longer inlines all images - the garment would vanish from it" ;; esac
+
+  # It must never cost the enquiry.
+  case "$dz" in *"finish(null)"*) g "a failed mockup still lets the enquiry send" ;;
+    *) b "the mockup has no failure path - it could block a lead" ;; esac
+
+  # Percentages, not invented centimetres: no garment measurements exist here.
+  case "$dz" in *"% of its width"*) g "placement is expressed as a percentage of the garment" ;;
+    *) b "the placement units changed - check nobody invented centimetres" ;; esac
+
+  # It must keep feeding the one lead pipeline.
+  case "$dz" in *"/api/send-email.php"*) g "the configurator posts to the existing lead endpoint" ;;
+    *) b "the configurator no longer posts to /api/send-email.php" ;; esac
+fi
+
 hdr "Result"
 printf '  %d passed, %d failed\n\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1
