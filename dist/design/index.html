@@ -800,9 +800,20 @@ function fillColours(){
   }).join('');
 }
 function build(){
-  state.product=D.products[0]; state.fabric=D.fabrics[0];
+  /* ?product=<slug> preselects a garment, so a buyer arriving from a product
+     page lands on the thing they were just reading about instead of on a
+     t-shirt. An unknown or missing slug falls back to index 0, which is the
+     behaviour every existing entry point already had.
+     The matching <option> is marked selected as well as the state being set:
+     without that the stage would render a jacket while the dropdown still
+     said "Classic t-shirt", and the next change event would fight it. */
+  var want=null;
+  try{ want=(new URLSearchParams(location.search)).get('product') }catch(e){}
+  var pi=0;
+  if(want){ for(var w=0;w<D.products.length;w++){ if(D.products[w].slug===want){ pi=w; break } } }
+  state.product=D.products[pi]; state.fabric=D.fabrics[0];
   state.colour=D.colours[0]; state.technique=D.techniques[0];
-  $('#dzProduct').innerHTML=D.products.map(function(p,i){return '<option value="'+i+'">'+p.name+'</option>'}).join('');
+  $('#dzProduct').innerHTML=D.products.map(function(p,i){return '<option value="'+i+'"'+(i===pi?' selected':'')+'>'+p.name+'</option>'}).join('');
   $('#dzTechnique').innerHTML=D.techniques.map(function(t,i){return '<option value="'+i+'">'+t.name+'</option>'}).join('')
     +'<option value="custom">Other \u2014 describe it</option>';
   fillColours(); fillFabrics(); fillGsm(); fillPlacements(); render();

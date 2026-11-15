@@ -271,6 +271,7 @@ COUNTRIES = {
 
 PRODUCTS = {
     'hoodie': {
+        'design': 'pullover-hoodie',
         'slug': 'hoodie', 'rows': ['Premium Hoodie', 'Crewneck Sweatshirt'],
         'hs': '6110', 'hs_label': 'Jerseys, pullovers, cardigans and sweatshirts, knitted',
         'gsm': '280-350gsm', 'tag': 'Hoodies &amp; Sweatshirts',
@@ -278,6 +279,7 @@ PRODUCTS = {
         'hero_img': '/images/cat-hoodies-hero.jpg',
     },
     't-shirt': {
+        'design': 'oversized-tee',
         'slug': 't-shirt', 'rows': ['Heavyweight T-Shirt'],
         'hs': '6109', 'hs_label': 'T-shirts, singlets and other vests, knitted',
         'gsm': '180-220gsm', 'tag': 'T-Shirts',
@@ -285,6 +287,7 @@ PRODUCTS = {
         'hero_img': '/images/st-graphic-tee.jpg',
     },
     'tracksuit': {
+        'design': 'club-tracksuit',
         'slug': 'tracksuit', 'rows': ['Tracksuit Set'],
         'hs': '6112', 'hs_label': 'Track suits, ski suits and swimwear, knitted',
         'gsm': '280-340gsm', 'tag': 'Tracksuits',
@@ -312,6 +315,7 @@ PRODUCTS = {
         'hero_img': '/images/st-acidwash-tee.jpg',
     },
     'jacket': {
+        'design': 'varsity-jacket',
         'slug': 'jacket',
         'rows': ['Bomber / Varsity Jacket', 'Windbreaker Jacket'],
         # Outerwear has no single code - see hs_multi_* below, same
@@ -327,6 +331,7 @@ PRODUCTS = {
         'hero_img': '/images/prod-jacket.jpg',
     },
     'winter-outerwear': {
+        'design': 'fleece-lined-jacket',
         'slug': 'winter-outerwear',
         'rows': ['Premium Hoodie', 'Crewneck Sweatshirt', 'Bomber / Varsity Jacket', 'Windbreaker Jacket', 'Tracksuit Set'],
         # Outerwear has no single code - see hs_multi_* below, same
@@ -342,6 +347,7 @@ PRODUCTS = {
         'hero_img': '/images/prod-jacket-v2.jpg',
     },
     'joggers': {
+        'design': 'tapered-joggers',
         'slug': 'joggers',
         'rows': ['Joggers / Sweatpants'],
         'hs': None,
@@ -354,6 +360,7 @@ PRODUCTS = {
         'hero_img': '/images/prod-joggers.jpg',
     },
     'fleece': {
+        'design': 'fleece-lined-jacket',
         'slug': 'fleece',
         'rows': ['Fleece Jacket'],
         'hs': None,
@@ -367,6 +374,7 @@ PRODUCTS = {
         'hero_img': '/images/cat-hoodies-fleece.jpg',
     },
     'workwear': {
+        'design': 'club-softshell',
         'slug': 'workwear',
         'rows': ['Work Trousers', 'Work Jacket', 'Hi-Vis Safety Vest'],
         'hs': None,
@@ -442,6 +450,21 @@ def build_table(P):
     return table, len(re.findall(r'\$[0-9]+\.[0-9]{2}', table)), wanted
 
 
+def design_cta(P):
+    """Link to the configurator with THIS page's garment preselected.
+
+    /design accepts ?product=<slug>; an unknown or absent slug falls back to
+    the first garment, so this cannot break an existing entry point. Products
+    with no single garment behind them emit nothing.
+    """
+    if not P.get('design'):
+        return ''
+    return ('<p class="note">Or <a href="/design?product=%s">design it '
+            'yourself</a> \u2014 pick the fabric, GSM, colour and decoration, '
+            'drop your logo on and send it straight through as an enquiry.</p>'
+            % P['design'])
+
+
 def default_fabric(P):
     """The fabric paragraph for a product that HAS one weight range.
 
@@ -508,6 +531,7 @@ clearance paperwork handled.</li>
 24 hours, with the real duty rate for your code.</p>
 <p><a class="btn" href="/#contact">Request a quote</a>
 &nbsp; <a href="/sample-order">Order a sample first</a></p>
+{design_cta(P)}
 </div>
 
 <h2>Questions brands ask</h2>
