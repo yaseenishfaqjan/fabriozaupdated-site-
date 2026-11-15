@@ -20,3 +20,4 @@ LEAD-JUDITH-REPLY-NL.md
 # they wrote. Same category as the LEADS files above. The GENERATOR
 # (tools/worklist.php) is committed; its output never is.
 FOLLOWUP-WORKLIST.md
+__pycache__/

@@ -33,6 +33,28 @@ import sys
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
+# THE SHORTENING RULE LIVES IN ONE PLACE. fix-meta-lengths.py already owns
+# it, and a copy here would drift from it; that drift is exactly what this
+# import was added to stop. Loaded by path because the filename has dashes.
+def _meta_rules():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        'fix_meta_lengths',
+        pathlib.Path(__file__).resolve().parent / 'fix-meta-lengths.py')
+    mod = importlib.util.module_from_spec(spec)
+    # That module has no __main__ guard: it scans dist/ at import time and
+    # decides whether to WRITE from '--apply' in sys.argv. Running this
+    # generator with --write --apply would otherwise rewrite every page's
+    # meta as a side effect of building one page. Hide our argv from it.
+    saved = sys.argv
+    sys.argv = [str(spec.origin)]
+    try:
+        spec.loader.exec_module(mod)
+    finally:
+        sys.argv = saved
+    return mod.shorten_title, mod.shorten_desc
+
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DIST = ROOT / 'dist'
 PRICING = DIST / 'pricing' / 'index.html'
@@ -289,6 +311,36 @@ PRODUCTS = {
         'noun': 'streetwear', 'title_noun': 'Streetwear',
         'hero_img': '/images/st-acidwash-tee.jpg',
     },
+    'jacket': {
+        'slug': 'jacket',
+        'rows': ['Bomber / Varsity Jacket', 'Windbreaker Jacket'],
+        # Outerwear has no single code - see hs_multi_* below, same
+        # reasoning as 'streetwear'.
+        'hs': None,
+        'hs_multi_uk': ("Outerwear spans several commodity codes rather than one: woven shells such as windbreakers sit under <strong>HS 6201</strong> (men's) and <strong>HS 6202</strong> (women's), knitted and fleece-bodied jackets under <strong>HS 6101</strong> and <strong>HS 6102</strong>, and a jacket whose outer surface is mostly leather moves to <strong>HS 4203</strong> altogether - which is worth knowing before you spec leather sleeves on a varsity. We confirm the code for your garment before quoting."),
+        'hs_multi_usa': ("Outerwear spans several tariff headings rather than one: woven shells such as windbreakers sit under <strong>HTS 6201</strong> (men's) and <strong>HTS 6202</strong> (women's), knitted and fleece-bodied jackets under <strong>HTS 6101</strong> and <strong>HTS 6102</strong>, and a jacket whose outer surface is mostly leather moves to <strong>HTS 4203</strong> altogether. The full ten-digit code decides the rate, and we confirm it in writing before quoting."),
+        'hs_label': '',
+        'gsm': 'wool melton bodies and nylon shells',
+        'fabric_html': ('<p>Outerwear is not one weight, and a single figure for it would mean nothing. A varsity body is wool melton at roughly 600-750gsm with melton or leather sleeves; a windbreaker shell is 70-90gsm nylon or polyester with a water-resistant finish. Linings, wadding and ribbing are specified separately from the shell.</p>\n<p>The actual weight, composition and finish of every component goes on the sample docket, so what you approve is a specification rather than an adjective.</p>'),
+        'tag': 'Jackets &amp; Outerwear',
+        'noun': 'jackets', 'title_noun': 'Jacket',
+        'hero_img': '/images/prod-jacket.jpg',
+    },
+    'winter-outerwear': {
+        'slug': 'winter-outerwear',
+        'rows': ['Premium Hoodie', 'Crewneck Sweatshirt', 'Bomber / Varsity Jacket', 'Windbreaker Jacket', 'Tracksuit Set'],
+        # Outerwear has no single code - see hs_multi_* below, same
+        # reasoning as 'streetwear'.
+        'hs': None,
+        'hs_multi_uk': ('A winter range crosses several commodity codes: hoodies, crewnecks and fleece-bodied jackets sit under <strong>HS 6110</strong>, tracksuits under <strong>HS 6112</strong>, woven shells under <strong>HS 6201</strong> and <strong>HS 6202</strong>, and anything with a mostly-leather outer surface under <strong>HS 4203</strong>. We confirm the code for each garment in your range before quoting rather than applying one to all of them.'),
+        'hs_multi_usa': ('A winter range crosses several tariff headings: hoodies, crewnecks and fleece-bodied jackets sit under <strong>HTS 6110</strong>, tracksuits under <strong>HTS 6112</strong>, woven shells under <strong>HTS 6201</strong> and <strong>HTS 6202</strong>, and a mostly-leather outer surface under <strong>HTS 4203</strong>. The full ten-digit code decides each rate, and we confirm every one in writing before quoting.'),
+        'hs_label': '',
+        'gsm': '260-750gsm depending on the garment',
+        'fabric_html': ('<p>This range runs from 260gsm to about 750gsm, so one number would not describe it. Crewnecks are 260-300gsm fleece-lined; hoodies 280-350gsm French terry or brushed fleece; tracksuits 280-340gsm; varsity bodies wool melton at roughly 600-750gsm; windbreaker shells 70-90gsm nylon.</p>\n<p>Heavier costs more and lighter costs less, and the actual GSM and composition of each garment goes on its sample docket rather than being called "premium", which tells you nothing.</p>'),
+        'tag': 'Winter &amp; Outerwear',
+        'noun': 'winter outerwear and heavy layers', 'title_noun': 'Winter Outerwear',
+        'hero_img': '/images/cat-hoodies-fleece.jpg',
+    },
 }
 
 
@@ -334,7 +386,8 @@ def build_table(P):
     ths = ''.join('<th>%s</th>' % html.escape(c) for c in header)
     trs = ''
     for r in wanted:
-        m = re.match(r'^(.*?)(\d{3}-\d{3}gsm.*|Zip jacket.*|Garment dyed.*)$', r[0])
+        m = re.match(r'^(.*?)(\d{3}-\d{3}gsm.*|Zip jacket.*|Garment dyed.*'
+                     r'|Wool body.*|Lightweight nylon.*)$', r[0])
         label = ('<strong>%s</strong><br><span class="spec">%s</span>'
                  % (html.escape(m.group(1).strip()), html.escape(m.group(2).strip()))
                  if m else '<strong>%s</strong>' % html.escape(r[0]))
@@ -347,6 +400,26 @@ def build_table(P):
     missing = [p for p in re.findall(r'\$[0-9]+\.[0-9]{2}', table) if p not in src]
     assert not missing, 'prices not on /pricing: %s' % missing
     return table, len(re.findall(r'\$[0-9]+\.[0-9]{2}', table)), wanted
+
+
+def default_fabric(P):
+    """The fabric paragraph for a product that HAS one weight range.
+
+    A product whose category spans weights sets fabric_html instead, the
+    same way a category with no single tariff code sets hs_multi_* rather
+    than hs. Outerwear is the case that forced this: a varsity body is
+    600-750gsm wool melton and a windbreaker shell is 70-90gsm nylon, so
+    one number would be wrong for one of them on a page that sells itself
+    on real figures.
+
+    The line breaks are deliberate and must match what is already shipped,
+    or every rebuild emits a whitespace-only diff and real changes get
+    lost in it.
+    """
+    return ('<p>%s is the weight range most brands ask us for, and the one these\n'
+            'prices are built on. Heavier costs more, lighter costs less. We put the actual\n'
+            'GSM and composition on the sample docket rather than calling it "premium",\n'
+            'which tells you nothing.</p>' % P['gsm'])
 
 
 def body_html(P, C, table):
@@ -370,10 +443,7 @@ first either way, so you approve the fit and the fabric before a full run.</p>
 {C['duty_html'](P, C)}
 
 <h2>Fabric and specification</h2>
-<p>{P['gsm']} is the weight range most brands ask us for, and the one these
-prices are built on. Heavier costs more, lighter costs less. We put the actual
-GSM and composition on the sample docket rather than calling it "premium",
-which tells you nothing.</p>
+{P.get('fabric_html') or default_fabric(P)}
 <ul>
 <li>Your own woven labels, care labels and hang tags</li>
 <li>Embroidery, screen print, puff print, DTF and sublimation</li>
@@ -420,6 +490,14 @@ def build(country, product, write):
             'prices and tariff codes, not estimates.'
             % (P['noun'], C['brands_lc'], P['gsm'], C['duty_blurb']))
 
+    # Born within the limits, not trimmed afterwards by a second pass.
+    # Measured on hoodie/uk: 63 -> 52 and 166 -> 121, which is exactly what
+    # is shipped today, so regenerating an existing page is a no-op.
+    shorten_title, shorten_desc = _meta_rules()
+    title, desc = shorten_title(title), shorten_desc(desc)
+    assert len(html.unescape(title)) <= 60, 'title %d: %s' % (len(title), title)
+    assert len(html.unescape(desc)) <= 160, 'desc %d: %s' % (len(desc), desc)
+
     table, nprices, wanted = build_table(P)
     tpl = (DIST / C['template'] / 'index.html').read_text(encoding='utf-8')
     s = tpl
@@ -433,6 +511,11 @@ def build(country, product, write):
                        lambda m: m.group(1) + html.escape(val, quote=True) + m.group(2),
                        s, count=1)
     s = s.replace('https://fabrioza.com/' + C['template'], 'https://fabrioza.com/' + slug)
+    # The nav CTA carries the source page as a RELATIVE query param, so the
+    # absolute-url replace above never touched it: every generated page kept
+    # the template's name and misattributed its own quote requests.
+    s = s.replace('from=/' + C['template'], 'from=/' + slug)
+    assert 'from=/' + C['template'] not in s, 'nav CTA still points at the template'
     s = re.sub(r'(<h1[^>]*>).*?(</h1>)', lambda m: m.group(1) + h1 + m.group(2),
                s, count=1, flags=re.S)
     s = re.sub(r'(<div class="category-tag">).*?(</div>)',
