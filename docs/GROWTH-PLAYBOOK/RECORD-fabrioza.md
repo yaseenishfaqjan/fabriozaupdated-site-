@@ -25,7 +25,7 @@ below is measured; the date is when it was measured.
 | Bing, last ~90 days | **30 clicks** · 2.4K impressions |
 | Google Search Console | **135 indexed** · 224 not indexed |
 | Referring domains | **2** |
-| Pages on the site | 175 (174 in the sitemap, all returning 200) |
+| Pages on the site | 193 (192 in the sitemap, all returning 200) |
 
 Bing's own top recommendation: *"Your site does not have enough inbound links
 from high quality domains."* That is the honest summary of the whole account.
@@ -170,6 +170,53 @@ prevent, because it is a number a buyer budgets against and then pays.
 Audit of all 12: titles 43–60 (limit 60), descriptions 118–160 (limit 160),
 exactly one h1 each, self-canonical, Clarity and GA4 present, nav CTA
 attributing to the page itself.
+
+### Completed — 16 Nov 2026: 30 product x country pages
+
+Five rows added to `/pricing`, then five products across six markets.
+
+| product | price at MOQ 50 | rows it quotes |
+|---|---|---|
+| jacket | — | Bomber / Varsity $32.00, Windbreaker $19.00 |
+| winter-outerwear | — | + hoodie, crewneck, tracksuit |
+| **joggers** | **$12.00** | Joggers / Sweatpants |
+| **fleece** | **$17.00** | Fleece Jacket |
+| **workwear** | **$15.00 / $24.00 / $8.00** | Work Trousers, Work Jacket, Hi-Vis Vest |
+
+**The price ladder is computed, never typed.** Verified identical across all
+12 pre-existing rows: 20 pcs = base x1.20, 100 = x0.90, 250 = x0.80,
+500 = x0.70. Each new row is therefore ONE decision — the MOQ price — and the
+other four cells are arithmetic. Typing them would be four chances to fumble
+a digit on a page a buyer holds us to.
+
+Each price sits between two existing rows so it can be argued from the table.
+Joggers has an independent cross-check: the Tracksuit Set (zip jacket +
+joggers) is $22.00, so separates at $12.00 + ~$17.00 imply a **24% set
+discount** — a sensible saving that does not undercut a product already sold.
+
+**Hi-vis states a compliance limit rather than implying certification.**
+Hi-vis sold as PPE in the UK or EU must meet **EN ISO 20471** — certified
+retroreflective tape, garment testing, a declaration of conformity. The
+workwear page says in plain text that the listed price is for visibility
+wear and that certification is quoted separately. Saying nothing would have
+let a buyer assume it, which is the expensive option.
+
+Sitemap 162 → **192**. All 30 pages return 200, each linked from its country
+hub, all submitted to Bing (quota 98 → 68) and IndexNow (40 URLs accepted).
+Audited: titles 42–60, descriptions 116–160, exactly one h1 each,
+self-canonical, Clarity + GA4, correct nav attribution, and **every price on
+every page verified to exist on `/pricing`** — 0 problems across 30.
+
+**Hero images were looked at, not guessed from filenames.** That is worth the
+two minutes: `st-utility-vest.jpg` turned out to be a canvas multi-pocket
+vest with work trousers and boots — the workwear range almost exactly — and
+`cat-hoodies-fleece.jpg` is a sherpa-lining detail that belonged on the
+fleece page, so winter-outerwear moved to `prod-jacket-v2.jpg`, the wool
+varsity it actually quotes.
+
+**Still no page for a product with no price.** That rule held throughout: the
+generator asserts every figure it prints exists on `/pricing`, so a page
+cannot ship quoting something nobody can quote.
 
 ### Four generator bugs found while doing it
 
