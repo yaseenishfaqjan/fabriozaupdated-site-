@@ -108,6 +108,19 @@ print('pages',t,'ga',g,'clarity',c)"
 - [ ] `llms.txt` + `llms-full.txt` for GEO: a plain-text summary of what the
       business does, who it serves, and the real constraints (MOQ, lead time,
       shipping). This is what an AI assistant quotes.
+
+- [ ] **Re-generate the AI files after ANY page is added.** They go stale
+      silently and nothing reports it. On fabrioza, 30 new pages covering the
+      entire winter range across six markets were invisible to `llms.txt` and
+      `llms-full.txt` — on the channel the CRM says is the **top attributable
+      lead source** (15 of 16 tagged leads). Regenerating took one command and
+      added 56 URLs. Check with `grep <new-slug> llms*.txt`, not by assuming.
+
+- [ ] **State what you have NOT certified, in words an assistant can quote.**
+      If a product sits near a regulated category — PPE, medical, food contact,
+      children's safety — say explicitly what the listed price does and does
+      not include. An assistant repeating a certification you never made is
+      worse than not being cited at all.
 - [ ] Images: real `alt` on anything meaningful. **`alt=""` on a decorative
       `aria-hidden` background is CORRECT** — Bing reports it as "missing";
       ignore that, adding text there makes screen readers worse.
@@ -128,6 +141,19 @@ print('pages',t,'ga',g,'clarity',c)"
 - [ ] This is the one item no code change fixes. Directories, suppliers,
       trade bodies, customer case studies, guest posts, supplier listings on
       customers' own sites.
+
+- [ ] **No orphans.** A page in the sitemap that nothing links to gets weak
+      crawl priority and receives no internal authority. Count inbound internal
+      links per page, not just outbound ones.
+
+- [ ] **The conversion tool is reachable from the pages that create intent,
+      and lands on the right thing.** fabrioza's configurator produced 0 of 224
+      leads while linked from no nav and no footer; after that was fixed it was
+      still reached only through the nav, so a buyer reading about jackets
+      landed on a t-shirt. A `?product=<slug>` deep link per page fixes the
+      second half. Make an unknown slug fall back silently, and set the
+      `<select>` as well as the state — otherwise the page renders one garment
+      while the control says another.
 
 ## 6. Converts
 
