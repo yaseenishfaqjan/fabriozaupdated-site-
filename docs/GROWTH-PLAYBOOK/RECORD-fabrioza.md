@@ -25,7 +25,7 @@ below is measured; the date is when it was measured.
 | Bing, last ~90 days | **30 clicks** · 2.4K impressions |
 | Google Search Console | **135 indexed** · 224 not indexed |
 | Referring domains | **2** |
-| Pages on the site | 165 (164 in the sitemap, all returning 200) |
+| Pages on the site | 175 (174 in the sitemap, all returning 200) |
 
 Bing's own top recommendation: *"Your site does not have enough inbound links
 from high quality domains."* That is the honest summary of the whole account.
@@ -144,11 +144,32 @@ no priced fleece jacket, no workwear line, and joggers exist only inside the
 tracksuit set. Those need a product and a price before they need a page —
 publishing them now would advertise something nobody can quote.
 
-**Next, once those products exist or for other markets:** the same two pages
-for USA, Canada, Australia, Germany and UAE are one command each
-(`python -I tools/build-country-product-page.py usa jacket --write`), and the
-duty wording changes correctly per country — the US page would say ~26.5%, not
-0%.
+**All six markets are now built — 12 pages, same day.** `jacket-` and
+`winter-outerwear-manufacturer-` exist for uk, usa, canada, australia,
+germany and uae. Sitemap 162 → 174, each linked from its own country hub,
+all 12 returning 200, all 15 changed URLs accepted by IndexNow.
+
+**The duty wording is the reason this was not a copy-paste job, and it came
+out right.** Extracted from the "What import actually costs you" section of
+each jacket page:
+
+| market | what the page actually says |
+|---|---|
+| uk | 0% under DCTS (92% of lines) + 20% import VAT |
+| usa | 16.5% MFN + 10% Section 301 = **26.5%** |
+| canada | 18% MFN + 5% GST |
+| australia | 10% GST + 5% |
+| germany | 0% + 12% + 19% VAT |
+| uae | 5% |
+
+Six markets, six different answers, and **no "0% duty" on the US page** —
+verified against the live HTML, which contains `26.5%` and does not contain
+`DCTS`. That is the exact error the generator's docstring was written to
+prevent, because it is a number a buyer budgets against and then pays.
+
+Audit of all 12: titles 43–60 (limit 60), descriptions 118–160 (limit 160),
+exactly one h1 each, self-canonical, Clarity and GA4 present, nav CTA
+attributing to the page itself.
 
 ### Four generator bugs found while doing it
 
