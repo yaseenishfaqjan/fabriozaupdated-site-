@@ -25,7 +25,7 @@ below is measured; the date is when it was measured.
 | Bing, last ~90 days | **30 clicks** · 2.4K impressions |
 | Google Search Console | **135 indexed** · 224 not indexed |
 | Referring domains | **2** |
-| Pages on the site | 163 (162 in the sitemap, all returning 200) |
+| Pages on the site | 165 (164 in the sitemap, all returning 200) |
 
 Bing's own top recommendation: *"Your site does not have enough inbound links
 from high quality domains."* That is the honest summary of the whole account.
@@ -124,3 +124,48 @@ for — e.g. `jacket-manufacturer-uk`, `fleece-manufacturer-uk`,
 
 **This is the single highest-value SEO work available on this site**, and it is
 content, not configuration.
+
+### Started — 16 Nov 2026
+
+| page | products behind it |
+|---|---|
+| `/jacket-manufacturer-uk` | Bomber / Varsity Jacket, Windbreaker Jacket |
+| `/winter-outerwear-manufacturer-uk` | + Premium Hoodie, Crewneck Sweatshirt, Tracksuit Set |
+
+Both built with `tools/build-country-product-page.py`, so they inherit the
+schema, hreflang, duty wording and live price table the five existing UK pages
+have. Sitemap 162 → 164; both linked from `/clothing-manufacturer-uk`.
+
+**Only two pages, deliberately.** Every product must map onto rows that really
+exist in `/pricing` — the generator asserts it. The only priced winter items
+are those two jackets plus the hoodie, crewneck and tracksuit already in use.
+So there is still **no honest `fleece-`, `workwear-` or `joggers-manufacturer-uk`**:
+no priced fleece jacket, no workwear line, and joggers exist only inside the
+tracksuit set. Those need a product and a price before they need a page —
+publishing them now would advertise something nobody can quote.
+
+**Next, once those products exist or for other markets:** the same two pages
+for USA, Canada, Australia, Germany and UAE are one command each
+(`python -I tools/build-country-product-page.py usa jacket --write`), and the
+duty wording changes correctly per country — the US page would say ~26.5%, not
+0%.
+
+### Four generator bugs found while doing it
+
+Found by rebuilding all 24 existing pages and diffing, which is worth doing
+before trusting any generator you did not just write:
+
+1. **Meta lengths had diverged.** Regenerating any page silently undid the
+   earlier meta work — 63-char title, 166-char description, against limits of
+   60 and 160, with nothing erroring. It now imports the rule from
+   `fix-meta-lengths.py` instead of restating it.
+2. **Lead attribution was wrong.** The nav CTA carries its source page in a
+   *relative* param (`from=/clothing-manufacturer-uk`); the generator only
+   rewrote absolute URLs, so every generated page would have credited its own
+   quote requests to the landing page.
+3. **Importing `fix-meta-lengths.py` ran it.** No `__main__` guard, and it
+   decides whether to write from `--apply` in `sys.argv` — so
+   `... --write --apply` would have rewritten every page's meta as a side
+   effect of building one.
+4. `default_fabric()` collapsed a paragraph onto one line, making every
+   rebuild emit whitespace-only noise.
