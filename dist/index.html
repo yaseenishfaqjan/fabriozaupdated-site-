@@ -683,7 +683,41 @@ a.fixed.bottom-36.right-6,.fixed.bottom-36.right-6{bottom:168px!important}
 </script>
 </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- SERVER-RENDERED HERO. Bing's Recommendations reported the h1 tag
+           missing on exactly one page, and this was it: the app's h1 is
+           created by React (src/sections/HeroV2.tsx), so the HTML a crawler
+           is served had #root empty and no h1 at all. The homepage is the
+           site's best converter when it is shown - 33.33% CTR at position
+           3.79 - and it was being judged on a blank document.
+
+           THIS IS NOT CLOAKING AND IT IS NOT A DUPLICATE. The copy below is
+           character-for-character what the app renders. main.tsx mounts with
+           createRoot(...).render(), NOT hydrateRoot - and createRoot WIPES
+           the container's children before its first render, so this block is
+           removed the moment the bundle runs. Verified in the bundle:
+           `b_.createRoot(document.getElementById("root")).render(...)`.
+           If anyone ever switches that call to hydrateRoot, this markup has
+           to go or every load will throw a hydration mismatch.
+
+           The classes are the app's own, so this matches the real hero's
+           final state. Two are deliberately dropped: `opacity-0`, which GSAP
+           animates away and which would render this invisible, and the
+           `hero-*` hooks, which are GSAP selectors and must only ever match
+           the live elements. The <video> is left out on purpose - it would
+           download vid-1.mp4 only to have it discarded milliseconds later. -->
+      <section class="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-ink-black">
+        <div class="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto">
+          <div class="inline-flex items-center gap-2 bg-white/10 border border-fabrioza-green/40 rounded-full px-4 py-2 mb-6">
+            <img src="/images/fabrioza-logo-sm.jpg" alt="FABRIOZA" width="24" height="24" class="w-6 h-6 rounded-full">
+            <span class="text-label text-fabrioza-green">Custom Clothing Manufacturer</span>
+          </div>
+          <h1 class="font-serif text-white mb-5" style="font-size:clamp(1.8rem, 4.5vw, 3.6rem);line-height:1.08">Premium Private Label Clothing Manufacturer for Global Brands</h1>
+          <p class="font-sans text-white/60 max-w-2xl mx-auto mb-5 text-base sm:text-lg leading-relaxed">We help fashion brands, sports teams, and ecommerce businesses launch high-quality custom apparel with factory-direct pricing and worldwide shipping.</p>
+          <p class="text-label text-fabrioza-green mb-8">10+ Years Experience&nbsp;|&nbsp;50K+ Pieces/Month&nbsp;|&nbsp;30+ Countries</p>
+        </div>
+      </section>
+    </div>
 
     <!-- Heavyweight streetwear showcase: second conversion band, injected
          before the contact section. Features the hoodie/tee/puff catalogs. -->
