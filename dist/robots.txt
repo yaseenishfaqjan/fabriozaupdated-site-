@@ -72,10 +72,20 @@ Allow: /
 User-agent: DuckAssistBot
 Allow: /
 
-# --- LLMs.txt Pointer (AI Content Preference) ---
-LLMs: https://fabrioza.com/llms.txt
-LLMs-Full: https://fabrioza.com/llms-full.txt
-AI-Content-Preference: https://fabrioza.com/llms.txt
-
 # --- Sitemap ---
+# Declared FIRST on purpose. The three LLMs pointers below are not
+# standard robots.txt directives and Bing's robots.txt Tester reports
+# each one as an error (3 errors, 15 Nov 2026). Every major parser
+# ignores a directive it does not know, so they are harmless - but a
+# parse error sitting ABOVE the Sitemap line is a needless risk on the
+# one line that must always be read. Order costs nothing; the risk did.
 Sitemap: https://fabrioza.com/sitemap.xml
+
+# --- LLMs.txt Pointer (AI Content Preference) ---
+# Commented out, not deleted. No crawler documents reading these keys,
+# and llms.txt is discovered at its own root path, which is live:
+# https://fabrioza.com/llms.txt and /llms-full.txt both serve 200.
+# Uncommenting any line brings its Bing error back with it.
+# LLMs: https://fabrioza.com/llms.txt
+# LLMs-Full: https://fabrioza.com/llms-full.txt
+# AI-Content-Preference: https://fabrioza.com/llms.txt

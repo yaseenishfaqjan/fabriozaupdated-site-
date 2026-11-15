@@ -11,7 +11,28 @@ This is the **deployment folder** for fabrioza.com (a B2B clothing-manufacturer 
 - Target: **VPS via Docker** (switched from cPanel in July 2026). `Dockerfile` (php:8.3-apache with rewrite/headers/expires/deflate enabled and `AllowOverride All`) + `docker-compose.yml` in the repo root are the deploy unit: `docker compose up -d --build` serves on port 8080.
 - An SSL-terminating reverse proxy (Caddy/nginx/Traefik) must sit in front and forward `X-Forwarded-Proto: https` — the `.htaccess` HTTPS 301 checks that header to avoid a redirect loop behind the proxy.
 - The full routing behavior was verified against this exact image with a 126-check URL matrix (see scratchpad test script pattern in git history / verification section below).
-- After deploying SEO-relevant changes, hit `https://fabrioza.com/indexnow.php` once (submits all sitemap URLs to Bing/Yandex via IndexNow) and resubmit `sitemap.xml` in Bing Webmaster Tools / GSC.
+- After deploying SEO-relevant changes, submit the CHANGED URLs to IndexNow --
+  **after the container is actually serving them, never straight after the
+  commit.** `https://fabrioza.com/indexnow.php` submits all 161 sitemap URLs
+  at once; prefer one call per changed URL:
+
+  ```bash
+  K=6e0726a1783a50994f70e2ffd2987f22
+  curl -s -o /dev/null -w '%{http_code}
+' \n    "https://api.indexnow.org/indexnow?url=https://fabrioza.com/<path>&key=$K&keyLocation=https://fabrioza.com/$K.txt"
+  ```
+
+  **This bit us on 15 Nov 2026 and cost a page 15 hours of indexing.**
+  `/custom-equestrian-apparel` was committed at 00:35:42; indexnow.php fired at
+  00:36 with all 161 URLs; Bing crawled at 00:37 -- while `docker compose up
+  --build` was still running. Bing recorded **"Indexing allowed? No -- URL
+  cannot appear on Bing"** and kept it until the record was refreshed by hand.
+  Nothing on our side was ever wrong: the live page serves 200 with
+  `index, follow` and a self-canonical, and BWT's own **Live URL** test said
+  "URL can be indexed by Bing". **The Bing Index tab shows the LAST CRAWL,
+  not the page** -- always run Live URL before believing it, then
+  Request indexing (quota 100/day) to refresh the stale record.
+- Verify a deploy by curling the change, never by a script's exit code.
 
 ## Known gaps
 
