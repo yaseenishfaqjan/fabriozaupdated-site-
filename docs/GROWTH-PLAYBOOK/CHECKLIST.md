@@ -81,7 +81,19 @@ print('pages',t,'ga',g,'clarity',c)"
 
 - [ ] **Sitemap submitted** in both consoles, and re-submitted after big
       changes. Check "last crawled" — fabrioza and nodevant were both months
-      stale without any error showing.
+      stale without any error showing. fabrioza's showed **136 URLs** against a
+      live file of 174 until it was resubmitted; nothing was flagged as wrong.
+
+- [ ] **Only ONE hostname's sitemap is registered.** fabrioza had both
+      `https://fabrioza.com/sitemap.xml` and `https://www.fabrioza.com/sitemap.xml`
+      registered in Bing — the same file reached through a hostname that 301s to
+      the apex. It reported 0 errors and 0 warnings, so nothing ever complained,
+      while quietly encouraging the engine to keep rediscovering `www` variants
+      of every URL. Those variants are the "Page with redirect" bucket that
+      makes a not-indexed count look alarming. Register the canonical hostname
+      only; delete the rest (Sitemaps → tick the row → Delete; the row's own
+      ⋮ menu offers Re-submit and nothing else, which is easy to read as "it
+      cannot be removed").
 
 ## 3. Understandable
 
