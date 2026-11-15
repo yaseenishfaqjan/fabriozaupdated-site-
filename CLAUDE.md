@@ -32,7 +32,22 @@ This is the **deployment folder** for fabrioza.com (a B2B clothing-manufacturer 
   "URL can be indexed by Bing". **The Bing Index tab shows the LAST CRAWL,
   not the page** -- always run Live URL before believing it, then
   Request indexing (quota 100/day) to refresh the stale record.
-- Verify a deploy by curling the change, never by a script's exit code.
+- Verify a deploy by curling the change, never by a script's exit code --
+  **and cache-bust when the file is static.** `robots.txt` is served by
+  Cloudflare with `Cache-Control: max-age=14400`, so for up to 4 hours after
+  a correct deploy `curl https://fabrioza.com/robots.txt` returns the OLD
+  file with `cf-cache-status: HIT` while the container already has the new
+  one. Measured 15 Nov 2026. HTML pages update immediately; static files do
+  not. Check all three before concluding anything:
+
+  ```bash
+  curl -sI https://fabrioza.com/robots.txt | grep -i 'cf-cache-status\|age:'
+  curl -s "https://fabrioza.com/robots.txt?cb=$(date +%s)" | head -3
+  ssh root@209.145.55.76 'docker exec fabrioza-web head -3 /var/www/html/robots.txt'
+  ```
+
+  Purging the Cloudflare cache is the only way to make it immediate, and that
+  is an owner action in the Cloudflare dashboard.
 
 ## Known gaps
 
