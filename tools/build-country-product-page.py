@@ -339,7 +339,45 @@ PRODUCTS = {
         'fabric_html': ('<p>This range runs from 260gsm to about 750gsm, so one number would not describe it. Crewnecks are 260-300gsm fleece-lined; hoodies 280-350gsm French terry or brushed fleece; tracksuits 280-340gsm; varsity bodies wool melton at roughly 600-750gsm; windbreaker shells 70-90gsm nylon.</p>\n<p>Heavier costs more and lighter costs less, and the actual GSM and composition of each garment goes on its sample docket rather than being called "premium", which tells you nothing.</p>'),
         'tag': 'Winter &amp; Outerwear',
         'noun': 'winter outerwear and heavy layers', 'title_noun': 'Winter Outerwear',
+        'hero_img': '/images/prod-jacket-v2.jpg',
+    },
+    'joggers': {
+        'slug': 'joggers',
+        'rows': ['Joggers / Sweatpants'],
+        'hs': None,
+        'hs_multi_uk': ("Joggers sit under <strong>HS 6103</strong> for men's and boys' and <strong>HS 6104</strong> for women's and girls' when knitted, and move to <strong>HS 6203</strong> and <strong>HS 6204</strong> when woven. We confirm the code for your garment before quoting."),
+        'hs_multi_usa': ("Joggers sit under <strong>HTS 6103</strong> for men's and boys' and <strong>HTS 6104</strong> for women's and girls' when knitted, and move to <strong>HTS 6203</strong> and <strong>HTS 6204</strong> when woven. The full ten-digit code decides the rate, and we confirm it in writing before quoting."),
+        'hs_label': '',
+        'gsm': '280-350gsm',
+        'tag': 'Joggers &amp; Sweatpants',
+        'noun': 'joggers and sweatpants', 'title_noun': 'Joggers',
+        'hero_img': '/images/prod-joggers.jpg',
+    },
+    'fleece': {
+        'slug': 'fleece',
+        'rows': ['Fleece Jacket'],
+        'hs': None,
+        'hs_multi_uk': ("A full-zip fleece sits under <strong>HS 6101</strong> for men's and boys' and <strong>HS 6102</strong> for women's and girls'; a bonded or woven-shell fleece moves to <strong>HS 6201</strong> and <strong>HS 6202</strong>. We confirm the code for your garment before quoting."),
+        'hs_multi_usa': ("A full-zip fleece sits under <strong>HTS 6101</strong> for men's and boys' and <strong>HTS 6102</strong> for women's and girls'; a bonded or woven-shell fleece moves to <strong>HTS 6201</strong> and <strong>HTS 6202</strong>. The full ten-digit code decides the rate, and we confirm it in writing before quoting."),
+        'hs_label': '',
+        'gsm': '280-320gsm',
+        'fabric_html': ('<p>280-320gsm anti-pill polar fleece is the weight these prices are built on, and the one most brands ask for: warm enough to wear as an outer layer in spring and autumn, light enough to sit under a shell in winter.</p>\n<p>Sherpa and bonded constructions cost more and are quoted separately. The actual weight, pile and anti-pill treatment go on the sample docket rather than being summarised as "premium", which tells you nothing.</p>'),
+        'tag': 'Fleece &amp; Midlayers',
+        'noun': 'fleece jackets', 'title_noun': 'Fleece',
         'hero_img': '/images/cat-hoodies-fleece.jpg',
+    },
+    'workwear': {
+        'slug': 'workwear',
+        'rows': ['Work Trousers', 'Work Jacket', 'Hi-Vis Safety Vest'],
+        'hs': None,
+        'hs_multi_uk': ('Workwear crosses several commodity codes because it is several garments: woven work trousers sit under <strong>HS 6203</strong> and <strong>HS 6204</strong>, work jackets under <strong>HS 6201</strong> and <strong>HS 6202</strong>, and high-visibility vests under <strong>HS 6211</strong>. We confirm the code for each item in your range before quoting rather than applying one to all of them.'),
+        'hs_multi_usa': ('Workwear crosses several tariff headings because it is several garments: woven work trousers sit under <strong>HTS 6203</strong> and <strong>HTS 6204</strong>, work jackets under <strong>HTS 6201</strong> and <strong>HTS 6202</strong>, and high-visibility vests under <strong>HTS 6211</strong>. The full ten-digit code decides each rate, and we confirm every one in writing before quoting.'),
+        'hs_label': '',
+        'gsm': 'poly-cotton twill, canvas and softshell',
+        'fabric_html': ('<p>Workwear is three different fabrics, so one weight would not describe it. Work trousers are 240-280gsm poly-cotton twill, reinforced at the knee and seat; work jackets are canvas or three-layer softshell at 280-320gsm; high-visibility vests are lightweight polyester mesh.</p>\n<p><strong>On high-visibility: read this before you order.</strong> Hi-vis sold as personal protective equipment in the UK or EU must meet <strong>EN ISO 20471</strong>, which means certified retroreflective tape, garment testing and a declaration of conformity. Our standard price above is for visibility wear, not for a certified PPE garment - certification is real work and we quote it separately rather than letting you assume it. Tell us which you need and we will say so in writing.</p>'),
+        'tag': 'Workwear &amp; Hi-Vis',
+        'noun': 'workwear', 'title_noun': 'Workwear',
+        'hero_img': '/images/st-utility-vest.jpg',
     },
 }
 
@@ -387,7 +425,9 @@ def build_table(P):
     trs = ''
     for r in wanted:
         m = re.match(r'^(.*?)(\d{3}-\d{3}gsm.*|Zip jacket.*|Garment dyed.*'
-                     r'|Wool body.*|Lightweight nylon.*)$', r[0])
+                     r'|Wool body.*|Lightweight nylon.*|Full-zip polar.*'
+                     r'|Poly-cotton, knee.*|Canvas or softshell.*'
+                     r'|Polyester mesh, reflective.*)$', r[0])
         label = ('<strong>%s</strong><br><span class="spec">%s</span>'
                  % (html.escape(m.group(1).strip()), html.escape(m.group(2).strip()))
                  if m else '<strong>%s</strong>' % html.escape(r[0]))
