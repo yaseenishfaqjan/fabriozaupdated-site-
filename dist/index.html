@@ -102,15 +102,18 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
-    <script type="application/ld+json">
-{
+    <script type="application/ld+json">{
  "@context": "https://schema.org",
  "@graph": [
   {
    "@type": "Organization",
    "name": "FABRIOZA",
    "url": "https://fabrioza.com",
-   "logo": "https://fabrioza.com/images/fabrioza-logo.jpg",
+   "logo": {
+    "@type": "ImageObject",
+    "@id": "https://fabrioza.com/#logo",
+    "url": "https://fabrioza.com/images/fabrioza-logo.jpg"
+   },
    "description": "Premium B2B clothing manufacturer specializing in custom sportswear, team uniforms, streetwear, and private label apparel manufacturing with low MOQ.",
    "foundingDate": "2015",
    "areaServed": [
@@ -164,6 +167,33 @@
    "@id": "https://fabrioza.com/#organization"
   },
   {
+   "@type": "WebSite",
+   "@id": "https://fabrioza.com/#website",
+   "url": "https://fabrioza.com",
+   "name": "FABRIOZA",
+   "description": "Custom clothing manufacturer: sportswear, streetwear, private label and team uniforms, MOQ from 20 pieces, DDP worldwide.",
+   "inLanguage": "en",
+   "publisher": {
+    "@id": "https://fabrioza.com/#organization"
+   }
+  },
+  {
+   "@type": "WebPage",
+   "@id": "https://fabrioza.com/#webpage",
+   "url": "https://fabrioza.com/",
+   "name": "Custom Clothing Manufacturer | Low MOQ from 20 Pieces | FABRIOZA",
+   "isPartOf": {
+    "@id": "https://fabrioza.com/#website"
+   },
+   "about": {
+    "@id": "https://fabrioza.com/#organization"
+   },
+   "primaryImageOfPage": {
+    "@id": "https://fabrioza.com/#logo"
+   },
+   "inLanguage": "en"
+  },
+  {
    "@type": [
     "LocalBusiness",
     "ClothingStore"
@@ -177,7 +207,7 @@
    "priceRange": "$$$",
    "address": {
     "@type": "PostalAddress",
-        "addressLocality": "McDonough",
+    "addressLocality": "McDonough",
     "addressRegion": "GA",
     "addressCountry": "US"
    },
@@ -395,15 +425,28 @@
     "priceCurrency": "USD",
     "priceValidUntil": "2027-12-31",
     "availability": "https://schema.org/InStock",
-    "url": "https://fabrioza.com",
+    "url": "https://fabrioza.com/custom-hoodie-manufacturer",
     "validFrom": "2026-07-01",
     "shippingDetails": {
      "@type": "OfferShippingDetails",
-     "shippingDestination": {"@type": "DefinedRegion", "name": "Worldwide"},
+     "shippingDestination": {
+      "@type": "DefinedRegion",
+      "name": "Worldwide"
+     },
      "deliveryTime": {
       "@type": "ShippingDeliveryTime",
-      "handlingTime": {"@type": "QuantitativeValue", "minValue": 14, "maxValue": 28, "unitCode": "DAY"},
-      "transitTime": {"@type": "QuantitativeValue", "minValue": 3, "maxValue": 7, "unitCode": "DAY"}
+      "handlingTime": {
+       "@type": "QuantitativeValue",
+       "minValue": 14,
+       "maxValue": 28,
+       "unitCode": "DAY"
+      },
+      "transitTime": {
+       "@type": "QuantitativeValue",
+       "minValue": 3,
+       "maxValue": 7,
+       "unitCode": "DAY"
+      }
      }
     },
     "hasMerchantReturnPolicy": {
@@ -411,9 +454,14 @@
      "applicableCountry": "PK",
      "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
      "merchantReturnLink": "https://fabrioza.com/faq"
+    },
+    "seller": {
+     "@id": "https://fabrioza.com/#organization"
     }
    },
-   "image": "https://fabrioza.com/images/products-premium/hoodie-bone.jpg"
+   "image": "https://fabrioza.com/images/products-premium/hoodie-bone.jpg",
+   "@id": "https://fabrioza.com/#product-hoodies",
+   "url": "https://fabrioza.com/custom-hoodie-manufacturer"
   },
   {
    "@type": "Product",
@@ -429,15 +477,28 @@
     "priceCurrency": "USD",
     "priceValidUntil": "2027-12-31",
     "availability": "https://schema.org/InStock",
-    "url": "https://fabrioza.com",
+    "url": "https://fabrioza.com/premium-tshirts",
     "validFrom": "2026-07-01",
     "shippingDetails": {
      "@type": "OfferShippingDetails",
-     "shippingDestination": {"@type": "DefinedRegion", "name": "Worldwide"},
+     "shippingDestination": {
+      "@type": "DefinedRegion",
+      "name": "Worldwide"
+     },
      "deliveryTime": {
       "@type": "ShippingDeliveryTime",
-      "handlingTime": {"@type": "QuantitativeValue", "minValue": 14, "maxValue": 28, "unitCode": "DAY"},
-      "transitTime": {"@type": "QuantitativeValue", "minValue": 3, "maxValue": 7, "unitCode": "DAY"}
+      "handlingTime": {
+       "@type": "QuantitativeValue",
+       "minValue": 14,
+       "maxValue": 28,
+       "unitCode": "DAY"
+      },
+      "transitTime": {
+       "@type": "QuantitativeValue",
+       "minValue": 3,
+       "maxValue": 7,
+       "unitCode": "DAY"
+      }
      }
     },
     "hasMerchantReturnPolicy": {
@@ -445,9 +506,14 @@
      "applicableCountry": "PK",
      "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
      "merchantReturnLink": "https://fabrioza.com/faq"
+    },
+    "seller": {
+     "@id": "https://fabrioza.com/#organization"
     }
    },
-   "image": "https://fabrioza.com/images/products-premium/tee-sand.jpg"
+   "image": "https://fabrioza.com/images/products-premium/tee-sand.jpg",
+   "@id": "https://fabrioza.com/#product-tshirts",
+   "url": "https://fabrioza.com/premium-tshirts"
   },
   {
    "@type": "Product",
@@ -463,15 +529,28 @@
     "priceCurrency": "USD",
     "priceValidUntil": "2027-12-31",
     "availability": "https://schema.org/InStock",
-    "url": "https://fabrioza.com",
+    "url": "https://fabrioza.com/private-label-clothing-manufacturer",
     "validFrom": "2026-07-01",
     "shippingDetails": {
      "@type": "OfferShippingDetails",
-     "shippingDestination": {"@type": "DefinedRegion", "name": "Worldwide"},
+     "shippingDestination": {
+      "@type": "DefinedRegion",
+      "name": "Worldwide"
+     },
      "deliveryTime": {
       "@type": "ShippingDeliveryTime",
-      "handlingTime": {"@type": "QuantitativeValue", "minValue": 14, "maxValue": 28, "unitCode": "DAY"},
-      "transitTime": {"@type": "QuantitativeValue", "minValue": 3, "maxValue": 7, "unitCode": "DAY"}
+      "handlingTime": {
+       "@type": "QuantitativeValue",
+       "minValue": 14,
+       "maxValue": 28,
+       "unitCode": "DAY"
+      },
+      "transitTime": {
+       "@type": "QuantitativeValue",
+       "minValue": 3,
+       "maxValue": 7,
+       "unitCode": "DAY"
+      }
      }
     },
     "hasMerchantReturnPolicy": {
@@ -479,9 +558,14 @@
      "applicableCountry": "PK",
      "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
      "merchantReturnLink": "https://fabrioza.com/faq"
+    },
+    "seller": {
+     "@id": "https://fabrioza.com/#organization"
     }
    },
-   "image": "https://fabrioza.com/images/products-premium/hoodie-embroidery.jpg"
+   "image": "https://fabrioza.com/images/products-premium/hoodie-embroidery.jpg",
+   "@id": "https://fabrioza.com/#product-private-label",
+   "url": "https://fabrioza.com/private-label-clothing-manufacturer"
   },
   {
    "@type": "Product",
@@ -497,15 +581,28 @@
     "priceCurrency": "USD",
     "priceValidUntil": "2027-12-31",
     "availability": "https://schema.org/InStock",
-    "url": "https://fabrioza.com",
+    "url": "https://fabrioza.com/custom-jerseys",
     "validFrom": "2026-07-01",
     "shippingDetails": {
      "@type": "OfferShippingDetails",
-     "shippingDestination": {"@type": "DefinedRegion", "name": "Worldwide"},
+     "shippingDestination": {
+      "@type": "DefinedRegion",
+      "name": "Worldwide"
+     },
      "deliveryTime": {
       "@type": "ShippingDeliveryTime",
-      "handlingTime": {"@type": "QuantitativeValue", "minValue": 14, "maxValue": 28, "unitCode": "DAY"},
-      "transitTime": {"@type": "QuantitativeValue", "minValue": 3, "maxValue": 7, "unitCode": "DAY"}
+      "handlingTime": {
+       "@type": "QuantitativeValue",
+       "minValue": 14,
+       "maxValue": 28,
+       "unitCode": "DAY"
+      },
+      "transitTime": {
+       "@type": "QuantitativeValue",
+       "minValue": 3,
+       "maxValue": 7,
+       "unitCode": "DAY"
+      }
      }
     },
     "hasMerchantReturnPolicy": {
@@ -513,9 +610,14 @@
      "applicableCountry": "PK",
      "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
      "merchantReturnLink": "https://fabrioza.com/faq"
+    },
+    "seller": {
+     "@id": "https://fabrioza.com/#organization"
     }
    },
-   "image": "https://fabrioza.com/images/sw-soccer.jpg"
+   "image": "https://fabrioza.com/images/sw-soccer.jpg",
+   "@id": "https://fabrioza.com/#product-jerseys",
+   "url": "https://fabrioza.com/custom-jerseys"
   },
   {
    "@type": "Product",
@@ -531,15 +633,28 @@
     "priceCurrency": "USD",
     "priceValidUntil": "2027-12-31",
     "availability": "https://schema.org/InStock",
-    "url": "https://fabrioza.com",
+    "url": "https://fabrioza.com/team-uniform-manufacturer",
     "validFrom": "2026-07-01",
     "shippingDetails": {
      "@type": "OfferShippingDetails",
-     "shippingDestination": {"@type": "DefinedRegion", "name": "Worldwide"},
+     "shippingDestination": {
+      "@type": "DefinedRegion",
+      "name": "Worldwide"
+     },
      "deliveryTime": {
       "@type": "ShippingDeliveryTime",
-      "handlingTime": {"@type": "QuantitativeValue", "minValue": 14, "maxValue": 28, "unitCode": "DAY"},
-      "transitTime": {"@type": "QuantitativeValue", "minValue": 3, "maxValue": 7, "unitCode": "DAY"}
+      "handlingTime": {
+       "@type": "QuantitativeValue",
+       "minValue": 14,
+       "maxValue": 28,
+       "unitCode": "DAY"
+      },
+      "transitTime": {
+       "@type": "QuantitativeValue",
+       "minValue": 3,
+       "maxValue": 7,
+       "unitCode": "DAY"
+      }
      }
     },
     "hasMerchantReturnPolicy": {
@@ -547,13 +662,17 @@
      "applicableCountry": "PK",
      "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
      "merchantReturnLink": "https://fabrioza.com/faq"
+    },
+    "seller": {
+     "@id": "https://fabrioza.com/#organization"
     }
    },
-   "image": "https://fabrioza.com/images/sw-basketball.jpg"
+   "image": "https://fabrioza.com/images/sw-basketball.jpg",
+   "@id": "https://fabrioza.com/#product-team-uniforms",
+   "url": "https://fabrioza.com/team-uniform-manufacturer"
   }
  ]
-}
-</script>
+}</script>
 
 <style>
       html { scrollbar-width: none; }
