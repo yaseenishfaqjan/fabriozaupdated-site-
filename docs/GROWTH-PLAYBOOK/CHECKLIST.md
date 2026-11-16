@@ -109,6 +109,13 @@ print('pages',t,'ga',g,'clarity',c)"
       business does, who it serves, and the real constraints (MOQ, lead time,
       shipping). This is what an AI assistant quotes.
 
+- [ ] **A generator with a hardcoded list is a hand-maintained list wearing a
+      costume.** nodevant's `gen-llms-full.mjs` looked automated and held three
+      blog slugs in an array while seven posts were published — four full
+      articles missing from `llms-full.txt`, silently. Derive the list from the
+      data file and throw if it parses nothing. After the fix: 28,864 → 57,577
+      bytes, 7 of 7 article bodies.
+
 - [ ] **Re-generate the AI files after ANY page is added.** They go stale
       silently and nothing reports it. On fabrioza, 30 new pages covering the
       entire winter range across six markets were invisible to `llms.txt` and
@@ -141,6 +148,19 @@ print('pages',t,'ga',g,'clarity',c)"
 - [ ] This is the one item no code change fixes. Directories, suppliers,
       trade bodies, customer case studies, guest posts, supplier listings on
       customers' own sites.
+
+- [ ] **Compare the ROUTES on disk against the sitemap, not the sitemap
+      against itself.** A hand-maintained list of paths goes stale the moment
+      someone adds a route, and nothing reports it. nodevant's `staticPages`
+      held 14 entries while the app had 19 static routes: `/pricing/`,
+      `/reverse-audit/` and `/build/` were all returning 200 with
+      `index, follow`, all linked from the footer, and none of them were in the
+      sitemap. `/pricing/` is a money page.
+
+      Two of the five absentees were absent correctly (`/admin/` and
+      `/audit/results/`, both noindex and `Disallow`d) — so the check is
+      "every indexable route is listed", not "every route is listed". Confirm
+      which is which by reading the page's robots meta, never by the name.
 
 - [ ] **No orphans.** A page in the sitemap that nothing links to gets weak
       crawl priority and receives no internal authority. Count inbound internal

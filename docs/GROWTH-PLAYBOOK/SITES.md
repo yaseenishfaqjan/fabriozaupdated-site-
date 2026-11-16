@@ -7,9 +7,34 @@ label said so.
 |---|---|---|---|---|---|
 | **fabrioza.com** | verified | verified | 163/163 | **163/163** | reference implementation — see `RECORD-fabrioza.md` |
 | **otrace.co** | — | verified | — | — | sweep playbook exists, not yet run |
-| **nodevant.com** | — | **verified 15 Nov** | yes | — | 20 titles / 26 descriptions / 1 h1 fixed; sitemap was 5 months stale |
+| **nodevant.com** | — | verified | 45/45 | **none** | see below |
 | **peachpicks.app** | — | **verified 15 Nov** | — | — | essentially unindexed: 0 clicks, 1 impression. Sitemap + IndexNow set up from scratch |
 | **globalshield360.io** | — | **blocked** | — | — | DNS points at the wrong host — see below |
+
+## nodevant.com — clean on-page, two structural gaps
+
+Audited 16 Nov 2026: **0 defects across all 42 live pages** — titles 35–60,
+descriptions 97–160, exactly one h1, canonical, og:image and 4–12 JSON-LD
+blocks each, no duplicates. The meta work from 15 Nov holds.
+
+What was wrong was structural, and neither would show in an on-page audit:
+
+- **Three indexable pages were missing from the sitemap** — `/pricing/`,
+  `/reverse-audit/`, `/build/`. All 200, all `index, follow`, all linked from
+  the footer. Sitemap 42 → 45.
+- **The AI files knew half the site.** `llms.txt` was missing 25 of 42 pages
+  (the whole `/ai-employees/` section, all six case studies, every service and
+  solution detail page). `llms-full.txt` carried 3 of 7 blog articles because
+  its "generator" hardcoded the slugs. Now 0 missing of 45, 7 of 7 articles,
+  28.9 KB → 57.6 KB.
+- `/ai-automation-agency/` was an **orphan** at priority 0.95 — now in the
+  footer.
+- **IndexNow set up from scratch** (key `a2a4eb32864cfd3578ba1379ef40a373`);
+  45 URLs accepted, HTTP 202.
+
+**Microsoft Clarity is on 0 of 45 pages.** GA4 is on all 45. Clarity needs its
+own project per site — fabrioza's `ze5wn6at0r` must not be reused, or two
+businesses' session recordings land in one dashboard. Owner decision.
 
 ## globalshield360.io — not an SEO problem
 
