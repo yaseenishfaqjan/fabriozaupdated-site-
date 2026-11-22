@@ -273,49 +273,147 @@ has  /clothing-manufacturer-australia '<title>Clothing Manufacturer for Australi
 has  /blog/clothing-manufacturer-australia-brands 'Importing Clothing to Australia' "AU blog post retargeted"
 lacks /blog/clothing-manufacturer-australia-brands 'Clothing Manufacturer for Australian Brands' "AU blog post no longer competes"
 
-# UK product pages. They exist to cover "<product> manufacturer uk", which
-# neither parent page targets - /custom-hoodie-manufacturer has no UK angle
-# and /clothing-manufacturer-uk has no product angle. They must NOT take the
-# phrase the UK landing page owns, or all three compete for one query.
-has   /hoodie-manufacturer-uk '<title>Hoodie Manufacturer for UK Brands'   "UK hoodie page owns its phrase"
-lacks /hoodie-manufacturer-uk 'Clothing Manufacturer for UK Brands'        "UK hoodie page does not compete with the UK landing page"
-has   /t-shirt-manufacturer-uk '<title>T-Shirt Manufacturer for UK Brands' "UK t-shirt page owns its phrase"
-lacks /t-shirt-manufacturer-uk 'Clothing Manufacturer for UK Brands'       "UK t-shirt page does not compete with the UK landing page"
+# THE 54-PAGE GARMENT x COUNTRY MATRIX IS RETIRED (22 Nov 2026).
+# 9 garments x 6 countries of near-identical text. Measured on raw page
+# text, hoodie-uk against tracksuit-uk scored 0.95 and t-shirts against
+# tracksuits 0.979 - so Google picked one winner per cluster and reported
+# the rest in Search Console as "Duplicate, Google chose different
+# canonical than user". 54 pages competing, none ranking. Each now 301s to
+# the one garment page that survived, and that page carries all six
+# markets' duty and delivery figures in ONE table instead of one country
+# per page.
+#
+# THE 46 CHECKS THAT USED TO LIVE HERE ASSERTED THOSE 54 PAGES EXIST. 29
+# went red the moment the consolidation shipped, on a site that was
+# correct - and the rest were worse: page() follows redirects, so every
+# `lacks` among them became a vacuous PASS, answering "the UK hoodie page
+# does not claim the US rate" by grepping /custom-hoodie-manufacturer. A
+# check that cannot fail is worse than no check. What follows asserts the
+# shape the site now has, and keeps the one thing those checks were really
+# for: that no page quotes another country's tariff as its own, because
+# that is a number somebody budgets against and pays at the border.
 
-# The MOQ in the hero is inherited from the template and was wrong on the
-# first build: it read "MOQ 50 pieces" on a site whose every headline says
-# 20, which is the same contradiction that made the enquiry form unusable.
-lacks /hoodie-manufacturer-uk 'MOQ 50 pieces'                              "UK hoodie page hero does not contradict the 20-piece MOQ"
-lacks /t-shirt-manufacturer-uk 'MOQ 50 pieces'                             "UK t-shirt page hero does not contradict the 20-piece MOQ"
+# One hop, not a chain. 54 pages 301ing through the HTTPS or trailing-slash
+# rules would cost an extra round trip each; the rules are written with
+# absolute https targets so they do not.
+hop() {  # hop <path> <absolute target> <label>
+  local out code loc
+  out=$(curl -s -o /dev/null --max-time 30 -w '%{http_code} %{redirect_url}' "$SITE$1")
+  code=${out%% *}; loc=${out#* }
+  if [ "$code" = "301" ] && [ "$loc" = "$2" ]; then g "$3"
+  else b "$3 (got $code -> ${loc:-nothing}, want 301 -> $2)"; fi
+}
 
-# Prices are parsed from /pricing at build time. If someone edits the price
-# list and not these pages, the site quotes two different numbers for one
-# garment - so a spot price from each table is pinned to the source.
-has   /hoodie-manufacturer-uk '$19.20'                                     "UK hoodie page carries the live 20-piece price"
-has   /pricing '$19.20'                                                    "...and /pricing still agrees with it"
-has   /t-shirt-manufacturer-uk '$11.40'                                    "UK t-shirt page carries the live 20-piece price"
-has   /pricing '$11.40'                                                    "...and /pricing still agrees with it"
-has   /tracksuit-manufacturer-uk '<title>Tracksuit Manufacturer for UK Brands'   "UK tracksuit page owns its phrase"
-lacks /tracksuit-manufacturer-uk 'Clothing Manufacturer for UK Brands'          "UK tracksuit page does not compete"
-lacks /tracksuit-manufacturer-uk 'MOQ 50 pieces'                                "UK tracksuit hero does not contradict the 20-piece MOQ"
-has   /tracksuit-manufacturer-uk '$26.40'                                       "UK tracksuit page carries the live 20-piece price"
-has   /pricing '$26.40'                                                         "...and /pricing still agrees with it"
+# Scoped to one table ROW, not to the page. All six positions now live on
+# every garment page, so "this page does not mention 0% duty" can no longer
+# be the check - the question is whether each figure sits in its own row.
+row_has() {  # row_has <path> <row key> <needle> <label>
+  fetched "$1" || { b "$4 (page not fetched)"; return; }
+  if sed 's/<tr>/\n<tr>/g' "$(page "$1")" | grep -F -- "$2" | grep -qF -- "$3"
+  then g "$4"; else b "$4"; fi
+}
+row_lacks() {  # row_lacks <path> <row key> <needle> <label>
+  fetched "$1" || { b "$4 (page not fetched)"; return; }
+  if sed 's/<tr>/\n<tr>/g' "$(page "$1")" | grep -F -- "$2" | grep -qF -- "$3"
+  then b "$4"; else g "$4"; fi
+}
 
-has   /streetwear-manufacturer-uk '<title>Streetwear Manufacturer for UK Brands' "UK streetwear page owns its phrase"
-lacks /streetwear-manufacturer-uk 'Clothing Manufacturer for UK Brands'          "UK streetwear page does not compete"
-lacks /streetwear-manufacturer-uk 'MOQ 50 pieces'                                "UK streetwear hero does not contradict the 20-piece MOQ"
-has   /streetwear-manufacturer-uk '$13.20'                                       "UK streetwear page carries the live 20-piece price"
-has   /pricing '$13.20'                                                          "...and /pricing still agrees with it"
-# Streetwear covers several garments, so it must NOT claim a single code -
-# naming one would be a wrong answer to the question a UK buyer is asking.
-has   /streetwear-manufacturer-uk 'spans several commodity codes'                "UK streetwear page does not claim one commodity code"
+hdr "Retired matrix pages (54 -> 9)"
+for pair in hoodie:custom-hoodie-manufacturer streetwear:streetwear-manufacturer \
+            fleece:custom-fleece jacket:custom-jackets joggers:custom-joggers \
+            t-shirt:custom-t-shirts tracksuit:custom-tracksuits \
+            winter-outerwear:custom-outerwear workwear:custom-workwear; do
+  gar=${pair%%:*}; tgt=${pair##*:}
+  for c in usa uk germany canada australia uae; do
+    hop "/$gar-manufacturer-$c" "https://fabrioza.com/$tgt" "/$gar-manufacturer-$c 301s to /$tgt"
+  done
+done
 
-# every UK product page must be reachable, not an orphan
-has   /sitemap.xml 'hoodie-manufacturer-uk'                                      "UK hoodie page is in the sitemap"
-has   /sitemap.xml 't-shirt-manufacturer-uk'                                     "UK t-shirt page is in the sitemap"
-has   /sitemap.xml 'tracksuit-manufacturer-uk'                                   "UK tracksuit page is in the sitemap"
-has   /sitemap.xml 'streetwear-manufacturer-uk'                                  "UK streetwear page is in the sitemap"
-has   /clothing-manufacturer-uk 'hoodie-manufacturer-uk'                         "UK landing page links its product pages"
+hdr "The 9 surviving garment pages"
+for s in custom-hoodie-manufacturer streetwear-manufacturer custom-fleece \
+         custom-jackets custom-joggers custom-t-shirts custom-tracksuits \
+         custom-outerwear custom-workwear; do
+  code "/$s" 200 "/$s serves"
+  has /sitemap.xml "fabrioza.com/$s<" "/$s is in the sitemap"
+  # Not an orphan: a redirect target has to be reachable by a crawler that
+  # never follows the 301, or the consolidation loses the link equity it
+  # was meant to concentrate.
+  has /clothing-manufacturer-uk  "href=\"/$s\"" "the UK landing page links /$s"
+  has /clothing-manufacturer-usa "href=\"/$s\"" "the USA landing page links /$s"
+done
+
+hdr "Duty by market, on one page instead of six"
+# Six countries, six different tariff positions, and the failure mode is a
+# page quoting a neighbour's rate. The UK is 0% under DCTS; Pakistan has no
+# US agreement, so cotton knits run ~26.5% (16.5% MFN + the 10% Section 301
+# tariff on Pakistani goods).
+for s in custom-t-shirts custom-tracksuits custom-joggers custom-fleece \
+         custom-jackets custom-outerwear custom-workwear \
+         custom-hoodie-manufacturer streetwear-manufacturer; do
+  has "/$s" 'Duty and delivery, by market' "/$s carries the per-market table"
+  row_has "/$s" 'United Kingdom'  'Developing Countries Trading' "/$s: UK row cites DCTS"
+  row_has "/$s" 'United States'   'Section 301'                  "/$s: US row cites Section 301"
+  # Asserted on the FACT, not on the scheme's full name. The row writes
+  # "excluded from Canada's GPT"; the first version of this check demanded
+  # "General Preferential Tariff" and went red on nine pages that say
+  # exactly the right thing. What a Canadian buyer needs to know is that
+  # apparel is EXCLUDED and pays the standard MFN rate.
+  #
+  # AND NO APOSTROPHE IN AN ASSERTION ON THESE PAGES. They are generated
+  # with html.escape(quote=True), so the live bytes read Canada&#x27;s -
+  # the second attempt at this check matched a literal ' and failed on all
+  # nine again, which looked like the same content fault twice.
+  row_has "/$s" 'Canada'          'excluded from Canada'         "/$s: Canada row states apparel is excluded from the GPT"
+  row_has "/$s" 'Canada'          '18%'                          "/$s: Canada row states the real knitwear rate"
+  row_has "/$s" 'Australia'       '10% GST'                      "/$s: Australia row cites GST"
+  row_has "/$s" 'Germany'         'GSP+'                         "/$s: Germany row cites GSP+"
+  row_has "/$s" 'United Arab'     'GCC common customs'           "/$s: UAE row cites the GCC tariff"
+  # The check the old per-country pages existed to make, moved to where the
+  # claims now live: the US rate must not appear in the UK row, and the
+  # UK-only scheme must not appear in the US row.
+  row_lacks "/$s" 'United Kingdom' '26.5'                        "/$s: UK row does not carry the US rate"
+  row_lacks "/$s" 'United States'  'Developing Countries Trading' "/$s: US row does not cite the UK-only scheme"
+done
+
+hdr "Garment-page prices still agree with /pricing"
+# Parsed from /pricing when these pages were built. If someone edits the
+# price list and not the garment pages, the site quotes two numbers for one
+# garment.
+for sp in custom-t-shirts:'$11.40' custom-tracksuits:'$26.40' \
+          custom-joggers:'$14.40' custom-fleece:'$20.40' \
+          custom-jackets:'$38.40' custom-outerwear:'$19.20' \
+          custom-workwear:'$18.00'; do
+  s=${sp%%:*}; price=${sp##*:}
+  has "/$s"    "$price" "/$s carries its 20-piece price $price"
+  has /pricing "$price" "...and /pricing still agrees with it"
+done
+
+hdr "Garment pages are differentiated, not six copies of one page"
+# The country consolidation did nothing for the garment axis, because the
+# source pages were already the same page: the only garment-specific block
+# was "Fabric and specification" at 82 words, and the only thing that
+# differed inside it was the GSM number. Each page is pinned to a detail
+# that is true of that garment and of no other, so a future template pass
+# that flattens them again goes red.
+has /custom-t-shirts   'spirality'            "t-shirts: side-seam spirality"
+has /custom-tracksuits 'dye lot'              "tracksuits: top and bottom from one dye lot"
+has /custom-joggers    'leg opening'          "joggers: leg opening in centimetres"
+has /custom-fleece     'anti-pill'            "fleece: anti-pill finish grade"
+has /custom-jackets    'DWR'                  "jackets: DWR vs laminated"
+has /custom-outerwear  'Baffled construction' "outerwear: baffle vs sewn-through"
+has /custom-workwear   'bar tacks'            "workwear: bar tacks at the stress points"
+# Hi-vis is a SAFETY claim. The September 2026 scrub removed 304
+# first-person ISO 9001 claims after clients challenged them; the only
+# certification claim allowed since is "amfori BSCI audited", and even that
+# is unconfirmed. So this page offers to confirm the standard in writing
+# and must never assert one.
+lacks /custom-workwear 'EN ISO 20471'         "workwear names no hi-vis standard it has not confirmed"
+# The FAQ duty answer quoted US-only figures on all six country variants.
+# It is gone from the FAQ and lives in the table, attributed per market.
+# FAQ schema that is not visible on the page is what loses a rich result,
+# and the first pass left this question in the schema on all 7 pages
+# because the removal pattern matched the matrix pages' wording instead.
+lacks /custom-t-shirts 'How long does delivery take?' "the shared delivery FAQ is gone, page and schema"
 
 # THE SITE MUST NOT CONTRADICT ITS OWN MOQ. Every country landing page
 # opened with "MOQ 50 pieces" while the homepage title, the hero, the
@@ -337,54 +435,6 @@ has   /clothing-manufacturer-uk 'MOQ from 20 pieces'     "UK page hero states th
 lacks /moq-calculator 'low MOQ of 50 pieces'             "/moq-calculator does not state 50 as the minimum"
 has   /moq-calculator '20 pieces'                        "/moq-calculator states the real minimum"
 has   /sitemap.xml 'precios-fabricacion-ropa'            "the Spanish price list is in the sitemap"
-
-# USA PRODUCT PAGES. The duty story is the OPPOSITE of the UK's and
-# getting it wrong costs a customer real money: Pakistan has no US trade
-# agreement, so cotton knits carry roughly 26.5% (16.5% MFN plus the 10%
-# Section 301 tariff on Pakistani goods), while the UK is 0% under DCTS.
-# These assert each page tells its own country the truth.
-has   /hoodie-manufacturer-usa '<title>Hoodie Manufacturer for USA Brands'  "USA hoodie page owns its phrase"
-has   /t-shirt-manufacturer-usa '<title>T-Shirt Manufacturer for USA Brands' "USA t-shirt page owns its phrase"
-has   /tracksuit-manufacturer-usa '<title>Tracksuit Manufacturer for USA Brands' "USA tracksuit page owns its phrase"
-has   /streetwear-manufacturer-usa '<title>Streetwear Manufacturer for USA Brands' "USA streetwear page owns its phrase"
-lacks /hoodie-manufacturer-usa 'Clothing Manufacturer for USA Brands'       "USA hoodie page does not compete with the USA landing page"
-lacks /hoodie-manufacturer-usa '0% import duty'                             "USA hoodie page does not claim the UK's 0% duty"
-lacks /streetwear-manufacturer-usa '0% import duty'                         "USA streetwear page does not claim the UK's 0% duty"
-lacks /hoodie-manufacturer-usa 'Developing Countries Trading Scheme'        "USA page does not cite a UK-only scheme"
-has   /hoodie-manufacturer-usa '26.5'                                       "USA page states the real duty rate"
-has   /hoodie-manufacturer-usa 'HTS 6110'                                   "USA page uses HTS, not HS"
-has   /hoodie-manufacturer-uk 'HS 6110'                                     "UK page still uses HS"
-has   /hoodie-manufacturer-uk '0% import duty'                              "UK page still states its 0% position"
-lacks /hoodie-manufacturer-uk '26.5'                                        "UK page does not carry the US rate"
-has   /sitemap.xml 'hoodie-manufacturer-usa'                                "USA hoodie page is in the sitemap"
-has   /sitemap.xml 'streetwear-manufacturer-usa'                            "USA streetwear page is in the sitemap"
-has   /clothing-manufacturer-usa 'hoodie-manufacturer-usa'                  "USA landing page links its product pages"
-
-# CANADA / AUSTRALIA / GERMANY / UAE product pages. Six countries, six
-# different tariff positions, and the failure mode is one page quoting
-# another country's rate - a number somebody budgets against and pays at
-# the border. Each is asserted to state its OWN position and not a
-# neighbour's.
-has   /hoodie-manufacturer-canada 'General Preferential Tariff'     "Canada page states apparel is excluded from GPT"
-has   /hoodie-manufacturer-canada '18%'                             "Canada page states the real knitwear rate"
-lacks /hoodie-manufacturer-canada '0% import duty'                  "Canada page does not claim the UK's 0%"
-lacks /hoodie-manufacturer-canada 'Section 301'                     "Canada page does not carry the US tariff"
-
-has   /hoodie-manufacturer-australia 'flat 5%'                      "Australia page states the real duty rate"
-has   /hoodie-manufacturer-australia '10% GST'                      "Australia page states GST"
-lacks /hoodie-manufacturer-australia '0% import duty'               "Australia page does not claim the UK's 0%"
-
-has   /hoodie-manufacturer-germany 'GSP+'                           "Germany page cites the EU scheme"
-has   /hoodie-manufacturer-germany 'will not quote you a flat 0%'   "Germany page keeps its rules-of-origin caveat"
-has   /hoodie-manufacturer-germany '19%'                            "Germany page states German import VAT"
-lacks /hoodie-manufacturer-germany 'Developing Countries Trading'   "Germany page does not cite the UK-only scheme"
-
-has   /hoodie-manufacturer-uae 'GCC common customs'                 "UAE page states the GCC duty"
-lacks /hoodie-manufacturer-uae '0% import duty'                     "UAE page does not claim the UK's 0%"
-
-has   /sitemap.xml 'hoodie-manufacturer-canada'                     "Canada product page is in the sitemap"
-has   /sitemap.xml 'streetwear-manufacturer-uae'                    "UAE product page is in the sitemap"
-has   /clothing-manufacturer-germany 'hoodie-manufacturer-germany'  "Germany landing page links its product pages"
 
 # PRODUCT DETAIL. 349 product cards across 13 collection pages were plain
 # divs - visible, priced, and impossible to click. Every one was a dead
