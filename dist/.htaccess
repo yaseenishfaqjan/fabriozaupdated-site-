@@ -148,6 +148,67 @@ ErrorDocument 404 /404.html
   # catch-all served the homepage shell with a 200 for ANY unknown URL,
   # which Bing flagged as thin/insufficient content (soft-404s, e.g.
   # /services). Unknown paths now fall through to the branded 404 page.
+
+  # --- Garment x country matrix consolidation, 22 Nov 2026 ---
+  # 54 pages that were 95% identical to each other (measured: hoodie-uk vs
+  # tracksuit-uk scored 0.95 on raw text). Google was picking one winner per
+  # cluster and reporting the rest as 'Duplicate, Google chose different
+  # canonical than user'. Each now 301s to the one garment page that survived,
+  # which carries the real per-market duty and delivery figures from all six.
+  RewriteRule ^fleece-manufacturer-australia/?$             https://fabrioza.com/custom-fleece [R=301,L]
+  RewriteRule ^fleece-manufacturer-canada/?$                https://fabrioza.com/custom-fleece [R=301,L]
+  RewriteRule ^fleece-manufacturer-germany/?$               https://fabrioza.com/custom-fleece [R=301,L]
+  RewriteRule ^fleece-manufacturer-uae/?$                   https://fabrioza.com/custom-fleece [R=301,L]
+  RewriteRule ^fleece-manufacturer-uk/?$                    https://fabrioza.com/custom-fleece [R=301,L]
+  RewriteRule ^fleece-manufacturer-usa/?$                   https://fabrioza.com/custom-fleece [R=301,L]
+  RewriteRule ^hoodie-manufacturer-australia/?$             https://fabrioza.com/custom-hoodie-manufacturer [R=301,L]
+  RewriteRule ^hoodie-manufacturer-canada/?$                https://fabrioza.com/custom-hoodie-manufacturer [R=301,L]
+  RewriteRule ^hoodie-manufacturer-germany/?$               https://fabrioza.com/custom-hoodie-manufacturer [R=301,L]
+  RewriteRule ^hoodie-manufacturer-uae/?$                   https://fabrioza.com/custom-hoodie-manufacturer [R=301,L]
+  RewriteRule ^hoodie-manufacturer-uk/?$                    https://fabrioza.com/custom-hoodie-manufacturer [R=301,L]
+  RewriteRule ^hoodie-manufacturer-usa/?$                   https://fabrioza.com/custom-hoodie-manufacturer [R=301,L]
+  RewriteRule ^jacket-manufacturer-australia/?$             https://fabrioza.com/custom-jackets [R=301,L]
+  RewriteRule ^jacket-manufacturer-canada/?$                https://fabrioza.com/custom-jackets [R=301,L]
+  RewriteRule ^jacket-manufacturer-germany/?$               https://fabrioza.com/custom-jackets [R=301,L]
+  RewriteRule ^jacket-manufacturer-uae/?$                   https://fabrioza.com/custom-jackets [R=301,L]
+  RewriteRule ^jacket-manufacturer-uk/?$                    https://fabrioza.com/custom-jackets [R=301,L]
+  RewriteRule ^jacket-manufacturer-usa/?$                   https://fabrioza.com/custom-jackets [R=301,L]
+  RewriteRule ^joggers-manufacturer-australia/?$            https://fabrioza.com/custom-joggers [R=301,L]
+  RewriteRule ^joggers-manufacturer-canada/?$               https://fabrioza.com/custom-joggers [R=301,L]
+  RewriteRule ^joggers-manufacturer-germany/?$              https://fabrioza.com/custom-joggers [R=301,L]
+  RewriteRule ^joggers-manufacturer-uae/?$                  https://fabrioza.com/custom-joggers [R=301,L]
+  RewriteRule ^joggers-manufacturer-uk/?$                   https://fabrioza.com/custom-joggers [R=301,L]
+  RewriteRule ^joggers-manufacturer-usa/?$                  https://fabrioza.com/custom-joggers [R=301,L]
+  RewriteRule ^streetwear-manufacturer-australia/?$         https://fabrioza.com/streetwear-manufacturer [R=301,L]
+  RewriteRule ^streetwear-manufacturer-canada/?$            https://fabrioza.com/streetwear-manufacturer [R=301,L]
+  RewriteRule ^streetwear-manufacturer-germany/?$           https://fabrioza.com/streetwear-manufacturer [R=301,L]
+  RewriteRule ^streetwear-manufacturer-uae/?$               https://fabrioza.com/streetwear-manufacturer [R=301,L]
+  RewriteRule ^streetwear-manufacturer-uk/?$                https://fabrioza.com/streetwear-manufacturer [R=301,L]
+  RewriteRule ^streetwear-manufacturer-usa/?$               https://fabrioza.com/streetwear-manufacturer [R=301,L]
+  RewriteRule ^t-shirt-manufacturer-australia/?$            https://fabrioza.com/custom-t-shirts [R=301,L]
+  RewriteRule ^t-shirt-manufacturer-canada/?$               https://fabrioza.com/custom-t-shirts [R=301,L]
+  RewriteRule ^t-shirt-manufacturer-germany/?$              https://fabrioza.com/custom-t-shirts [R=301,L]
+  RewriteRule ^t-shirt-manufacturer-uae/?$                  https://fabrioza.com/custom-t-shirts [R=301,L]
+  RewriteRule ^t-shirt-manufacturer-uk/?$                   https://fabrioza.com/custom-t-shirts [R=301,L]
+  RewriteRule ^t-shirt-manufacturer-usa/?$                  https://fabrioza.com/custom-t-shirts [R=301,L]
+  RewriteRule ^tracksuit-manufacturer-australia/?$          https://fabrioza.com/custom-tracksuits [R=301,L]
+  RewriteRule ^tracksuit-manufacturer-canada/?$             https://fabrioza.com/custom-tracksuits [R=301,L]
+  RewriteRule ^tracksuit-manufacturer-germany/?$            https://fabrioza.com/custom-tracksuits [R=301,L]
+  RewriteRule ^tracksuit-manufacturer-uae/?$                https://fabrioza.com/custom-tracksuits [R=301,L]
+  RewriteRule ^tracksuit-manufacturer-uk/?$                 https://fabrioza.com/custom-tracksuits [R=301,L]
+  RewriteRule ^tracksuit-manufacturer-usa/?$                https://fabrioza.com/custom-tracksuits [R=301,L]
+  RewriteRule ^winter-outerwear-manufacturer-australia/?$   https://fabrioza.com/custom-outerwear [R=301,L]
+  RewriteRule ^winter-outerwear-manufacturer-canada/?$      https://fabrioza.com/custom-outerwear [R=301,L]
+  RewriteRule ^winter-outerwear-manufacturer-germany/?$     https://fabrioza.com/custom-outerwear [R=301,L]
+  RewriteRule ^winter-outerwear-manufacturer-uae/?$         https://fabrioza.com/custom-outerwear [R=301,L]
+  RewriteRule ^winter-outerwear-manufacturer-uk/?$          https://fabrioza.com/custom-outerwear [R=301,L]
+  RewriteRule ^winter-outerwear-manufacturer-usa/?$         https://fabrioza.com/custom-outerwear [R=301,L]
+  RewriteRule ^workwear-manufacturer-australia/?$           https://fabrioza.com/custom-workwear [R=301,L]
+  RewriteRule ^workwear-manufacturer-canada/?$              https://fabrioza.com/custom-workwear [R=301,L]
+  RewriteRule ^workwear-manufacturer-germany/?$             https://fabrioza.com/custom-workwear [R=301,L]
+  RewriteRule ^workwear-manufacturer-uae/?$                 https://fabrioza.com/custom-workwear [R=301,L]
+  RewriteRule ^workwear-manufacturer-uk/?$                  https://fabrioza.com/custom-workwear [R=301,L]
+  RewriteRule ^workwear-manufacturer-usa/?$                 https://fabrioza.com/custom-workwear [R=301,L]
 </IfModule>
 
 # --- Compression (Gzip) ---
