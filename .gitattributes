@@ -32,3 +32,26 @@
 # interpreter tolerates CRLF. Eleven .php files are already CRLF in the
 # working tree and work fine.
 *.sh text eol=lf
+
+# dist/assets/ is the BUILT, SERVED artifact and its exact bytes are the
+# thing being verified. The reasoning above that lets .php and .py tolerate
+# CRLF does not transfer here: nothing interprets these files, they are
+# served verbatim under a content-hashed name with max-age=31536000.
+#
+# tools/verify-live.sh:546 md5s the repo's copy of the homepage bundle
+# against the bytes the site serves. Measured 23 Nov 2026: a fresh clone
+# with core.autocrlf=true put 17 CRs into dist/assets/index-C6-wz3bb.js -
+# 624142 -> 624159 bytes, md5 b4ef863c -> 79647fa7 - and the suite went red
+# with "the live bundle differs from this checkout". That is a FALSE red
+# caused by the checkout: the main checkout, the container and the live
+# bytes through Cloudflare all agree on b4ef863c. A check that fails from a
+# clean clone teaches people to ignore it.
+#
+# Deployment itself is unaffected - it is `git pull --ff-only` on the Linux
+# VPS, which never applied the conversion. This is about any Windows
+# checkout being a faithful copy of what is served, which is also what
+# CLAUDE.md's post-build patching of this bundle (exact string swaps, and
+# line-number-sensitive selectors in index.html) depends on.
+#
+# -text rather than binary: no conversion in either direction, still diffable.
+dist/assets/** -text
