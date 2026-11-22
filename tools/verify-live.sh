@@ -434,6 +434,63 @@ has   /clothing-manufacturer-uk 'MOQ from 20 pieces'     "UK page hero states th
 # that is correct.
 lacks /moq-calculator 'low MOQ of 50 pieces'             "/moq-calculator does not state 50 as the minimum"
 has   /moq-calculator '20 pieces'                        "/moq-calculator states the real minimum"
+
+# THE HERO CHECK ABOVE CANNOT SEE A TABLE CELL OR A FAQ ANSWER, and those
+# are where the contradiction actually was. Every `lacks 'MOQ 50 pieces'`
+# above passed throughout, on nine pages that each titled themselves "MOQ
+# from 20" and then said 50 somewhere a buyer reads first:
+#
+#   * the seven pages carrying the price list parsed from /pricing printed a
+#     column headed plain "MOQ" whose cell read "50 pcs" / "50 sets";
+#   * /custom-hoodie-manufacturer and /streetwear-manufacturer have no price
+#     table at all - they answered "what is the minimum" with "50 pieces per
+#     style" in the visible FAQ AND in FAQPage JSON-LD, which is the answer
+#     Google can surface as a rich result.
+#
+# NO NUMBER CHANGED HERE, because 50 is not wrong. /pricing publishes a
+# "Trial Order (Any Product)" row at 20 pcs for "+20% of the MOQ price",
+# and /sampling-and-moq states both tiers as policy: standard MOQ 50 pieces
+# per style, smallest production run 20 pieces for new brands at a higher
+# unit price. The garment tables inherited the 50 and the 20-pcs price
+# column but dropped the trial row that explains them, so the only thing on
+# those pages saying 50 without saying "bulk" was a column LABEL.
+#
+# Asserted in BOTH directions. A lacks-only check on a cell goes green the
+# day the table disappears, which is the "check that cannot fail" this file
+# has been bitten by twice already.
+for s in custom-t-shirts custom-tracksuits custom-joggers custom-fleece \
+         custom-jackets custom-outerwear custom-workwear; do
+  lacks "/$s" '<th>MOQ</th>'            "/$s does not label the bulk threshold MOQ"
+  has   "/$s" '<th>Bulk MOQ</th>'       "/$s names the 50 cell as the bulk threshold"
+  has   "/$s" '<th>20 pcs (trial)</th>' "/$s marks the 20-piece column as the trial run"
+done
+# Visible copy and schema are separate greps on purpose: the answer has to
+# match in both for the rich result to be legitimate, and the first fix of
+# this class on this site corrected the page and left the JSON-LD alone.
+for s in custom-hoodie-manufacturer streetwear-manufacturer; do
+  lacks "/$s" '<p>50 pieces per style'              "/$s FAQ does not answer the minimum with 50"
+  lacks "/$s" '"text": "50 pieces per style'        "/$s FAQPage schema does not answer it with 50 either"
+  has   "/$s" '20 pieces per style on a trial run'  "/$s answers the minimum with the real one"
+done
+lacks /streetwear-manufacturer 'MOQ from 50 pieces.' "/streetwear-manufacturer does not open on a 50-piece MOQ"
+has   /streetwear-manufacturer 'MOQ from 20 pieces'  "...it states the real minimum instead"
+
+# NOT SITE-WIDE, DELIBERATELY - do not read the nine loops above as cover.
+# The same contradiction is still live on roughly 25 other pages, including
+# the HOMEPAGE itself (title "MOQ from 20 Pieces", schema "starts at just 50
+# pieces per style per color"), /faq, the four country landing pages whose
+# heroes the checks above already police, /custom-sportswear-manufacturer,
+# /private-label-clothing-manufacturer, /clothing-manufacturer-for-startups,
+# /medical-scrubs, /custom-golf-polos, /activewear-manufacturer, the six
+# non-English MOQ pages and ~10 blog posts. Widening these loops before that
+# copy is fixed would paint the suite permanently red, which this repo has
+# already learned is the same as having no suite.
+#
+# And two of them are an OWNER question, not a rewrite:
+# /sublimation-clothing-manufacturer and /team-uniform-manufacturer answer
+# "50 pieces per design" for sublimated kits, while /pricing says 20 sets
+# (Sports Jersey) and 15 sets (Soccer Kit) and /sampling-and-moq says
+# "15-20 sets". Three numbers for one product - pick one before testing it.
 has   /sitemap.xml 'precios-fabricacion-ropa'            "the Spanish price list is in the sitemap"
 
 # PRODUCT DETAIL. 349 product cards across 13 collection pages were plain
