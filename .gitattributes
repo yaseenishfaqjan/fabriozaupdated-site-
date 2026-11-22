@@ -1,0 +1,34 @@
+# Shell scripts must stay LF, whatever platform the checkout happens on.
+#
+# core.autocrlf is true (it comes from the system gitconfig, not this repo)
+# and there was no .gitattributes, so a fresh clone on Windows checked the
+# four tracked .sh files out as 100% CRLF. Confirmed with a --no-checkout
+# control clone of the parent commit.
+#
+# What CRLF does to these four, measured under GNU bash 5.2 on Linux:
+#
+#   set -euo pipefail  -> "set: pipefail^M: invalid option name", exit 2,
+#                         aborts immediately. Only install-inbox-cron.sh.
+#   set -uo pipefail   -> same error, then CARRIES ON and exits 0, with
+#                         every variable CR-suffixed. verify-live.sh,
+#                         setup-whatsapp.sh.
+#   set -u             -> same, exits 0. resend_check.sh.
+#
+# So three of the four do NOT fail loudly. They run to completion, exit 0,
+# and carry a trailing CR in every string - a URL, an ssh argument, a lock
+# path. A redirect target gets it too: `cat > out.conf` writes `out.conf^M`,
+# a different file, and the script reports success. verify-live.sh is the
+# 374-check suite run after every deploy, so that is the worst place for it.
+#
+# None of this reproduces on Windows: Git for Windows patches its bash to
+# strip the CR, so all four run fine in Git Bash. It only breaks on the VPS.
+#
+# Scoped to *.sh deliberately. A broad `* text=auto` would renormalize
+# tracked files across the whole repo, and the HTML has mixed, per-file
+# endings that nothing should rewrite in bulk.
+#
+# .php and .py are excluded on purpose: none carries a shebang or the exec
+# bit, so they are only ever run as `php <file>` / `python <file>`, where the
+# interpreter tolerates CRLF. Eleven .php files are already CRLF in the
+# working tree and work fine.
+*.sh text eol=lf
