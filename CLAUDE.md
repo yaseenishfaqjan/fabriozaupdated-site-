@@ -97,3 +97,99 @@ curl -sI https://fabrioza.com/blog         # expect 200 (hub page)
 curl -sI https://fabrioza.com/what-we-make # expect 404
 curl -sI https://fabrioza.com/pricing/index.html  # expect 301 -> /pricing
 ```
+
+## Uptime monitoring, and the DOWN alerts that were never outages
+
+The `ALERT: 1 site(s) DOWN -- fabrioza.com (HTTP 000)` emails, followed ~5
+minutes later by `Recovered`, are a **false alarm with a known cause**. Twice
+on record the site was serving normally throughout. Read this before
+investigating the site itself.
+
+The monitor is **shared infrastructure, not in this repo**:
+`/opt/scalaro/site-monitor.sh` on `209.145.55.76`, cron `*/5`, logging to
+`/var/log/site-monitor.log`, state in `/var/lib/site-monitor/`, credentials
+read from `/opt/fabrioza/.env` (Resend + Telegram). It watches 13 sites on
+that box.
+
+**fabrioza.com is the only one of the 13 that does not resolve to the box.**
+Measured 23 Nov 2026:
+
+```
+fabrioza.com      -> 104.21.82.233, 172.67.208.221   (Cloudflare)
+the other twelve  -> 209.145.55.76                   (the box itself)
+```
+
+So twelve of those probes never leave the machine, while fabrioza's goes out
+to a Cloudflare edge and hairpins back in. That round trip is the only fragile
+path in the whole monitor, and it is the only one that has ever failed:
+**2 failures in 5,132 probes since 5 Nov 2026 — 0.039%** (11 Nov 16:10:41,
+23 Nov 11:10:40), both fabrioza, each lasting exactly one pass.
+
+**Neither was an outage, and the proof is in nginx's own log.** During the
+23 Nov event nginx served a real visitor `/blog/tshirt-manufacturing-cost`
+and its assets at **200 in the same seconds the probe was timing out**; the
+container had `restarts=0` and 23h uptime, nginx had `restarts=0` and had
+started hours earlier, and there were zero nginx errors in the window. The ten
+probes that ran after fabrioza in that pass all reached the origin and
+returned 200 — fabrioza's two attempts produced **no origin log line at all**,
+so they died between this box and Cloudflare.
+
+**HTTP 000 is not a server error.** curl reports `000` when it got no HTTP
+response whatsoever — connection refused, DNS failure, TLS handshake failure
+or timeout. It is never a 5xx from the app, so "HTTP 000" in an alert is a
+reason to check the path in front of the site, not the site.
+
+### Fixed 23 Nov 2026 — and do NOT simplify it
+
+The probe now has three outcomes instead of two. When both public attempts
+fail it asks the origin directly, with
+`curl --resolve <host>:443:209.145.55.76`, which bypasses public DNS while
+keeping SNI and Host set to the real name so the correct vhost answers and the
+certificate is still validated:
+
+| | verdict | behaviour |
+|---|---|---|
+| public probe OK | `ok` | up |
+| public fails twice, origin answers | `edge` | **silent on the first pass**; alerts on the second (10 min) as `unreachable from OUTSIDE` |
+| public fails, origin fails too | `down` | pages immediately, unchanged |
+
+Requiring two consecutive passes kills both false alarms on record (each
+lasted one pass) while a genuine Cloudflare/DNS outage still reaches you.
+**Do not "simplify" this to suppressing the alert whenever the origin is
+healthy** — that is silence during exactly the outage customers can see and
+the owner cannot. All 13 sites were measured to serve a valid certificate on
+a `--resolve` probe, so the fallback is not fabrioza-only and a site that
+stops doing so reads as DOWN rather than silently passing.
+
+The log now carries a verdict column, so a hairpin stall appears as
+`000-origin200  edge` without sending anything. Tests:
+`bash /opt/scalaro/site-monitor.test.sh /opt/scalaro/site-monitor.sh` — 18
+assertions driving the real state machine with the single HTTP call stubbed,
+against a scratch state dir and a non-existent env file, so it sends nothing.
+Two of them are mutation checks (`EDGE_CONFIRM=1` must alert on pass 1; a dead
+origin must never be downgraded to `edge`) without which "no alert on pass 1"
+would also pass against a script that never alerts at all. Rollback copy:
+`/opt/scalaro/site-monitor.sh.bak-20261123-143354`.
+
+### Two measurement traps hit while diagnosing this
+
+- **Grepping the nginx access log for `fabrioza` finds nothing and proves
+  nothing.** That string only appears in the **referer** field, so a request
+  to `/` with no referer — which is exactly what the monitor sends — is
+  invisible. Search by user agent (`curl/`) instead. Doing that is what
+  produced the decisive evidence above; the first pass had been reading the
+  wrong field and would have concluded the probe never ran.
+- **`docker logs` is not the record of what happened.** The containers restart
+  and take the history with them. The durable record is
+  `/var/log/site-monitor.log` plus its logrotated `.gz` files, which is where
+  the 5,132-probe count came from.
+
+**Timestamps do not line up, and the clocks are both correct.** The server
+runs `America/Chicago` while the webmail client displays 7 hours ahead, so log
+`11:10:40` is the `18:10` email. Reconcile the timezone before treating two
+entries as separate events.
+
+**Still unexplained, deliberately:** both failures landed at minute `:10`, at
+`:10:40` and `:10:41`. Nothing in cron runs then. With two data points that is
+not a pattern, and it is recorded here as an open question rather than a
+cause.
