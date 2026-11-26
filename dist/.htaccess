@@ -59,7 +59,17 @@ ErrorDocument 404 /404.html
   RewriteRule ^our-work/?$  https://fabrioza.com/what-we-make [R=301,L]
   RewriteRule ^gallery/?$   https://fabrioza.com/what-we-make [R=301,L]
   RewriteRule ^services/?$ https://fabrioza.com/what-we-make                    [R=301,L]
-  RewriteRule ^contact/?$  https://fabrioza.com/#contact    [R=301,NE,L]
+  # /contact became a REAL PAGE on 26 Nov 2026 (Safepay merchant review
+  # requires a contact page carrying the registered business details), so
+  # its 301 to the homepage anchor is gone. dist/contact/index.html is now
+  # served 200 by the generic directory-serve rule further down; there is
+  # no per-page rule to add. The homepage #contact form is untouched.
+  # Was: RewriteRule ^contact/?$  https://fabrioza.com/#contact [R=301,NE,L]
+
+  # /privacy-policy is the URL most review processes and visitors try; the
+  # real, indexed page has always been /privacy, so alias rather than
+  # duplicate. One hop, no second page competing for the same query.
+  RewriteRule ^privacy-policy/?$ https://fabrioza.com/privacy [R=301,L]
   RewriteRule ^products/?$ https://fabrioza.com/#collections [R=301,NE,L]
   # /moq points at the MOQ CALCULATOR, not a homepage anchor.
   # It used to send /moq -> /#calculator. Google strips the fragment, so
