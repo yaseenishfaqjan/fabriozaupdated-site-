@@ -79,6 +79,15 @@ ErrorDocument 404 /404.html
   # what someone typing /moq wants. Changed 10 Nov 2026.
   RewriteRule ^moq/?$      https://fabrioza.com/moq-calculator [R=301,NE,L]
 
+  # --- 4c. Bare category words that Google found and we never had ------
+  # Search Console, 10 Nov 2026: /streetwear/ and /sportswear/ were both
+  # crawled. The trailing-slash strip turned them into /streetwear and
+  # /sportswear, neither of which exists, so a crawler followed a 301
+  # straight into a 404. Point them at the real pages instead; a 301 to a
+  # 404 spends the crawl and passes nothing.
+  RewriteRule ^streetwear/?$ https://fabrioza.com/streetwear-manufacturer [R=301,L]
+  RewriteRule ^sportswear/?$ https://fabrioza.com/sportswear-catalog [R=301,L]
+
   # --- 4b. Removed womenswear pages (client design conflict / catalog reset).
   # All 301 to the collections hub; retarget if replacements are built. ---
   RewriteRule ^fashion-wear/?$ https://fabrioza.com/what-we-make [R=301,L]

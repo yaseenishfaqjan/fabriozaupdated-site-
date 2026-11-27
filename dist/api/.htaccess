@@ -1,0 +1,7 @@
+# These endpoints answer JSON to the site's own forms. robots.txt already
+# disallows /api/, but Disallow only stops CRAWLING - a URL that something
+# links to can still be indexed from the link alone, which is how
+# /api/csrf.php reached Search Console's report on 10 Nov 2026.
+# X-Robots-Tag is the header that actually prevents indexing, and unlike
+# robots.txt it is obeyed on a URL the crawler already has.
+Header always set X-Robots-Tag "noindex, nofollow"
