@@ -159,6 +159,40 @@ PAGES = [
                     "apparel production",
         "chips": ["1,000 to 10,000+ units", "46% at 5,000 pcs", "L/C at sight"],
     },
+    {
+        "slug": "university-club-kits",
+        "content": "university-club-kits.html",
+        "updated": "2026-11-27",
+        "title": "University &amp; Club Kit Supplier | 20 Per Design, Names Free",
+        "og_title": "Kit Supplier for Universities, Clubs and Teams",
+        "h1": "Kit Supplier for Universities, Clubs and Teams",
+        "tag": "One squad, not one container",
+        "form": True,
+        "desc": "Team kit from 20 pieces per design, 15 per full kit. Player names "
+                "and numbers free on sublimation, XS-3XL size run to try first, "
+                "every sport from one factory.",
+        "keywords": "university kit supplier, college team uniforms, club kit "
+                    "manufacturer, team kit supplier, university sports kit, "
+                    "custom club teamwear, school sports kit manufacturer",
+        "chips": ["20 per design", "Names &amp; numbers free", "XS&ndash;3XL size run"],
+    },
+    {
+        "slug": "wholesale-clothing-distributor",
+        "content": "wholesale-clothing-distributor.html",
+        "updated": "2026-11-27",
+        "title": "Wholesale Clothing Supplier for Distributors | Private Label",
+        "og_title": "Wholesale and Distributor Supply",
+        "h1": "Wholesale Supply for Distributors and Resellers",
+        "tag": "Buying to resell",
+        "form": True,
+        "desc": "Factory-direct private label supply: your labels not ours, no "
+                "published customer work, 46% at 5,000, L/C at sight, and a "
+                "50-piece minimum to test a line.",
+        "keywords": "wholesale clothing supplier, clothing distributor supplier, "
+                    "private label clothing manufacturer, white label clothing "
+                    "supplier, bulk apparel wholesale, reseller clothing supplier",
+        "chips": ["Your label, never ours", "46% at 5,000 pcs", "Test a line at 50"],
+    },
 ]
 
 
