@@ -1,0 +1,605 @@
+<style>
+.td-wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.td-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;align-items:start}
+@media(max-width:900px){.td-grid{grid-template-columns:1fr}}
+.td-stage{background:#fff;border:1px solid #e3e5e8;border-radius:14px;padding:18px}
+.td-views{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.td-views{grid-template-columns:1fr}}
+.td-view{text-align:center}
+.td-view h4{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:#6B6B6B;margin:0 0 6px}
+.td-view svg{width:100%;height:auto;max-width:300px;background:#f6f7f8;border-radius:10px}
+.td-panel{background:#fff;border:1px solid #e3e5e8;border-radius:14px;padding:18px;position:sticky;top:84px}
+@media(max-width:900px){.td-panel{position:static}}
+.td-panel h3{font-size:1rem;margin:0 0 4px}
+.td-sec{border-top:1px solid #eceef0;margin-top:16px;padding-top:14px}
+.td-sec:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.td-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}
+.td-row label{font-size:.88rem;color:#333}
+.td-swatches{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.td-sw{width:24px;height:24px;border-radius:5px;border:1px solid rgba(0,0,0,.18);cursor:pointer;padding:0}
+.td-sw[aria-pressed="true"]{outline:2px solid #4A7C59;outline-offset:2px}
+.td-seg{display:flex;gap:6px;flex-wrap:wrap}
+.td-seg button{flex:1 1 auto;padding:8px 10px;border:1px solid #d7dade;background:#fff;border-radius:8px;cursor:pointer;font-size:.85rem}
+.td-seg button[aria-pressed="true"]{background:#4A7C59;border-color:#4A7C59;color:#fff}
+.td-wrap input[type=text],.td-wrap input[type=email],.td-wrap input[type=number],.td-wrap select,.td-wrap textarea{
+  width:100%;padding:9px 10px;border:1px solid #d7dade;border-radius:8px;font:inherit;font-size:16px;background:#fff}
+.td-wrap input[type=color]{width:42px;height:30px;padding:0;border:1px solid #d7dade;border-radius:6px;background:#fff}
+.td-hint{font-size:.8rem;color:#6B6B6B;margin:4px 0 0}
+.td-err{font-size:.82rem;color:#b3261e;margin:6px 0 0}
+.td-ok{font-size:.82rem;color:#2f6b43;margin:6px 0 0}
+.td-roster{width:100%;border-collapse:collapse;margin-top:10px;font-size:.88rem}
+.td-roster th,.td-roster td{border:1px solid #e3e5e8;padding:6px 8px;text-align:left}
+.td-roster th{background:#f6f7f8;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
+.td-roster input,.td-roster select{padding:5px 6px;font-size:15px}
+.td-roster tr.bad td{background:#fdf1f0}
+.td-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.td-sizes{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.td-chip{background:#eef3ef;border:1px solid #d7e3da;border-radius:999px;padding:4px 11px;font-size:.84rem}
+.td-btn{background:#4A7C59;color:#fff;border:0;border-radius:9px;padding:11px 18px;font-size:1rem;cursor:pointer}
+.td-btn[disabled]{opacity:.55;cursor:not-allowed}
+.td-btn-sec{background:#fff;color:#333;border:1px solid #d7dade}
+.td-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+</style>
+
+<div class="td-wrap">
+  <p class="lede" style="font-size:1.05rem;max-width:780px">Design your kit, add the squad, and
+  send it to us. We reply with a quotation within one working day &mdash; there is no price on
+  this page because the figure depends on fabric, decoration and quantity, and we would rather
+  quote your actual kit than show you a number that changes.</p>
+
+  <div class="td-grid">
+    <!-- ---------------- preview ---------------- -->
+    <div>
+      <div class="td-stage">
+        <div class="td-views">
+          <div class="td-view"><h4>Front</h4><div id="tdFront"></div></div>
+          <div class="td-view"><h4>Back</h4><div id="tdBack"></div></div>
+        </div>
+        <p class="td-hint" style="text-align:center">Preview is a design guide, not a production
+        drawing. We confirm every placement on the sample before bulk.</p>
+      </div>
+
+      <!-- ---------------- roster ---------------- -->
+      <div class="td-stage" style="margin-top:22px">
+        <h3 style="margin:0 0 4px">Squad list</h3>
+        <p class="td-hint">Upload a CSV with the columns <strong>Player Name, Number,
+        Size</strong>, or type the squad in below. Names and numbers are free on sublimated
+        kit.</p>
+
+        <div class="td-actions" style="margin-top:10px">
+          <input type="file" id="tdCsv" accept=".csv,text/csv" style="display:none">
+          <button class="td-btn td-btn-sec" type="button" id="tdCsvBtn">Upload CSV</button>
+          <button class="td-btn td-btn-sec" type="button" id="tdAddRow">Add player</button>
+          <button class="td-btn td-btn-sec" type="button" id="tdSample">Load 15-player sample</button>
+        </div>
+        <p class="td-hint">Sizes accepted: YXS, YS, YM, YL, XS, S, M, L, XL, 2XL, 3XL.</p>
+
+        <div class="td-scroll">
+          <table class="td-roster" id="tdTable">
+            <thead><tr><th style="width:44%">Player name</th><th style="width:18%">Number</th>
+            <th style="width:26%">Size</th><th style="width:12%"></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="tdRosterMsg"></div>
+        <div class="td-sizes" id="tdSizes"></div>
+      </div>
+
+      <!-- ---------------- submit ---------------- -->
+      <div class="td-stage" style="margin-top:22px">
+        <h3 style="margin:0 0 4px">Send it to us</h3>
+        <p class="td-hint">We reply within one working day, Monday to Saturday.</p>
+        <form id="tdForm" novalidate style="margin-top:10px">
+          <div class="td-row"><label for="tdName">Your name *</label></div>
+          <input type="text" id="tdName" name="name" required>
+          <div class="td-row" style="margin-top:10px"><label for="tdEmail">Email *</label></div>
+          <input type="email" id="tdEmail" name="email" required>
+          <div class="td-row" style="margin-top:10px"><label for="tdClub">Club, university or company</label></div>
+          <input type="text" id="tdClub" name="company">
+          <div class="td-row" style="margin-top:10px"><label for="tdCountry">Delivery country</label></div>
+          <input type="text" id="tdCountry" name="country">
+          <div class="td-row" style="margin-top:10px"><label for="tdMsg">Anything else we should know</label></div>
+          <textarea id="tdMsg" name="message" rows="3" placeholder="Fabric preference, deadline, sponsor logos, budget"></textarea>
+          <label class="lq-consent" style="display:flex;gap:8px;align-items:flex-start;margin-top:12px">
+            <input type="checkbox" id="tdConsent" required>
+            <span style="font-size:.86rem">I understand FABRIOZA will use these details to reply
+            to my enquiry and prepare a quotation. *</span>
+          </label>
+          <div class="td-actions">
+            <button class="td-btn" type="submit" id="tdSubmit">Send my design</button>
+          </div>
+          <div id="tdFormMsg"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ---------------- controls ---------------- -->
+    <aside class="td-panel">
+      <div class="td-sec">
+        <h3>Garment</h3>
+        <div class="td-seg" id="tdGarment">
+          <button type="button" data-g="soccer" aria-pressed="true">Soccer</button>
+          <button type="button" data-g="basketball" aria-pressed="false">Basketball</button>
+          <button type="button" data-g="polo" aria-pressed="false">Polo</button>
+        </div>
+      </div>
+
+      <div class="td-sec">
+        <h3>Colours</h3>
+        <div id="tdZones"></div>
+      </div>
+
+      <div class="td-sec">
+        <h3>Club logo</h3>
+        <p class="td-hint">SVG or PDF preferred, PNG accepted. Placed on the left chest.</p>
+        <input type="file" id="tdLogo" accept=".svg,.pdf,.png,image/svg+xml,application/pdf,image/png">
+        <div class="td-row" style="margin-top:10px">
+          <label for="tdLogoW">Width</label><span id="tdLogoWv" style="font-size:.85rem">8.0 cm</span>
+        </div>
+        <input type="range" id="tdLogoW" min="4" max="12" step="0.5" value="8" style="width:100%">
+        <p class="td-hint">4 cm to 12 cm. Larger than 12 cm stops being a chest logo.</p>
+        <div id="tdLogoMsg"></div>
+      </div>
+
+      <div class="td-sec">
+        <h3>Back: name &amp; number</h3>
+        <div class="td-row"><label for="tdFont">Font</label></div>
+        <select id="tdFont">
+          <option value="block">Block (condensed)</option>
+          <option value="classic">Classic serif</option>
+          <option value="rounded">Rounded sans</option>
+        </select>
+        <div class="td-row" style="margin-top:10px">
+          <label for="tdTextCol">Text colour</label><input type="color" id="tdTextCol" value="#ffffff">
+        </div>
+        <div class="td-row">
+          <label for="tdOutlineCol">Outline</label><input type="color" id="tdOutlineCol" value="#0b1f3a">
+        </div>
+        <div class="td-row">
+          <label for="tdOutline">Outline width</label>
+          <select id="tdOutline" style="width:auto">
+            <option value="0">None</option><option value="2" selected>Thin</option>
+            <option value="4">Thick</option>
+          </select>
+        </div>
+        <p class="td-hint">The preview shows the first player on your squad list, or 10 / PLAYER
+        until you add one.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------------------------------------------------------------
+     Geometry. One shape set per garment, drawn twice (front/back) so
+     the two views can never drift apart. Zones are addressed by id so
+     a colour change is a fill swap, never a re-render of the roster.
+     viewBox is 300x360 for all three, which keeps the cm scale honest:
+     a 60 cm chest width maps to 300 units, so 1 cm = 5 units.
+  ------------------------------------------------------------------*/
+  var UNITS_PER_CM = 5;
+
+  var GARMENTS = {
+    soccer: {
+      label:'Soccer jersey',
+      zones:['body','sleeves','collar','panels'],
+      body:'M90,70 L210,70 L214,330 L86,330 Z',
+      sleeves:['M90,70 L60,86 L44,150 L80,160 L92,104 Z','M210,70 L240,86 L256,150 L220,160 L208,104 Z'],
+      collar:'M126,70 Q150,96 174,70 L166,62 Q150,80 134,62 Z',
+      panels:['M86,330 L92,160 L104,160 L98,330 Z','M214,330 L208,160 L196,160 L202,330 Z']
+    },
+    basketball: {
+      label:'Basketball jersey',
+      zones:['body','trim','collar','panels'],
+      body:'M96,74 L204,74 L212,330 L88,330 Z',
+      sleeves:[],
+      collar:'M128,74 Q150,98 172,74 L164,66 Q150,84 136,66 Z',
+      panels:['M88,330 L96,150 L108,150 L100,330 Z','M212,330 L204,150 L192,150 L200,330 Z'],
+      trim:['M96,74 L120,74 L112,116 L92,104 Z','M204,74 L180,74 L188,116 L208,104 Z']
+    },
+    polo: {
+      label:'Polo shirt',
+      zones:['body','sleeves','collar','placket'],
+      body:'M92,74 L208,74 L212,326 L88,326 Z',
+      sleeves:['M92,74 L62,90 L48,152 L86,162 L94,108 Z','M208,74 L238,90 L252,152 L214,162 L206,108 Z'],
+      collar:'M128,74 L150,96 L172,74 L164,60 L150,74 L136,60 Z',
+      placket:['M144,92 L156,92 L156,150 L144,150 Z']
+    }
+  };
+
+  var ZONE_LABELS = {body:'Body',sleeves:'Sleeves',collar:'Collar',panels:'Side panels',
+                     trim:'Shoulder trim',placket:'Placket'};
+
+  var TEAM_COLOURS = ['#0b1f3a','#17304f','#8b1a1a','#b3261e','#1f6b3a','#2f6b43','#f5a623',
+                      '#ffd400','#ffffff','#111111','#6b2d8b','#0d6a7a','#c75b12','#8c8f93'];
+
+  var FONTS = {
+    block:  "'Arial Narrow','Helvetica Neue',Arial,sans-serif",
+    classic:"Georgia,'Times New Roman',serif",
+    rounded:"'Trebuchet MS',Verdana,sans-serif"
+  };
+
+  var state = {
+    garment:'soccer',
+    colours:{body:'#0b1f3a',sleeves:'#ffffff',collar:'#ffffff',panels:'#b3261e',
+             trim:'#ffffff',placket:'#ffffff'},
+    logo:null,              // {name, type, dataUrl|null, sizeBytes}
+    logoWidthCm:8,
+    font:'block', textColour:'#ffffff', outlineColour:'#0b1f3a', outlineWidth:2,
+    roster:[]
+  };
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  /* ---------------- SVG build ---------------- */
+  function shapes(g, zone){
+    var v = g[zone];
+    if (!v) return [];
+    return Array.isArray(v) ? v : [v];
+  }
+
+  function buildSvg(side){
+    var g = GARMENTS[state.garment];
+    var out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 360" role="img" aria-label="'
+               + esc(g.label + ' ' + side + ' view') + '">'];
+    out.push('<rect width="300" height="360" fill="#f6f7f8"/>');
+
+    // draw order matters: body, panels/trim, sleeves, collar
+    ['body','panels','trim','sleeves','placket','collar'].forEach(function(z){
+      shapes(g, z).forEach(function(d){
+        out.push('<path d="' + d + '" fill="' + (state.colours[z] || '#cccccc')
+                 + '" stroke="rgba(0,0,0,.28)" stroke-width="1.2"/>');
+      });
+    });
+
+    if (side === 'front' && state.logo && state.logo.dataUrl){
+      var w = state.logoWidthCm * UNITS_PER_CM;
+      out.push('<image href="' + state.logo.dataUrl + '" x="' + (112 - w/2) + '" y="112" width="'
+               + w + '" height="' + w + '" preserveAspectRatio="xMidYMid meet"/>');
+    } else if (side === 'front' && state.logo){
+      out.push('<rect x="96" y="112" width="32" height="32" rx="4" fill="rgba(0,0,0,.08)" stroke="rgba(0,0,0,.25)" stroke-dasharray="4 3"/>');
+      out.push('<text x="112" y="152" text-anchor="middle" font-size="9" fill="#555">logo</text>');
+    }
+
+    if (side === 'back'){
+      var p = state.roster[0] || {name:'PLAYER', number:'10'};
+      var name = String(p.name || 'PLAYER').toUpperCase();
+      var num  = String(p.number == null ? '10' : p.number);
+      var stroke = state.outlineWidth > 0
+        ? ' stroke="' + state.outlineColour + '" stroke-width="' + state.outlineWidth
+          + '" paint-order="stroke" stroke-linejoin="round"'
+        : '';
+      // The jersey body is ~120 units across at this viewBox. Text is scaled to
+      // fit it rather than drawn at a fixed size: at 26px a name of eight
+      // characters already runs past the side seams, which is exactly what a
+      // real printer would refuse to do.
+      var BODY_W = 120;
+      function fitSize(text, max){
+        var w = Math.max(1, String(text).length) * 0.62;
+        return Math.max(9, Math.min(max, BODY_W / w));
+      }
+      var nameSize = fitSize(name, 26);
+      var numSize  = fitSize(num, 96);
+      out.push('<text x="150" y="128" text-anchor="middle" font-family="' + FONTS[state.font]
+               + '" font-size="' + nameSize.toFixed(1) + '" font-weight="700" letter-spacing="1"'
+               + ' fill="' + state.textColour + '"' + stroke + '>' + esc(name) + '</text>');
+      out.push('<text x="150" y="' + (num.length > 2 ? 230 : 238) + '" text-anchor="middle"'
+               + ' font-family="' + FONTS[state.font] + '" font-size="' + numSize.toFixed(1)
+               + '" font-weight="800" fill="' + state.textColour + '"' + stroke + '>'
+               + esc(num) + '</text>');
+    }
+
+    out.push('</svg>');
+    return out.join('');
+  }
+
+  function render(){
+    $('tdFront').innerHTML = buildSvg('front');
+    $('tdBack').innerHTML  = buildSvg('back');
+  }
+
+  /* ---------------- colour controls ---------------- */
+  function buildZoneControls(){
+    var g = GARMENTS[state.garment], host = $('tdZones');
+    host.innerHTML = '';
+    g.zones.forEach(function(z){
+      var wrap = document.createElement('div');
+      wrap.style.marginBottom = '12px';
+      wrap.innerHTML = '<div class="td-row"><label for="c_' + z + '">' + ZONE_LABELS[z]
+        + '</label><input type="color" id="c_' + z + '" value="' + state.colours[z] + '"></div>'
+        + '<div class="td-swatches" data-zone="' + z + '"></div>';
+      host.appendChild(wrap);
+
+      var sw = wrap.querySelector('.td-swatches');
+      TEAM_COLOURS.forEach(function(hex){
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'td-sw'; b.style.background = hex;
+        b.title = hex; b.setAttribute('aria-label', ZONE_LABELS[z] + ' ' + hex);
+        b.setAttribute('aria-pressed', String(state.colours[z].toLowerCase() === hex));
+        b.addEventListener('click', function(){
+          state.colours[z] = hex;
+          wrap.querySelector('input[type=color]').value = hex;
+          sw.querySelectorAll('.td-sw').forEach(function(o){
+            o.setAttribute('aria-pressed', String(o.style.background === b.style.background)); });
+          render();
+        });
+        sw.appendChild(b);
+      });
+      wrap.querySelector('input[type=color]').addEventListener('input', function(e){
+        state.colours[z] = e.target.value; render();
+      });
+    });
+  }
+
+  /* ---------------- roster ---------------- */
+  var SIZES = ['YXS','YS','YM','YL','XS','S','M','L','XL','2XL','3XL'];
+  var NAME_MAX = 14;   // what fits across the back of a jersey
+
+  function addRow(p){
+    state.roster.push({name:(p&&p.name)||'', number:(p&&p.number)||'', size:(p&&p.size)||''});
+    drawRoster();
+  }
+
+  function drawRoster(){
+    var tb = $('tdTable').querySelector('tbody');
+    tb.innerHTML = '';
+    state.roster.forEach(function(p, i){
+      var tr = document.createElement('tr');
+      var opts = ['<option value=""></option>'].concat(SIZES.map(function(s){
+        return '<option value="' + s + '"' + (p.size === s ? ' selected' : '') + '>' + s + '</option>';
+      })).join('');
+      tr.innerHTML =
+        '<td><input type="text" value="' + esc(p.name) + '" data-i="' + i + '" data-f="name" maxlength="24"></td>' +
+        '<td><input type="text" value="' + esc(p.number) + '" data-i="' + i + '" data-f="number" inputmode="numeric" maxlength="3"></td>' +
+        '<td><select data-i="' + i + '" data-f="size">' + opts + '</select></td>' +
+        '<td><button type="button" class="td-btn td-btn-sec" style="padding:4px 9px" data-del="' + i + '">Remove</button></td>';
+      tb.appendChild(tr);
+    });
+    validate();
+  }
+
+  function validate(){
+    var msg = [], seen = {}, dupes = [], tb = $('tdTable').querySelector('tbody');
+    [].forEach.call(tb.rows, function(r){ r.className = ''; });
+
+    state.roster.forEach(function(p, i){
+      var bad = false;
+      if (p.name && p.name.length > NAME_MAX){
+        msg.push('Row ' + (i+1) + ': "' + esc(p.name) + '" is ' + p.name.length
+                 + ' characters. Over ' + NAME_MAX + ' will be set smaller to fit the back.');
+        bad = true;
+      }
+      if (p.name && !p.size){ msg.push('Row ' + (i+1) + ' (' + esc(p.name) + '): no size chosen.'); bad = true; }
+      if (p.number !== '' && !/^\d{1,3}$/.test(String(p.number))){
+        msg.push('Row ' + (i+1) + ': number must be 1 to 3 digits.'); bad = true;
+      }
+      if (p.number !== ''){
+        if (seen[p.number] != null){ dupes.push(p.number); bad = true;
+          if (tb.rows[seen[p.number]]) tb.rows[seen[p.number]].className = 'bad'; }
+        else seen[p.number] = i;
+      }
+      if (bad && tb.rows[i]) tb.rows[i].className = 'bad';
+    });
+
+    if (dupes.length){
+      msg.unshift('Duplicate numbers: ' + dupes.filter(function(v,i,a){return a.indexOf(v)===i;}).join(', ')
+                  + '. Two players cannot wear the same number.');
+    }
+
+    var box = $('tdRosterMsg');
+    box.innerHTML = msg.length
+      ? '<p class="td-err">' + msg.join('<br>') + '</p>'
+      : (state.roster.length ? '<p class="td-ok">' + state.roster.length + ' players, no problems found.</p>' : '');
+
+    // size summary
+    var counts = {};
+    state.roster.forEach(function(p){ if (p.size) counts[p.size] = (counts[p.size]||0)+1; });
+    $('tdSizes').innerHTML = SIZES.filter(function(s){ return counts[s]; })
+      .map(function(s){ return '<span class="td-chip">' + s + ' &times; ' + counts[s] + '</span>'; })
+      .join('') + (state.roster.length
+        ? '<span class="td-chip" style="background:#fff">Total ' + state.roster.length + '</span>' : '');
+
+    render();
+    return msg.length === 0;
+  }
+
+  /* CSV: quoted fields and CRLF both occur in exports from club spreadsheets. */
+  function parseCsv(text){
+    var rows = [], row = [], cur = '', q = false;
+    text = text.replace(/^﻿/, '');
+    for (var i = 0; i < text.length; i++){
+      var c = text[i];
+      if (q){
+        if (c === '"' && text[i+1] === '"'){ cur += '"'; i++; }
+        else if (c === '"'){ q = false; }
+        else cur += c;
+      } else if (c === '"'){ q = true; }
+      else if (c === ','){ row.push(cur); cur = ''; }
+      else if (c === '\n'){ row.push(cur); rows.push(row); row = []; cur = ''; }
+      else if (c !== '\r'){ cur += c; }
+    }
+    if (cur !== '' || row.length){ row.push(cur); rows.push(row); }
+    return rows.filter(function(r){ return r.some(function(c){ return String(c).trim() !== ''; }); });
+  }
+
+  function loadCsv(text){
+    var rows = parseCsv(text);
+    if (!rows.length){ $('tdRosterMsg').innerHTML = '<p class="td-err">That file had no rows.</p>'; return; }
+    var head = rows[0].map(function(h){ return String(h).trim().toLowerCase(); });
+    var iN = head.findIndex(function(h){ return /name/.test(h); });
+    var iU = head.findIndex(function(h){ return /number|no\.?$|#/.test(h); });
+    var iS = head.findIndex(function(h){ return /size/.test(h); });
+    var start = 1;
+    if (iN < 0 && iU < 0 && iS < 0){ iN = 0; iU = 1; iS = 2; start = 0; }   // headerless
+    state.roster = [];
+    for (var r = start; r < rows.length; r++){
+      var c = rows[r];
+      state.roster.push({
+        name:   String(iN >= 0 ? (c[iN]||'') : '').trim(),
+        number: String(iU >= 0 ? (c[iU]||'') : '').trim(),
+        size:   String(iS >= 0 ? (c[iS]||'') : '').trim().toUpperCase()
+      });
+    }
+    drawRoster();
+  }
+
+  /* ---------------- wiring ---------------- */
+  $('tdGarment').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-g]'); if (!b) return;
+    state.garment = b.dataset.g;
+    [].forEach.call(this.querySelectorAll('button'), function(o){
+      o.setAttribute('aria-pressed', String(o === b)); });
+    buildZoneControls(); render();
+  });
+
+  $('tdTable').addEventListener('input', function(e){
+    var t = e.target; if (t.dataset.i == null) return;
+    state.roster[+t.dataset.i][t.dataset.f] = t.value;
+    validate();
+  });
+  $('tdTable').addEventListener('change', function(e){
+    var t = e.target; if (t.dataset.i == null) return;
+    state.roster[+t.dataset.i][t.dataset.f] = t.value;
+    validate();
+  });
+  $('tdTable').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-del]'); if (!b) return;
+    state.roster.splice(+b.dataset.del, 1); drawRoster();
+  });
+
+  $('tdAddRow').addEventListener('click', function(){ addRow(); });
+  $('tdCsvBtn').addEventListener('click', function(){ $('tdCsv').click(); });
+  $('tdCsv').addEventListener('change', function(e){
+    var f = e.target.files && e.target.files[0]; if (!f) return;
+    var fr = new FileReader();
+    fr.onload = function(){ loadCsv(String(fr.result)); };
+    fr.readAsText(f);
+  });
+
+  $('tdSample').addEventListener('click', function(){
+    var names = ['A Rahman','J Okafor','M Silva','T Novak','L Haddad','R Oyelaran','D Kowalski',
+                 'S Mbeki','K Tanaka','P Andersson','F Moreau','N Patel','G Rossi','H Yilmaz','C Nguyen'];
+    var sizes = ['S','M','M','L','L','XL','M','L','S','XL','M','L','2XL','M','L'];
+    state.roster = names.map(function(n, i){ return {name:n, number:String(i+1), size:sizes[i]}; });
+    drawRoster();
+  });
+
+  $('tdLogoW').addEventListener('input', function(e){
+    state.logoWidthCm = parseFloat(e.target.value);
+    $('tdLogoWv').textContent = state.logoWidthCm.toFixed(1) + ' cm';
+    render();
+  });
+
+  $('tdLogo').addEventListener('change', function(e){
+    var f = e.target.files && e.target.files[0];
+    var box = $('tdLogoMsg');
+    if (!f){ state.logo = null; box.innerHTML = ''; render(); return; }
+    if (f.size > 8 * 1024 * 1024){
+      box.innerHTML = '<p class="td-err">That file is ' + (f.size/1048576).toFixed(1)
+        + ' MB. Please keep it under 8 MB.</p>';
+      e.target.value = ''; return;
+    }
+    state.logo = {name:f.name, type:f.type || '', dataUrl:null, sizeBytes:f.size};
+    var isPreviewable = /^image\/(svg\+xml|png)$/.test(f.type) || /\.(svg|png)$/i.test(f.name);
+    if (isPreviewable){
+      var fr = new FileReader();
+      fr.onload = function(){ state.logo.dataUrl = String(fr.result); render(); };
+      fr.readAsDataURL(f);
+      box.innerHTML = '<p class="td-ok">' + esc(f.name) + ' attached.</p>';
+    } else {
+      // A PDF cannot be drawn by the browser, and pretending otherwise would
+      // show an empty chest and read as a broken upload. Say so instead.
+      var fr2 = new FileReader();
+      fr2.onload = function(){ state.logo.dataUrl = null; state.logo.raw = String(fr2.result); };
+      fr2.readAsDataURL(f);
+      box.innerHTML = '<p class="td-ok">' + esc(f.name) + ' attached. A PDF cannot be previewed '
+        + 'in the browser, so the chest shows a placeholder &mdash; we will use the real file.</p>';
+    }
+    render();
+  });
+
+  ['tdFont','tdTextCol','tdOutlineCol','tdOutline'].forEach(function(id){
+    $(id).addEventListener('input', function(){
+      state.font = $('tdFont').value;
+      state.textColour = $('tdTextCol').value;
+      state.outlineColour = $('tdOutlineCol').value;
+      state.outlineWidth = parseInt($('tdOutline').value, 10);
+      render();
+    });
+  });
+
+  /* ---------------- submit ---------------- */
+  $('tdForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var box = $('tdFormMsg'), btn = $('tdSubmit');
+    var name = $('tdName').value.trim(), email = $('tdEmail').value.trim();
+
+    if (!name || !email || !$('tdConsent').checked){
+      box.innerHTML = '<p class="td-err">Name, email and the consent box are required.</p>'; return;
+    }
+    if (!state.roster.length){
+      box.innerHTML = '<p class="td-err">Add at least one player, or load the sample squad.</p>'; return;
+    }
+    if (!validate()){
+      box.innerHTML = '<p class="td-err">Please fix the squad list above first.</p>'; return;
+    }
+
+    btn.disabled = true; btn.textContent = 'Sending...';
+    box.innerHTML = '';
+
+    var payload = {
+      name:name, email:email,
+      company:$('tdClub').value.trim(), country:$('tdCountry').value.trim(),
+      message:$('tdMsg').value.trim(),
+      design:{garment:state.garment, colours:state.colours, font:state.font,
+              textColour:state.textColour, outlineColour:state.outlineColour,
+              outlineWidth:state.outlineWidth, logoWidthCm:state.logoWidthCm,
+              logoName:state.logo ? state.logo.name : null},
+      roster:state.roster,
+      svg:{front:buildSvg('front'), back:buildSvg('back')},
+      source_page:location.pathname
+    };
+    if (state.logo && (state.logo.dataUrl || state.logo.raw)){
+      payload.logo = {name:state.logo.name, type:state.logo.type,
+                      data:state.logo.dataUrl || state.logo.raw};
+    }
+
+    fetch('/api/csrf.php', {credentials:'same-origin'})
+      .then(function(r){ return r.json(); })
+      .then(function(t){
+        payload.csrf = t.token;
+        return fetch('/api/team-design.php', {
+          method:'POST', credentials:'same-origin',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify(payload)
+        });
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        btn.disabled = false; btn.textContent = 'Send my design';
+        if (j && j.success){
+          box.innerHTML = '<p class="td-ok">Thank you &mdash; your design and squad list have '
+            + 'reached us. We reply within one working day. Reference: ' + esc(j.reference || '') + '</p>';
+          $('tdForm').reset();
+        } else {
+          box.innerHTML = '<p class="td-err">' + esc((j && j.message)
+            || 'Something went wrong. Please email info@fabrioza.com.') + '</p>';
+        }
+      })
+      .catch(function(){
+        btn.disabled = false; btn.textContent = 'Send my design';
+        box.innerHTML = '<p class="td-err">We could not send that. Please email '
+          + 'info@fabrioza.com and we will pick it up.</p>';
+      });
+  });
+
+  buildZoneControls();
+  addRow();
+  render();
+})();
+</script>
