@@ -207,6 +207,23 @@ function crm_db(): PDO {
         $pdo->exec('PRAGMA user_version = 8');
         $version = 8;
     }
+
+    if ($version < 9) {
+        // Popup counters. Aggregated by day and event rather than one row per
+        // impression: this fires on most page views, and a raw event log would
+        // be the largest table in the database inside a month while answering
+        // the same three questions.
+        $pdo->exec("
+        CREATE TABLE IF NOT EXISTS popup_stats (
+          day   TEXT NOT NULL,
+          event TEXT NOT NULL,
+          n     INTEGER NOT NULL DEFAULT 0,
+          PRIMARY KEY (day, event)
+        );
+        ");
+        $pdo->exec('PRAGMA user_version = 9');
+        $version = 9;
+    }
     return $pdo;
 }
 

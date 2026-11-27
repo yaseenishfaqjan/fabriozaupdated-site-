@@ -18,6 +18,17 @@ $bySource = $q("SELECT COALESCE(NULLIF(form_type,''),'(unknown)') k, COUNT(*) n 
     WHERE status != 'spam' GROUP BY k ORDER BY n DESC")->fetchAll();
 $maxSrc = max(array_column($bySource, 'n') ?: [1]);
 $trial = (int)$q("SELECT COUNT(*) FROM leads WHERE form_type = 'Trial Order'")->fetchColumn();
+
+// Feature popup counters. The table may not exist on a database that has not
+// been migrated yet, and a dashboard must not 500 because of a counter.
+$pop = ['view' => 0, 'click' => 0, 'closed' => 0, 'closed_esc' => 0];
+try {
+    foreach ($q("SELECT event, SUM(n) n FROM popup_stats GROUP BY event")->fetchAll() as $r) {
+        $pop[$r['event']] = (int)$r['n'];
+    }
+} catch (Throwable $e) { /* not migrated yet */ }
+$popClose = $pop['closed'] + $pop['closed_esc'];
+$popCtr   = $pop['view'] > 0 ? round($pop['click'] / $pop['view'] * 100, 1) : 0.0;
 $quote = (int)$q("SELECT COUNT(*) FROM leads WHERE form_type IN ('Quote','Contact Form')")->fetchColumn();
 
 adm_head('Dashboard');
@@ -29,6 +40,13 @@ adm_head('Dashboard');
   <div class="bg-white rounded-2xl shadow p-5"><div class="text-3xl font-extrabold"><?= $month ?></div><div class="text-sm text-stone-500">Leads this month</div></div>
   <div class="bg-white rounded-2xl shadow p-5"><div class="text-3xl font-extrabold text-teal-700"><?= $trial ?></div><div class="text-sm text-stone-500">Trial Order leads</div></div>
   <div class="bg-white rounded-2xl shadow p-5"><div class="text-3xl font-extrabold text-amber-700"><?= $quote ?></div><div class="text-sm text-stone-500">Quote leads</div></div>
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+  <div class="bg-white rounded-2xl shadow p-5"><div class="text-3xl font-extrabold"><?= $pop['view'] ?></div><div class="text-sm text-stone-500">Popup shown</div></div>
+  <div class="bg-white rounded-2xl shadow p-5"><div class="text-3xl font-extrabold text-emerald-700"><?= $pop['click'] ?></div><div class="text-sm text-stone-500">Popup clicked</div></div>
+  <div class="bg-white rounded-2xl shadow p-5"><div class="text-3xl font-extrabold text-stone-500"><?= $popClose ?></div><div class="text-sm text-stone-500">Popup dismissed</div></div>
+  <div class="bg-white rounded-2xl shadow p-5"><div class="text-3xl font-extrabold text-emerald-700"><?= $popCtr ?>%</div><div class="text-sm text-stone-500">Popup click rate</div></div>
 </div>
 
 <div class="grid md:grid-cols-2 gap-6 mb-8">
