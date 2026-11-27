@@ -56,7 +56,14 @@ function adm_check_csrf(): void {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $t = (string)($_POST['csrf'] ?? '');
         if (empty($_SESSION['adm_csrf']) || !hash_equals($_SESSION['adm_csrf'], $t)) {
-            http_response_code(403); exit('Invalid CSRF token. Go back and retry.');
+            // "Go back and retry" was wrong advice: the browser's back button
+            // restores the SAME stale token and fails again. Send the admin to a
+            // freshly issued form instead, which is what actually fixes it.
+            http_response_code(403);
+            $to = (strpos($_SERVER['SCRIPT_NAME'] ?? '', 'login.php') !== false)
+                ? 'login.php?expired=1' : 'index.php?expired=1';
+            header('Location: ' . $to);
+            exit('Your session expired. <a href="' . $to . '">Open a fresh form</a> and try again.');
         }
     }
 }

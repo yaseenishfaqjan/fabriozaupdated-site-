@@ -19,6 +19,28 @@ RUN a2enmod rewrite headers expires deflate \
 # CRM data dir (named volume mounts here; ownership seeded from the image)
 RUN mkdir -p /var/data && chown www-data:www-data /var/data
 
+# PHP sessions live on the SAME volume, not in the container's /tmp.
+#
+# Default save_path is /tmp, which is part of the container layer, so every
+# `docker compose up -d --build` destroyed every session. In practice that
+# logged the admin out mid-task and, if a login form was already open, the
+# submit came back "Invalid CSRF token" - the token was fine, the session
+# behind it had been thrown away by a deploy. Reported from the live site.
+#
+# gc_maxlifetime 1440 (24 minutes) was the second half of the same complaint:
+# leave the login page open over a coffee and the token expires. 2 hours is
+# the right order of magnitude for a CRM someone works in.
+RUN {       echo 'session.save_path = "/var/data/sessions"';       echo 'session.gc_maxlifetime = 7200';     } > /usr/local/etc/php/conf.d/fabrioza-sessions.ini
+
+# The directory itself is created by the ENTRYPOINT, not here. Docker seeds a
+# volume from the image only when the volume is EMPTY, and production's
+# /var/data already holds the database - so a RUN mkdir would never appear
+# there and session_start() would fail for everyone. See docker-entrypoint.sh.
+COPY docker-entrypoint.sh /usr/local/bin/fabrioza-entrypoint.sh
+RUN chmod +x /usr/local/bin/fabrioza-entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/fabrioza-entrypoint.sh"]
+CMD ["apache2-foreground"]
+
 # TWO upload paths, and they bind on different limits.
 #
 # The contact form posts attachments base64-encoded inside a JSON body, so its

@@ -2,6 +2,12 @@
 require __DIR__ . '/_lib.php';
 adm_session();
 $err = '';
+// Arrives here from adm_check_csrf() when the token no longer matches a live
+// session - almost always because a deploy recreated the container. Say that
+// plainly rather than leaving a blank form the admin has already filled once.
+if (isset($_GET['expired'])) {
+    $err = 'Your session expired, so the form was rejected. This page is fresh - please sign in again.';
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     adm_check_csrf();
