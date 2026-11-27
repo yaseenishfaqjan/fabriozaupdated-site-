@@ -48,6 +48,43 @@ APPLY = "--apply" in sys.argv
 # Descriptions are kept under 160 characters: tools/fix-meta-lengths.py exists
 # in this repo because that limit has been missed before.
 # --------------------------------------------------------------------------
+# Custom Fabric Development ships Service + FAQPage on top of the default
+# nodes. Written here rather than inline in PAGES so the JSON stays readable.
+# Every question below also appears as a visible <h4> in the content fragment;
+# schema_verify.py fails the build if one does not.
+SERVICE_NODE = f'''{{
+   "@type": "Service",
+   "name": "Custom Fabric Development",
+   "serviceType": "Custom textile and fabric development for clothing brands",
+   "description": "Fabric developed to a brand's own composition, GSM, knit and Pantone colour for bulk orders of 300 pieces or more, prepared in 4 to 6 working days.",
+   "provider": {{"@id": "{SITE}/#organization"}},
+   "areaServed": "Worldwide",
+   "url": "{SITE}/custom-fabric-development"
+  }}'''
+
+_CF_FAQ = [
+    ("What is the minimum order?",
+     "300 pieces per order for custom fabric development. That can be split across sizes and colourways within the order."),
+    ("How long does the fabric take?",
+     "4 to 6 working days after you approve the specification. Garment production follows the fabric."),
+    ("Can I match a fabric I already have?",
+     "Yes. Send the composition, the GSM and photographs, or the details of a reference garment."),
+    ("Can you match my Pantone colour?",
+     "Yes. The fabric is dyed to your code, and you approve the result by photo and video before anything is cut."),
+    ("Is this available for samples only?",
+     "No. Custom fabric is for bulk orders of 300+ pieces. A sample can be made first in our closest stock fabric."),
+    ("How do I approve the fabric?",
+     "Photographs and video at every stage: the fabric itself, then cutting, decoration and the finished garments before they ship."),
+    ("What are the payment terms?",
+     "50% deposit and 50% before dispatch. On orders of 1,000 pieces and over it is 70% deposit and 30% before dispatch, and a Letter of Credit at sight is accepted from 5,000 pieces."),
+]
+FAQ_NODE = ('{\n   "@type": "FAQPage",\n   "inLanguage": "en",\n   "mainEntity": [\n'
+            + ",\n".join(
+                '    {"@type": "Question", "name": "%s",\n'
+                '     "acceptedAnswer": {"@type": "Answer", "text": "%s"}}' % (q, a)
+                for q, a in _CF_FAQ)
+            + "\n   ]\n  }")
+
 PAGES = [
     {
         "slug": "refund-policy",
@@ -193,6 +230,22 @@ PAGES = [
                     "supplier, bulk apparel wholesale, reseller clothing supplier",
         "chips": ["Your label, never ours", "46% at 5,000 pcs", "Test a line at 50"],
     },
+    {
+        "slug": "custom-fabric-development",
+        "content": "custom-fabric-development.html",
+        "updated": "2026-11-27",
+        "title": "Custom Fabric Development for Clothing Brands | FABRIOZA",
+        "og_title": "Your Fabric. Made Fresh. Only for Your Brand.",
+        "h1": "Your Fabric. Made Fresh. Only for Your Brand.",
+        "tag": "For bulk orders 300+",
+        "desc": "Custom fabric developed for your brand: your composition, GSM, knit and "
+                "Pantone colour, for bulk orders of 300+ pieces, ready in 4 to 6 working days.",
+        "keywords": "custom fabric development, custom fabric clothing manufacturer, "
+                    "private label fabric, custom gsm fabric, pantone matched fabric, "
+                    "bulk apparel manufacturing, exclusive fabric for brands",
+        "chips": ["300+ pieces", "4&ndash;6 working days", "Approved by you at every stage"],
+        "schema": [SERVICE_NODE, FAQ_NODE],
+    },
 ]
 
 
@@ -251,6 +304,14 @@ def page_html(p):
         + f".%20%28via%20fabrioza.com%2F{p['slug']}%29"
     )
     fab = re.sub(r"\?text=[^\"]*", "?text=" + wa_text, FAB, count=1)
+
+    # Extra JSON-LD nodes for pages that need more than the default three.
+    # They go INSIDE the same @graph: schema_verify.py enforces one graph per
+    # page, and every FAQ question emitted here must also exist as a visible
+    # heading on the page or that check fails the build.
+    extra_schema = ""
+    for node in p.get("schema", []):
+        extra_schema += "  " + node.strip() + ",\n"
 
     chips = "<span>&middot;</span>".join(f"<span>{c}</span>" for c in p["chips"])
     body = (CONTENT_DIR / p["content"]).read_text(encoding="utf-8").rstrip("\n")
@@ -323,7 +384,7 @@ def page_html(p):
    "isPartOf": {{"@id": "{SITE}/#organization"}},
    "publisher": {{"@id": "{SITE}/#organization"}}
   }},
-  {{
+{extra_schema}  {{
    "@type": "BreadcrumbList",
    "itemListElement": [
     {{"@type": "ListItem", "position": 1, "name": "Home", "item": "{SITE}/"}},

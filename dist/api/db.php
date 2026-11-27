@@ -271,9 +271,22 @@ function crm_lead_score(array $d): int {
      * Reading the first number restores what the tiers were written for,
      * and is also the conservative reading: someone who picks "20-50" is
      * promising 20, not 50. */
-    preg_match('/\d+/', (string)($d['quantity'] ?? ''), $qm);
+    // Strip thousands separators BEFORE reading the first number. Without
+    // this, "5,000+ pieces" matched the digit 5 and scored zero for quantity,
+    // so the single biggest enquiry type on the site ranked BELOW a 300-piece
+    // one and never crossed the score >= 35 "hot lead" threshold in
+    // admin/index.php. Measured on two real submissions: 300-500 scored 40,
+    // 5,000+ scored 20.
+    $qstr = str_replace([',', ' '], '', (string)($d['quantity'] ?? ''));
+    preg_match('/\d+/', $qstr, $qm);
     $qty = (int)($qm[0] ?? 0);
-    if ($qty >= 100)     { $score += 20; }
+    // The top tier used to be 100, written when this site sold 20 to 100
+    // piece orders. It meant 300 and 10,000 scored identically, so the CRM
+    // could not tell a club order from a distributor programme.
+    if ($qty >= 5000)    { $score += 35; }
+    elseif ($qty >= 1000) { $score += 30; }
+    elseif ($qty >= 300) { $score += 25; }
+    elseif ($qty >= 100) { $score += 20; }
     elseif ($qty >= 50)  { $score += 15; }
     elseif ($qty >= 20)  { $score += 10; }
     if (trim((string)($d['company'] ?? '')) !== '') { $score += 15; }

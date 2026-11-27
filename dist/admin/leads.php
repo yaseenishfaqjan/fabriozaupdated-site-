@@ -111,6 +111,7 @@ adm_head('Leads');
       <td class="p-3 <?= $r['status'] === 'new' ? 'font-bold' : '' ?>">
         <a class="hover:underline" href="/admin/lead.php?id=<?= $r['id'] ?>"><?= e($r['name']) ?></a>
         <?php if (in_array($r['id'], $staleIds)): ?><span class="ml-1 text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded-full font-bold uppercase">needs attention</span><?php endif; ?>
+        <?php if (($r['form_type'] ?? '') === 'custom-fabric'): ?><span class="ml-1 text-[10px] bg-emerald-700 text-white px-1.5 py-0.5 rounded-full font-bold uppercase" title="Custom fabric development, minimum 300 pieces">bulk 300+</span><?php endif; ?>
         <div class="text-xs text-stone-400"><?= e($r['email']) ?></div></td>
       <td class="p-3"><?= e($r['company']) ?></td>
       <td class="p-3 text-xs"><?= e($r['form_type']) ?></td>

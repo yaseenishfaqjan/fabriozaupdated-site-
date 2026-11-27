@@ -19,11 +19,23 @@ RUN a2enmod rewrite headers expires deflate \
 # CRM data dir (named volume mounts here; ownership seeded from the image)
 RUN mkdir -p /var/data && chown www-data:www-data /var/data
 
-# Lead attachments arrive base64-encoded inside the JSON body, so the binding
-# limit is post_max_size, not upload_max_filesize. Base64 is ~4/3 of the raw
-# bytes: a 10 MB file is ~13.4 MB on the wire, and PHP's default post_max_size
-# of 8M would reject it with an empty $_POST and no useful error.
-RUN {       echo 'post_max_size = 24M';       echo 'upload_max_filesize = 12M';       echo 'memory_limit = 128M';       echo 'max_input_time = 120';     } > /usr/local/etc/php/conf.d/fabrioza-uploads.ini
+# TWO upload paths, and they bind on different limits.
+#
+# The contact form posts attachments base64-encoded inside a JSON body, so its
+# binding limit is post_max_size, not upload_max_filesize. Base64 is ~4/3 of
+# the raw bytes, and PHP's default post_max_size of 8M rejected those with an
+# empty $_POST and no useful error.
+#
+# The custom-fabric form posts multipart/form-data instead, because it accepts
+# up to 5 tech packs at 20 MB each. As base64-in-JSON that is ~133 MB held in
+# memory per request; as multipart PHP streams each file straight to a temp
+# file on disk and memory stays flat. post_max_size has to clear the whole
+# multipart body, upload_max_filesize caps one file.
+#
+# memory_limit is 256M as headroom, not because an upload needs it. Measured
+# on the host before raising it: 11,956 MB total with 5,606 MB available
+# across 56 containers.
+RUN {       echo 'post_max_size = 110M';       echo 'upload_max_filesize = 20M';       echo 'memory_limit = 256M';       echo 'max_input_time = 300';       echo 'max_file_uploads = 20';     } > /usr/local/etc/php/conf.d/fabrioza-uploads.ini
 
 COPY dist/ /var/www/html/
 

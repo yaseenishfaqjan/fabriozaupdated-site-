@@ -76,6 +76,10 @@ EN = [
     # is the record of what happens otherwise: the configurator sat at 0 of 224
     # leads while it was linked from 0 navs and 0 footers.
     ('Kit Designer', '/team-designer'),
+    # The premium offer: fabric developed for one brand, 300+ pieces.
+    # In the bar because it is the highest-value enquiry on the site and
+    # an orphaned offer page converts nobody - see the note above.
+    ('Custom Fabric', '/custom-fabric-development'),
     ('Sportswear', '/sportswear-catalog'),
     ('Pricing', '/pricing'),
     ('Samples', '/sample-order'),

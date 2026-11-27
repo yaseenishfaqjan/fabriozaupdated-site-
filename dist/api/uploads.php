@@ -19,7 +19,7 @@
  * reported. An uploaded file is attacker-controlled input.
  */
 
-const CRM_UPLOAD_MAX_BYTES  = 10485760;   // 10 MB per file
+const CRM_UPLOAD_MAX_BYTES  = 20971520;   // 20 MB per file
 const CRM_UPLOAD_MAX_FILES  = 5;
 
 /** Accepted types: leading magic bytes -> canonical extension. */
@@ -153,4 +153,69 @@ function crm_format_bytes(int $b): string {
     if ($b >= 1048576) { return round($b / 1048576, 1) . ' MB'; }
     if ($b >= 1024)    { return round($b / 1024) . ' KB'; }
     return $b . ' B';
+}
+
+/**
+ * Store one MULTIPART upload (a $_FILES entry) against a lead.
+ *
+ * Why this exists next to crm_store_upload(): the contact form posts
+ * attachments base64-encoded in a JSON body, which is fine for a few MB but
+ * holds ~4/3 of the file in memory. The custom-fabric form takes up to five
+ * tech packs at 20 MB, so it posts multipart/form-data instead - PHP streams
+ * each one to a temp file and memory stays flat.
+ *
+ * Validation is identical and deliberately so: magic bytes decide the type,
+ * never the extension the browser reported, and the file is written outside
+ * the web root under CRM_DATA_DIR. The ONLY difference is where the bytes
+ * come from.
+ *
+ * @param array $file one entry of $_FILES, already de-interleaved
+ * @return array{ok:bool, error?:string, id?:int, name?:string, size?:int}
+ */
+function crm_store_uploaded_file(PDO $db, int $leadId, array $file): array {
+    $err = (int)($file['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($err === UPLOAD_ERR_NO_FILE) { return ['ok' => false, 'error' => 'no file']; }
+    if ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE) {
+        return ['ok' => false, 'error' => 'too large'];
+    }
+    if ($err !== UPLOAD_ERR_OK) { return ['ok' => false, 'error' => 'upload failed (' . $err . ')']; }
+
+    $tmp = (string)($file['tmp_name'] ?? '');
+    // is_uploaded_file is the check that stops a crafted path being read off
+    // the server and filed as a customer attachment.
+    if ($tmp === '' || !is_uploaded_file($tmp)) {
+        return ['ok' => false, 'error' => 'not an uploaded file'];
+    }
+    $size = (int)($file['size'] ?? 0);
+    if ($size <= 0) { return ['ok' => false, 'error' => 'empty file']; }
+    if ($size > CRM_UPLOAD_MAX_BYTES) { return ['ok' => false, 'error' => 'too large']; }
+
+    // Sniff from the head only: no reason to read 20 MB to identify a type.
+    $fh = @fopen($tmp, 'rb');
+    if (!$fh) { return ['ok' => false, 'error' => 'unreadable']; }
+    $head = (string)fread($fh, 4096);
+    fclose($fh);
+    $ext = crm_upload_sniff($head);
+    if ($ext === null) { return ['ok' => false, 'error' => 'file type not accepted']; }
+
+    $origName = (string)($file['name'] ?? '');
+    $safeName = preg_replace('/[^A-Za-z0-9._ -]/', '_', basename($origName));
+    $safeName = mb_substr(trim($safeName) ?: "attachment.$ext", 0, 120);
+
+    $dir = crm_upload_dir() . '/' . $leadId;
+    if (!is_dir($dir) && !@mkdir($dir, 0700, true) && !is_dir($dir)) {
+        return ['ok' => false, 'error' => 'storage unavailable'];
+    }
+    $stored = bin2hex(random_bytes(16)) . '.' . $ext;
+    if (!@move_uploaded_file($tmp, $dir . '/' . $stored)) {
+        return ['ok' => false, 'error' => 'could not be saved'];
+    }
+    @chmod($dir . '/' . $stored, 0600);
+
+    $db->prepare('INSERT INTO lead_files (lead_id, orig_name, stored_name, mime, size_bytes)
+                  VALUES (?,?,?,?,?)')
+       ->execute([$leadId, $safeName, $stored, crm_upload_mime($ext), $size]);
+
+    return ['ok' => true, 'id' => (int)$db->lastInsertId(),
+            'name' => $safeName, 'size' => $size];
 }
