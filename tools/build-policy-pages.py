@@ -141,6 +141,24 @@ PAGES = [
                     "factory pakistan",
         "chips": ["Sialkot, Pakistan", "Mon&ndash;Sat 10:00&ndash;19:00 PKT", "Reply in 1 working day"],
     },
+    {
+        "slug": "bulk-clothing-manufacturer",
+        "updated": "2026-11-27",
+        "content": "bulk-clothing-manufacturer.html",
+        "title": "Bulk Clothing Manufacturer | 1,000+ Units, 46% at 5,000",
+        "og_title": "Bulk and Contract Clothing Manufacturing",
+        "h1": "Bulk and Contract Clothing Manufacturing",
+        "tag": "1,000 pieces and up",
+        "form": True,
+        "desc": "Unit prices to 10,000+, 8 production lines, AQL 2.5 inspection "
+                "and Letter of Credit at sight. Test a style at 50 pieces before "
+                "committing to 5,000.",
+        "keywords": "bulk clothing manufacturer, contract clothing manufacturer, "
+                    "wholesale clothing manufacturer, large order clothing "
+                    "manufacturer, 5000 units clothing manufacturer, volume "
+                    "apparel production",
+        "chips": ["1,000 to 10,000+ units", "46% at 5,000 pcs", "L/C at sight"],
+    },
 ]
 
 
@@ -267,7 +285,7 @@ def page_html(p):
    "description": "{p['desc']}",
    "url": "{url}",
    "inLanguage": "en",
-   "dateModified": "2026-11-26",
+   "dateModified": "{p.get('updated', '2026-11-26')}",
    "isPartOf": {{"@id": "{SITE}/#organization"}},
    "publisher": {{"@id": "{SITE}/#organization"}}
   }},
@@ -319,15 +337,18 @@ def page_html(p):
 def main():
     print(f"shell source : {SHELL_SRC.relative_to(REPO)}")
     print(f"style block  : {len(STYLE)} chars")
-    print(f"last updated : {UPDATED}")
     print(f"mode         : {'APPLY' if APPLY else 'DRY RUN'}\n")
 
     for p in PAGES:
         out = DIST / p["slug"] / "index.html"
         html = page_html(p)
 
-        if UPDATED not in html:
-            sys.exit(f"FATAL: {p['slug']} has no 'Last updated: {UPDATED}' line.")
+        # Every page must carry a date, but not all the same one: a page added
+        # later says when IT was written. Asserting one shared constant would
+        # either reject the new page or force a false date onto the old ones.
+        stamp = re.search(r"Last updated: (\d{1,2} \w+ \d{4})", html)
+        if not stamp:
+            sys.exit(f"FATAL: {p['slug']} has no 'Last updated: <date>' line.")
 
         existed = out.exists()
         before = out.stat().st_size if existed else 0
