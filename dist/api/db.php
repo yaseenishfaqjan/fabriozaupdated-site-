@@ -163,6 +163,50 @@ function crm_db(): PDO {
         $pdo->exec('PRAGMA user_version = 7');
         $version = 7;
     }
+
+    if ($version < 8) {
+        // Team Uniform Designer (/team-designer).
+        //
+        // The DESIGN is stored as parameters, never as the SVG the browser
+        // sent. Re-rendering from parameters in admin means no client-supplied
+        // markup is ever written into an admin page, which is the whole class
+        // of stored-XSS this avoids. It also keeps a design re-renderable if
+        // the artwork template changes.
+        //
+        // One row per player rather than a JSON blob: the print pack and the
+        // order sheet both iterate players, and a size summary is a GROUP BY
+        // rather than a parse.
+        $pdo->exec("
+        CREATE TABLE IF NOT EXISTS team_designs (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          reference TEXT NOT NULL,
+          garment TEXT NOT NULL,
+          colours TEXT NOT NULL,
+          font TEXT,
+          text_colour TEXT,
+          outline_colour TEXT,
+          outline_width INTEGER DEFAULT 0,
+          logo_width_cm REAL,
+          logo_upload_id INTEGER,
+          logo_name TEXT
+        );
+        CREATE TABLE IF NOT EXISTS team_roster (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          design_id INTEGER REFERENCES team_designs(id) ON DELETE CASCADE,
+          position INTEGER NOT NULL,
+          player_name TEXT NOT NULL,
+          player_number TEXT,
+          size TEXT
+        );
+        CREATE INDEX IF NOT EXISTS idx_designs_lead   ON team_designs(lead_id);
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_designs_ref ON team_designs(reference);
+        CREATE INDEX IF NOT EXISTS idx_roster_design ON team_roster(design_id);
+        ");
+        $pdo->exec('PRAGMA user_version = 8');
+        $version = 8;
+    }
     return $pdo;
 }
 

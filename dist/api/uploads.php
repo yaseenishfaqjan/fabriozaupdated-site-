@@ -43,6 +43,17 @@ function crm_upload_sniff(string $bytes): ?string {
             }
         }
     }
+    // SVG is text, not a binary with a fixed magic number. Real files start
+    // with a BOM, blank lines or an XML declaration in any combination, so a
+    // strncmp from byte 0 misses most of them. Require BOTH an XML-ish
+    // opening AND a literal <svg element, so an arbitrary XML document
+    // cannot pass as an image.
+    $head = ltrim(substr($bytes, 0, 1024), " \t\r\n\xEF\xBB\xBF");
+    if ($head !== '' && $head[0] === '<'
+        && (strncmp($head, '<svg', 4) === 0 || strncmp($head, '<?xml', 5) === 0)
+        && stripos(substr($bytes, 0, 4096), '<svg') !== false) {
+        return 'svg';
+    }
     return null;
 }
 
@@ -53,6 +64,11 @@ function crm_upload_mime(string $ext): string {
         'pdf' => 'application/pdf',
         'ai'  => 'application/postscript',
         'eps' => 'application/postscript',
+        // Stored as octet-stream ON PURPOSE. An SVG is executable XML and
+        // admin/file.php echoes this header, so octet-stream guarantees it
+        // can only ever download, never render in the admin origin. The
+        // real type stays in the filename.
+        'svg' => 'application/octet-stream',
     ][$ext] ?? 'application/octet-stream';
 }
 
