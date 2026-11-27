@@ -67,6 +67,15 @@ EN = [
     # the wrong call for the one page that turns a browser into a specified
     # enquiry.
     ('Design', '/design'),
+    # /team-designer is the TEAM tool: jersey colours, club logo, and a squad
+    # list that becomes a per-player print pack. Distinct from /design, which
+    # configures one garment. Named "Kit Designer" rather than a second
+    # "Designer" so the two are told apart at a glance in the bar.
+    #
+    # Added to the nav on arrival rather than later, because the comment above
+    # is the record of what happens otherwise: the configurator sat at 0 of 224
+    # leads while it was linked from 0 navs and 0 footers.
+    ('Kit Designer', '/team-designer'),
     ('Sportswear', '/sportswear-catalog'),
     ('Pricing', '/pricing'),
     ('Samples', '/sample-order'),
